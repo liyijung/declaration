@@ -30,7 +30,7 @@ function handleCCCCodeEnter(event, inputElement) {
 }
 
 // 讀取稅則數據
-fetch('./tax_data.json')
+fetch('./HScode_Reg/tax_data.json')
     .then(response => response.json())
     .then(data => {
         console.log("Tax data loaded successfully:", data); // 調試代碼
@@ -43,7 +43,7 @@ let exportRegData = {};
 let taxRegData = {};
 
 // 讀取輸入規定對應表
-fetch('./Reg/IReg.csv')
+fetch('./HScode_Reg/IReg.csv')
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -57,7 +57,7 @@ fetch('./Reg/IReg.csv')
     .catch(error => console.error('載入 IReg.csv 錯誤:', error));
 
 // 讀取輸出規定對應表
-fetch('./Reg/EReg.csv')
+fetch('./HScode_Reg/EReg.csv')
     .then(response => response.text())
     .then(data => {
         exportRegData = parseCSVToObject(data);
@@ -66,7 +66,7 @@ fetch('./Reg/EReg.csv')
     .catch(error => console.error('載入 EReg.csv 錯誤:', error));
 
 // 讀取稽徵規定對應表
-fetch('./Reg/TaxReg.csv')
+fetch('./HScode_Reg/TaxReg.csv')
     .then(response => response.text())
     .then(data => {
         taxRegData = parseCSVToObject(data);
