@@ -254,7 +254,6 @@
                 if (response.ok && data.valid) {
                     showUserInfo(data.username);
                 } else {
-                    alert("登入已過期，請重新登入！");
                     localStorage.removeItem("token"); // 清除過期 Token
                     window.location.href = "index.html"; // 重新導向到登入畫面
                 }
@@ -288,14 +287,13 @@
             const token = localStorage.getItem("token");
             if (!token) {
                 event.preventDefault();
-                alert("請先登入！");
             }
         }
 
         // 自動顯示公告
         setTimeout(() => {
             document.getElementById('announcement-box').style.bottom = '20px';
-        }, 3000);
+        }, 0);
 
         // 點擊關閉
         document.getElementById('close-btn').addEventListener('click', () => {
