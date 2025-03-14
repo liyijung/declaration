@@ -13,6 +13,30 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-control {
+            border-radius: 10px;
+        }
+        .btn-primary {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #007bff;
         }
 
         .container {
@@ -89,14 +113,46 @@
 
 <!-- 🚀 報單管理系統導航列 -->
 <header class="bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center">
-
     <h2 class="m-0">📑 報單系統</h2>
     <nav class="d-flex align-items-center">
-
+        <!-- 🔑 登入按鈕（未登入時顯示） -->
+        <button id="login-btn" class="btn btn-outline-light ms-3" data-bs-toggle="modal" data-bs-target="#loginModal">
+            🔑 登入
+        </button>
+        
+        <!-- 👤 登入後顯示帳號資訊 -->
+        <div id="user-info" class="d-none d-flex align-items-center">
+            <span class="me-3 text-light fw-bold" id="user-name">👤 使用者</span>
+            <button id="logout-btn" class="btn btn-outline-warning">🔓 登出</button>
+        </div>
     </nav>
 </header>
 
 <body>
+
+    <!-- 🔑 登入彈跳框 -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">🔑 登入系統</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="username" placeholder="帳號" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" class="form-control" id="password" placeholder="密碼" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">登入</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container text-center mt-5">
         <div class="row justify-content-center gap-5">
             
@@ -106,7 +162,8 @@
                     <div class="card-body pt-3">
                         <h3 class="card-title text-primary">✈️ 出口報單製作</h3>
                         <p class="card-text">建立出口報單，查看與編輯申報內容。</p>
-                        <a id="export-link" href="Export.html" class="btn btn-primary btn-lg w-100">進入製作</a>
+                        <a id="export-link" href="Export.html" class="btn btn-primary btn-lg w-100"
+                        onclick="checkLogin(event)">進入製作</a>
                     </div>
                 </div>
             </div>
@@ -118,7 +175,7 @@
                         <h3 class="card-title text-success">📦 進口報單製作</h3>
                         <p class="card-text">建立進口報單，查看與編輯申報內容。</p>
                         <a id="import-link" href="Import.html" class="btn btn-success btn-lg w-100
-                        disabled">【建置中】</a> <!-- disabled 避免使用者誤點 -->
+                        disabled" onclick="checkLogin(event)">【建置中】</a> <!-- disabled 避免使用者誤點 -->
                     </div>
                 </div>
             </div>
@@ -147,8 +204,92 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- 公告彈出 JavaScript -->
     <script>
+        const API_URL = "http://127.0.0.1:5000"; // Flask API 伺服器
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById('login-form');
+            const loginBtn = document.getElementById('login-btn');
+            const userInfo = document.getElementById('user-info');
+            const userNameSpan = document.getElementById('user-name');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // 🔍 檢查是否已登入
+            checkLoginStatus();
+
+            // 🔑 登入
+            loginForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                const response = await fetch(`${API_URL}/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.token) {
+                    localStorage.setItem("token", data.token); // 儲存 Token
+                    showUserInfo(username);
+                    closeModal(); // 關閉登入視窗
+                } else {
+                    alert(data.message); // 失敗時顯示錯誤訊息
+                }
+            });
+
+            // ✅ 檢查登入狀態
+            async function checkLoginStatus() {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+
+                const response = await fetch(`${API_URL}/verify`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.valid) {
+                    showUserInfo(data.username);
+                } else {
+                    localStorage.removeItem("token"); // 無效 Token，強制登出
+                }
+            }
+
+            // 🔓 登出
+            logoutBtn.addEventListener('click', function () {
+                localStorage.removeItem("token");
+                window.location.reload();
+            });
+
+            // 🎯 顯示使用者名稱
+            function showUserInfo(username) {
+                loginBtn.classList.add('d-none');
+                userInfo.classList.remove('d-none');
+                userNameSpan.textContent = `👤 ${username}`;
+            }
+
+            // 🎯 關閉登入彈跳視窗
+            function closeModal() {
+                let modal = document.getElementById('loginModal');
+                let modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) modalInstance.hide();
+                document.body.classList.remove('modal-open');
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            }
+        });
+
+        // 🔒 防止未登入進入 `Export.html` 或 `Import.html`
+        function checkLogin(event) {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                event.preventDefault();
+                alert("請先登入！");
+            }
+        }
+
         // xxxx 秒後自動顯示公告
         setTimeout(() => {
             document.getElementById('announcement-box').style.bottom = '20px';
