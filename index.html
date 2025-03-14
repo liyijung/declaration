@@ -287,6 +287,7 @@
             const token = localStorage.getItem("token");
             if (!token) {
                 event.preventDefault();
+                alert("請先登入！");
             }
         }
 
