@@ -27,6 +27,9 @@
                 alert("⚠️ 登入已過期，請重新登入！");
                 localStorage.removeItem("token");
                 window.location.href = "index.html";
+            } else {
+                // 🔄 **自動填入「製單人員」欄位**
+                document.getElementById("Maker").value = data.username;
             }
         });
     </script>
