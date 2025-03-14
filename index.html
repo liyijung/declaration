@@ -254,7 +254,9 @@
                 if (response.ok && data.valid) {
                     showUserInfo(data.username);
                 } else {
-                    localStorage.removeItem("token"); // 無效 Token，強制登出
+                    alert("登入已過期，請重新登入！");
+                    localStorage.removeItem("token"); // 清除過期 Token
+                    window.location.href = "index.html"; // 重新導向到登入畫面
                 }
             }
 
