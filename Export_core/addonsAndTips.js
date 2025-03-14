@@ -13,7 +13,7 @@ function summarizeOrgCountry() {
     // 讀取 countryMapping.csv 文件並解析
     const loadCountryMapping = async () => {
         try {
-            const response = await fetch('./countryMapping.csv');
+            const response = await fetch('./Export_format/countryMapping.csv');
             const csvText = await response.text();
 
             // 解析 CSV 文件
@@ -589,7 +589,7 @@ function validateDclDocType() {
 }
 
 // 長期委任字號：
-const excelFilePath = './出口長委登記表.xlsx';
+const excelFilePath = './Export_format/出口長委登記表.xlsx';
 
 function fetchAndParseExcel(callback) {
     fetch(excelFilePath)
@@ -658,7 +658,7 @@ document.getElementById('SHPR_BAN_ID').addEventListener('input', handleCheck);
 document.getElementById('checkBtn').addEventListener('click', handleCheck);
 
 // 出口備註
-const thingsToNoteExcelFilePath = './thingsToNote.xlsx';
+const thingsToNoteExcelFilePath = './Export_format/thingsToNote.xlsx';
 
 function thingsToNoteExcel(callback) {
     fetch(thingsToNoteExcelFilePath)
