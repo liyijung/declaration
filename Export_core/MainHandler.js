@@ -450,7 +450,7 @@ function clearSHPRFields() {
 
 // 查找未登記公司
 function checkUnregisteredCompany(SHPR_BAN_ID) {
-    fetch('./thingsToNote.xlsx')
+    fetch('./Export_format/thingsToNote.xlsx')
         .then(response => {
             if (!response.ok) throw new Error('無法讀取出口備註');
             return response.arrayBuffer();
