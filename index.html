@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>報單管理系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 🌟 純漸層背景 */
+        body {
+            background: linear-gradient(to bottom, #dfe9f3, #a6c0fe); /* 藍色漸層 */
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            margin-top: 150px;
+            flex: 1; /* 讓主內容填滿 */
+        }
+
+        .card {
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        /* 🛠️ 公告視窗樣式 */
+        #announcement-box {
+            position: fixed;
+            bottom: -150px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9); /* 半透明背景 */
+            border: 2px solid #333;
+            border-radius: 20px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            transition: bottom 1s ease;
+            z-index: 1000;
+            backdrop-filter: blur(5px); /* 模糊效果 */
+        }
+
+        #announcement {
+            font-size: 40px;
+        }
+
+        #message {
+            font-weight: bold;
+            animation: bounce 1s infinite alternate;
+        }
+
+        #close-btn {
+            background: #ff7f7f;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #close-btn:hover {
+            background: #e74c3c;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        /* 📌 頁面底部區塊 */
+        footer {
+            background: #3b3b3b;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<!-- 🚀 報單管理系統導航列 -->
+<header class="bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center">
+
+    <h2 class="m-0">📑 報單系統</h2>
+    <nav class="d-flex align-items-center">
+
+    </nav>
+</header>
+
+<body>
+    <div class="container text-center mt-5">
+        <div class="row justify-content-center gap-5">
+            
+            <!-- 出口報單製作 -->
+            <div class="col-md-5">
+                <div class="card border-primary h-100 shadow">
+                    <div class="card-body pt-3">
+                        <h3 class="card-title text-primary">✈️ 出口報單製作</h3>
+                        <p class="card-text">建立出口報單，查看與編輯申報內容。</p>
+                        <a id="export-link" href="EXport.html" class="btn btn-primary btn-lg w-100">進入製作</a>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- 進口報單製作 -->
+            <div class="col-md-5">
+                <div class="card border-success h-100 shadow">
+                    <div class="card-body pt-3">
+                        <h3 class="card-title text-success">📦 進口報單製作</h3>
+                        <p class="card-text">建立進口報單，查看與編輯申報內容。</p>
+                        <a id="import-link" href="IMport.html" class="btn btn-success btn-lg w-100
+                        disabled">【建置中】</a> <!-- disabled 避免使用者誤點 -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 🛠️ 公告區 -->
+    <div id="announcement-box">
+        <div id="announcement">📢</div>
+        <div id="message">
+            🌐 重要通知：本系統即將更換網址！<br>
+            <a href="https://liyijung.github.io/declarationForm/EXport" target="_blank" 
+                style="color: #007bff; font-weight: bold; display: inline-block; margin-top: 5px;">
+                👉 點此前往新網站
+            </a>
+        </div>
+        <button id="close-btn">關閉</button>
+    </div>
+
+    <!-- 📌 頁面底部資訊 -->
+    <footer>
+        <p style="text-align: left;">版本號：v1.0.0</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 公告彈出 JavaScript -->
+    <script>
+        // xxxx 秒後自動顯示公告
+        setTimeout(() => {
+            document.getElementById('announcement-box').style.bottom = '20px';
+        }, 0);
+
+        // 點擊關閉
+        document.getElementById('close-btn').addEventListener('click', () => {
+            document.getElementById('announcement-box').style.bottom = '-150px';
+        });
+    </script>
+    
+</body>
+</html>
