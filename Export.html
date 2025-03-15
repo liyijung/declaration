@@ -8,6 +8,11 @@
 </head>
 <body>
     <script>
+
+        const API_URL = window.location.origin.includes("github.io") || window.location.origin.includes("netlify.app")
+            ? "https://declaration-wsmf.onrender.com"  // 🔹 Flask API 網址
+            : "http://127.0.0.1:5000";  // 🔹 本機開發環境
+
         document.addEventListener("DOMContentLoaded", async function () {
             const token = localStorage.getItem("token");
     
@@ -15,7 +20,7 @@
                 window.location.href = "index.html";
             }
     
-            const response = await fetch("http://127.0.0.1:5000/verify", {
+        const response = await fetch(`${API_URL}/verify`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token })
