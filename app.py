@@ -85,22 +85,18 @@ def verify():
 
     token = auth_header.split(" ")[1]
 
+    if token in revoked_tokens:  # 🛑 若 Token 在黑名單，則拒絕請求
+        return jsonify({"valid": False, "message": "Token 已失效"}), 401
+
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"], options={"require": ["exp"]})
-        roles = get_user_role(decoded["username"])
+        username = decoded["username"]
 
-        # 判斷是否應該禁用按鈕
-        export_disabled = "export" not in roles
-        import_disabled = "import" not in roles
+        users = get_users()
+        if username not in users:  # 🛑 檢查使用者是否已刪除
+            return jsonify({"valid": False, "message": "帳戶不存在"}), 401
 
-        return jsonify({
-            "valid": True,
-            "username": decoded["username"],
-            "roles": roles,
-            "export_disabled": export_disabled,
-            "import_disabled": import_disabled
-        })
-
+        return jsonify({"valid": True, "username": username})
     except jwt.ExpiredSignatureError:
         return jsonify({"valid": False, "message": "Token 已過期"}), 401
     except jwt.InvalidTokenError:
@@ -123,10 +119,10 @@ def refresh():
         if username not in users or not users[username]:
             return jsonify({"valid": False, "message": "驗證失敗"}), 401
 
-        # 🔄 **產生新的 Token，延長 12 小時**
+        # 🔄 **產生新的 Token，延長 1 小時**
         new_token = jwt.encode({
             "username": username,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }, SECRET_KEY, algorithm="HS256")
 
         return jsonify({"token": new_token})
@@ -136,9 +132,14 @@ def refresh():
     except jwt.InvalidTokenError:
         return jsonify({"valid": False, "message": "無效的 Token"}), 401
 
-# 🔓 **登出 API**
+revoked_tokens = set()  # 存放已登出的 Token
+
 @app.route('/logout', methods=['POST'])
 def logout():
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        revoked_tokens.add(token)  # 🛑 把 Token 加入黑名單
     return jsonify({"message": "登出成功"})
 
 # ✅ **啟動 Flask 伺服器**
