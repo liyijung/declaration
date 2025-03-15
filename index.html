@@ -272,11 +272,25 @@
             }
 
             // 🔓 登出
-            logoutBtn.addEventListener('click', function () {
+            logoutBtn.addEventListener('click', async function () {
+                const token = localStorage.getItem("token");
+
+                if (token) {
+                    await fetch(`${API_URL}/logout`, {
+                        method: "POST",
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                }
+
+                // 清除本地 Token
                 localStorage.removeItem("token");
                 sessionStorage.removeItem("loggedInUser");
+
+                // 更新 UI
                 loginBtn.classList.remove('d-none');
                 userInfo.classList.add('d-none');
+
+                // 重新載入頁面
                 window.location.reload();
             });
 
