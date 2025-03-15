@@ -6,25 +6,24 @@ import os
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet
 
-# 🔑 讀取 `.env` 檔案的環境變數（確保 Flask 可以讀取密碼、密鑰等）
+# 讀取 `.env` 變數
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # ✅ 允許前端（如 GitHub Pages）請求後端 API
 
 # 🔐 取得環境變數中的密鑰
-SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")  # JWT 加密密鑰
-ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY")  # 密碼加密用的 Fernet 金鑰
+SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
+ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY")
 
 # 🚨 **檢查 `ENCRYPTION_KEY` 是否存在，若未設定則報錯**
 if not ENCRYPTION_KEY:
-    raise ValueError("❌ 錯誤：ENCRYPTION_KEY 未設置！請在 `.env` 檔案內添加此金鑰！")
+    raise ValueError("❌ 錯誤：ENCRYPTION_KEY 未設置！")
 
-# 🔐 建立 Fernet 加密物件，用來加密/解密密碼
+# 🔐 建立 Fernet 加密物件
 cipher_suite = Fernet(ENCRYPTION_KEY.encode())
 
 # 🛠 **解密密碼**
-# 此函式用來解密 `.env` 內儲存的密碼
 def decrypt_password(encrypted_password):
     if not encrypted_password:  # 避免 `None` 傳入 Fernet，導致錯誤
         return None
@@ -33,40 +32,49 @@ def decrypt_password(encrypted_password):
     except Exception:
         return None  # 如果解密失敗，回傳 None，避免程式崩潰
 
-# 🔒 **取得帳號密碼（從 `.env` 讀取並解密）**
+# 🔒 取得帳號密碼
 def get_users():
-    return {
-        "Eva": decrypt_password(os.getenv("USER_EVA", "")),  # 讀取並解密 `Eva` 的密碼
-        "Admin": decrypt_password(os.getenv("USER_ADMIN", ""))  # 讀取並解密 `Admin` 的密碼
-    }
+    users = {}
 
-# 🔍 **取得帳號的權限**
-# 例如 `.env` 內 `ROLE_EVA=export`，則 `Eva` 的權限為 `export`
+    for key, value in os.environ.items():
+        if key.startswith("USERNAME_"):
+            user_index = key.split("_")[-1]
+            username = value
+            password = decrypt_password(os.getenv(f"USER_{user_index}", ""))
+            if username and password:
+                users[username] = password
+    return users
+
+# 🔍 取得使用者權限
 def get_user_role(username):
-    return os.getenv(f"ROLE_{username.upper()}", "user").lower()
+    for key, value in os.environ.items():
+        if key.startswith("USERNAME_") and value == username:
+            user_index = key.split("_")[-1]
+            role = os.getenv(f"ROLE_{user_index}", "").lower()
+            if role == "manager":
+                return ["manager", "export", "import"]
+            return [role] if role else []
+    return []
 
 # 🔑 **登入 API**
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
-    username = data.get("username")  # 取得使用者輸入的帳號
-    password = data.get("password")  # 取得使用者輸入的密碼
-    
-    users = get_users()  # 取得所有帳號的密碼
-    stored_password = users.get(username)  # 取得該帳號的密碼
+    username = data.get("username")
+    password = data.get("password")
 
-    # 🛠 **密碼驗證**
-    # 🔹 我們使用 Fernet 加密，所以直接比對解密後的密碼
-    # 🔹 如果密碼匹配，則發送 JWT Token
+    users = get_users()
+    stored_password = users.get(username)
+
     if stored_password and password == stored_password:
         token = jwt.encode({
             "username": username,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)  # Token 12 小時後過期
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
         }, SECRET_KEY, algorithm="HS256")
 
-        return jsonify({"token": token})  # ✅ 回傳 Token，讓前端存起來
+        return jsonify({"token": token})
 
-    return jsonify({"message": "登入失敗"}), 401  # ❌ 錯誤：帳號或密碼錯誤
+    return jsonify({"message": "登入失敗"}), 401
 
 # 🔍 **驗證 Token API（確保使用者登入狀態）**
 @app.route('/verify', methods=['POST'])
@@ -75,11 +83,24 @@ def verify():
     if not auth_header or not auth_header.startswith("Bearer "):
         return jsonify({"valid": False, "message": "缺少 Token"}), 401
 
-    token = auth_header.split(" ")[1]  # 取得 Bearer <TOKEN>
+    token = auth_header.split(" ")[1]
 
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"], options={"require": ["exp"]})
-        return jsonify({"valid": True, "username": decoded["username"], "role": get_user_role(decoded["username"])})
+        roles = get_user_role(decoded["username"])
+
+        # 判斷是否應該禁用按鈕
+        export_disabled = "export" not in roles
+        import_disabled = "import" not in roles
+
+        return jsonify({
+            "valid": True,
+            "username": decoded["username"],
+            "roles": roles,
+            "export_disabled": export_disabled,
+            "import_disabled": import_disabled
+        })
+
     except jwt.ExpiredSignatureError:
         return jsonify({"valid": False, "message": "Token 已過期"}), 401
     except jwt.InvalidTokenError:
@@ -118,9 +139,9 @@ def refresh():
 # 🔓 **登出 API**
 @app.route('/logout', methods=['POST'])
 def logout():
-    return jsonify({"message": "登出成功"})  # 登出只需要刪除前端的 Token，後端不需特別處理
+    return jsonify({"message": "登出成功"})
 
 # ✅ **啟動 Flask 伺服器**
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # 🛠️ Render 會提供 `PORT`，本機則用 `5000`
+    port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host='0.0.0.0', port=port)
