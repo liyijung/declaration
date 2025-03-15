@@ -71,11 +71,12 @@ def login():
 # 🔍 **驗證 Token API（確保使用者登入狀態）**
 @app.route('/verify', methods=['POST'])
 def verify():
-    auth_header = request.headers.get("Authorization")  # ✅ 從 Header 取得 Token
+    auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         return jsonify({"valid": False, "message": "缺少 Token"}), 401
 
-    token = auth_header.split(" ")[1]  # 🔹 從 `Bearer <TOKEN>` 提取 Token
+    token = auth_header.split(" ")[1]  # 取得 Bearer <TOKEN>
+
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"], options={"require": ["exp"]})
         return jsonify({"valid": True, "username": decoded["username"], "role": get_user_role(decoded["username"])})
