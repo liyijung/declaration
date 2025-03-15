@@ -204,6 +204,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- 🔍 權限與登入管理 -->
     <script>
         // 🔍 自動偵測 Flask API 伺服器
         const API_URL = window.location.origin.includes("github.io") || window.location.origin.includes("netlify.app")
@@ -254,8 +255,7 @@
                 // 🛠️ 確保 Token 有效
                 const response = await fetch(`${API_URL}/verify`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token })
+                    headers: { "Authorization": `Bearer ${token}` }
                 });
 
                 const data = await response.json();
@@ -288,11 +288,10 @@
 
                 fetch(`${API_URL}/verify`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: localStorage.getItem("token") })
+                    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
                 }).then(res => res.json()).then(data => {
                     if (data.role) {
-                        userNameSpan.textContent += `（${data.role.toUpperCase()}）`;
+                        userNameSpan.textContent += `（${data.roles.join(", ").toUpperCase()}）`;
                     }
                 });
             }
