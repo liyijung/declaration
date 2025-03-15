@@ -69,7 +69,7 @@ def login():
     if stored_password and password == stored_password:
         token = jwt.encode({
             "username": username,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }, SECRET_KEY, algorithm="HS256")
 
         return jsonify({"token": token})
