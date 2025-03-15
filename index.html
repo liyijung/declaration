@@ -174,8 +174,9 @@
                     <div class="card-body pt-3">
                         <h3 class="card-title text-success">📦 進口報單製作</h3>
                         <p class="card-text">建立進口報單，查看與編輯申報內容。</p>
-                        <a id="import-link" href="Import.html" class="btn btn-success btn-lg w-100"
-                        onclick="checkLogin(event)">【建置中】</a> <!-- 若加 disabled 可避免使用者誤點 -->
+                        <a id="import-link" href="#" class="btn btn-success btn-lg w-100"
+                            onclick="checkLogin(event, 'Import.html')">【建置中】</a>
+                            <!-- 若加 disabled 可避免使用者誤點 -->
                     </div>
                 </div>
             </div>
@@ -224,8 +225,8 @@
             // 🔑 登入
             loginForm.addEventListener('submit', async function (event) {
                 event.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
 
                 const response = await fetch(`${API_URL}/login`, {
                     method: "POST",
@@ -237,6 +238,8 @@
                 if (response.ok && data.token) {
                     localStorage.setItem("token", data.token);
                     sessionStorage.setItem("loggedInUser", username); // 保持登入狀態
+                    sessionStorage.setItem("userRoles", JSON.stringify(data.roles || [])); // ✅ 立即更新角色
+                    
                     showUserInfo(username);
                     closeModal(); 
                 } else {
@@ -245,14 +248,17 @@
 
             });
 
-            // ✅ 檢查登入狀態
             async function checkLoginStatus() {
                 const token = localStorage.getItem("token");
                 if (!token) {
                     return;
                 }
 
-                // 🛠️ 確保 Token 有效
+                // 🛠️ 確保清除舊的角色資訊，避免殘留
+                sessionStorage.removeItem("loggedInUser");
+                sessionStorage.removeItem("userRoles");
+                
+                // 🛠️ 向後端請求驗證 Token
                 const response = await fetch(`${API_URL}/verify`, {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${token}` }
@@ -261,14 +267,14 @@
                 const data = await response.json();
                 if (!response.ok || !data.valid) {
                     localStorage.removeItem("token");
-                    sessionStorage.removeItem("loggedInUser");
+                    sessionStorage.clear();
                 } else {
-                    showUserInfo(sessionStorage.getItem("loggedInUser"));
+                    // **✅ 確保覆蓋舊的角色資訊**
+                    sessionStorage.setItem("loggedInUser", data.username);
+                    sessionStorage.setItem("userRoles", JSON.stringify(data.roles || [])); // 🛠️ 確保角色為陣列
+                    
+                    showUserInfo(data.username);
                 }
-            }
-
-            if (sessionStorage.getItem("loggedInUser")) {
-                showUserInfo(sessionStorage.getItem("loggedInUser"));
             }
 
             // 🔓 登出
@@ -326,9 +332,29 @@
             if (!token) {
                 event.preventDefault();
                 alert("請先登入！");
-            } else {
-                window.location.href = page;
+                return;
             }
+
+            // 🛠️ 取得角色資訊，並確保 JSON 解析不會出錯
+            const userRolesString = sessionStorage.getItem("userRoles");
+            const userRoles = userRolesString && userRolesString !== "" ? JSON.parse(userRolesString) : [];
+
+            console.log("🔎 目前使用者角色:", userRoles);  // 確認前端是否獲取最新的角色
+
+            // 角色權限檢查
+            if (page.includes("Export") && !userRoles.includes("export")) {
+                event.preventDefault();
+                alert("❌ 無出口權限！");
+                return;
+            }
+            if (page.includes("Import") && !userRoles.includes("import")) {
+                event.preventDefault();
+                alert("❌ 無進口權限！");
+                return;
+            }
+
+            // 如果權限允許，導向指定頁面
+            window.location.href = page;
         }
 
         // 公告視窗
