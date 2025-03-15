@@ -11,12 +11,7 @@ from cryptography.fernet import Fernet
 # 🔑 讀取 `.env` 配置
 load_dotenv()
 
-app = Flask(__name__, static_folder="static", template_folder="templates")
-
-@app.route("/")
-def home():
-    return render_template("index.html")  # 讓 Flask 回傳 index.html
-    
+app = Flask(__name__)
 CORS(app)  # 允許跨域請求 (允許前端從 GitHub 呼叫 Flask API)
 
 SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")  # 環境變數內的密鑰
