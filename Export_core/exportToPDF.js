@@ -49,8 +49,8 @@ async function exportToPDF() {
         doc.setTextColor(0, 0, 0); // 黑色
 
         // 加載模板 PDF
-        const templateHomeBytes = await fetch('Template_Home.pdf').then(res => res.arrayBuffer());
-        const templateContinuationBytes = await fetch('Template_Continuation.pdf').then(res => res.arrayBuffer());
+        const templateHomeBytes = await fetch('./Export_format/Template_Home.pdf').then(res => res.arrayBuffer());
+        const templateContinuationBytes = await fetch('./Export_format/Template_Continuation.pdf').then(res => res.arrayBuffer());
 
         const templateHome = await pdfjsLib.getDocument({ data: templateHomeBytes }).promise;
         const templateContinuation = await pdfjsLib.getDocument({ data: templateContinuationBytes }).promise;
