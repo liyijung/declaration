@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>報單系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 🌟 純漸層背景 */
+        body {
+            background: linear-gradient(to bottom, #dfe9f3, #a6c0fe); /* 藍色漸層 */
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-control {
+            border-radius: 10px;
+        }
+        .btn-primary {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .container {
+            margin-top: 150px;
+            flex: 1; /* 讓主內容填滿 */
+        }
+
+        .card {
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        /* 🛠️ 公告視窗樣式 */
+        #announcement-box {
+            position: fixed;
+            bottom: -150px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9); /* 半透明背景 */
+            border: 2px solid #333;
+            border-radius: 20px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            transition: bottom 1s ease;
+            z-index: 1000;
+            backdrop-filter: blur(5px); /* 模糊效果 */
+        }
+
+        #announcement {
+            font-size: 40px;
+        }
+
+        #message {
+            font-weight: bold;
+            animation: bounce 1s infinite alternate;
+        }
+
+        #close-btn {
+            background: #ff7f7f;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #close-btn:hover {
+            background: #e74c3c;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        /* 📌 頁面底部區塊 */
+        footer {
+            background: #3b3b3b;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<!-- 🚀 報單管理系統導航列 -->
+<header class="bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center">
+    <h2 class="m-0">📑 報單系統</h2>
+    <nav class="d-flex align-items-center">
+        <!-- 🔑 登入按鈕（未登入時顯示） -->
+        <button id="login-btn" class="btn btn-outline-light ms-3" data-bs-toggle="modal" data-bs-target="#loginModal">
+            🔑 登入
+        </button>
+        
+        <!-- 👤 登入後顯示帳號資訊 -->
+        <div id="user-info" class="d-none d-flex align-items-center">
+            <span class="me-3 text-light fw-bold" id="user-name">👤 使用者</span>
+            <button id="logout-btn" class="btn btn-outline-warning">🔓 登出</button>
+        </div>
+    </nav>
+</header>
+
+<body>
+
+    <!-- 🔑 登入彈跳框 -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">🔑 登入系統</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="username" placeholder="帳號" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" class="form-control" id="password" placeholder="密碼" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">登入</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container text-center mt-5">
+        <div class="row justify-content-center gap-5">
+            
+            <!-- 出口報單製作 -->
+            <div class="col-md-5">
+                <div class="card border-primary h-100 shadow">
+                    <div class="card-body pt-3">
+                        <h3 class="card-title text-primary">✈️ 出口報單製作</h3>
+                        <p class="card-text">建立出口報單，查看與編輯申報內容。</p>
+                        <a id="export-link" href="Export.html" class="btn btn-primary btn-lg w-100"
+                        onclick="checkLogin(event)">進入製作</a>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- 進口報單製作 -->
+            <div class="col-md-5">
+                <div class="card border-success h-100 shadow">
+                    <div class="card-body pt-3">
+                        <h3 class="card-title text-success">📦 進口報單製作</h3>
+                        <p class="card-text">建立進口報單，查看與編輯申報內容。</p>
+                        <a id="import-link" href="Import.html" class="btn btn-success btn-lg w-100
+                        disabled" onclick="checkLogin(event)">【建置中】</a> <!-- disabled 避免使用者誤點 -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 🛠️ 公告區 -->
+    <div id="announcement-box">
+        <div id="announcement">📢</div>
+        <div id="message">
+            🌐 重要通知：本系統即將更換網址！<br>
+            <a href="https://liyijung.github.io/declaration/Export" target="_blank" 
+                style="color: #007bff; font-weight: bold; display: inline-block; margin-top: 5px;">
+                👉 點此前往新網站
+            </a>
+        </div>
+        <button id="close-btn">關閉</button>
+    </div>
+
+    <!-- 📌 頁面底部資訊 -->
+    <footer>
+        <p style="text-align: left;">版本號：v1.0.0</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const API_URL = "http://127.0.0.1:5000"; // Flask API 伺服器
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById('login-form');
+            const loginBtn = document.getElementById('login-btn');
+            const userInfo = document.getElementById('user-info');
+            const userNameSpan = document.getElementById('user-name');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // 🔍 檢查是否已登入
+            checkLoginStatus();
+
+            // 🔑 登入
+            loginForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                const response = await fetch(`${API_URL}/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.token) {
+                    localStorage.setItem("token", data.token); // 儲存 Token
+                    showUserInfo(username);
+                    closeModal(); // 關閉登入視窗
+                } else {
+                    alert(data.message); // 失敗時顯示錯誤訊息
+                }
+            });
+
+            // ✅ 檢查登入狀態
+            async function checkLoginStatus() {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+
+                const response = await fetch(`${API_URL}/verify`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.valid) {
+                    showUserInfo(data.username);
+                } else {
+                    localStorage.removeItem("token"); // 清除過期 Token
+                    window.location.href = "index.html"; // 重新導向到登入畫面
+                }
+            }
+
+            // 🔓 登出
+            logoutBtn.addEventListener('click', function () {
+                localStorage.removeItem("token");
+                window.location.reload();
+            });
+
+            // 🎯 顯示使用者名稱
+            function showUserInfo(username) {
+                loginBtn.classList.add('d-none');
+                userInfo.classList.remove('d-none');
+                userNameSpan.textContent = `👤 ${username}`;
+            }
+
+            // 🎯 關閉登入彈跳視窗
+            function closeModal() {
+                let modal = document.getElementById('loginModal');
+                let modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) modalInstance.hide();
+                document.body.classList.remove('modal-open');
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            }
+        });
+
+        // 🔒 防止未登入進入 `Export.html` 或 `Import.html`
+        function checkLogin(event) {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                event.preventDefault();
+                alert("請先登入！");
+            }
+        }
+
+        // 自動顯示公告
+        setTimeout(() => {
+            document.getElementById('announcement-box').style.bottom = '20px';
+        }, 0);
+
+        // 點擊關閉
+        document.getElementById('close-btn').addEventListener('click', () => {
+            document.getElementById('announcement-box').style.bottom = '-150px';
+        });
+    </script>
+    
+</body>
+</html>
