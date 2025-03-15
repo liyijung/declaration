@@ -51,9 +51,15 @@ def get_user_role(username):
         if key.startswith("USERNAME_") and value == username:
             user_index = key.split("_")[-1]
             role = os.getenv(f"ROLE_{user_index}", "").lower()
+
+            # 🔹 修正：確保 `role` 不會是空字串
             if role == "manager":
                 return ["manager", "export", "import"]
-            return [role] if role else []
+            elif role == "export":
+                return ["export"]
+            elif role == "import":
+                return ["import"]
+            return []  # 🛑 確保不是 `""` 而是 `[]`
     return []
 
 # 🔑 **登入 API**
@@ -67,12 +73,13 @@ def login():
     stored_password = users.get(username)
 
     if stored_password and password == stored_password:
+        roles = get_user_role(username)  # ✅ 獲取角色
         token = jwt.encode({
             "username": username,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
         }, SECRET_KEY, algorithm="HS256")
 
-        return jsonify({"token": token})
+        return jsonify({"token": token, "roles": roles})  # ✅ 一併回傳角色資訊
 
     return jsonify({"message": "登入失敗"}), 401
 
@@ -85,18 +92,22 @@ def verify():
 
     token = auth_header.split(" ")[1]
 
-    if token in revoked_tokens:  # 🛑 若 Token 在黑名單，則拒絕請求
-        return jsonify({"valid": False, "message": "Token 已失效"}), 401
-
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"], options={"require": ["exp"]})
         username = decoded["username"]
 
         users = get_users()
-        if username not in users:  # 🛑 檢查使用者是否已刪除
+        if username not in users:  # 🛑 若帳號已刪除，則拒絕請求
             return jsonify({"valid": False, "message": "帳戶不存在"}), 401
 
-        return jsonify({"valid": True, "username": username})
+        roles = get_user_role(username)  # ✅ 確保這裡回傳的是最新的角色資訊
+        
+        return jsonify({
+            "valid": True,
+            "username": username,
+            "roles": roles if roles else []  # 🔹 確保 roles 不會是 None 或空字串
+        })
+
     except jwt.ExpiredSignatureError:
         return jsonify({"valid": False, "message": "Token 已過期"}), 401
     except jwt.InvalidTokenError:
