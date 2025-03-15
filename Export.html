@@ -7,36 +7,6 @@
     <link rel="stylesheet" href="Export_format/styles.css">
 </head>
 <body>
-    <script>
-
-        const API_URL = window.location.origin.includes("github.io") || window.location.origin.includes("netlify.app")
-            ? "https://declaration-wsmf.onrender.com"  // 🔹 Flask API 網址
-            : "http://127.0.0.1:5000";  // 🔹 本機開發環境
-
-        document.addEventListener("DOMContentLoaded", async function () {
-            const token = localStorage.getItem("token");
-    
-            if (!token) {
-                window.location.href = "index.html";
-            }
-    
-        const response = await fetch(`${API_URL}/verify`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token })
-            });
-    
-            const data = await response.json();
-            if (!response.ok || !data.valid) {
-                localStorage.removeItem("token");
-                window.location.href = "index.html";
-            } else {
-                // 🔄 **自動填入「製單人員」欄位**
-                document.getElementById("Maker").value = data.username;
-            }
-        });
-    </script>
-    
     <!--固定在頁面頂部-->
     <div class="tabs-wrapper">
         <div class="tabs">
@@ -1144,18 +1114,62 @@ Alt + 2 指定項次">攤重</button>
         生成 PDF 需等候，請勿重複點選。
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script>
+        // ✅ 設定 Flask API 伺服器網址（避免多次運行 `window.location.origin.includes`）
+        const API_URL = location.origin.includes("github.io") || location.origin.includes("netlify.app")
+            ? "https://declaration-wsmf.onrender.com"  // 🔹 Render 部署的 Flask API
+            : "http://127.0.0.1:5000";  // 🔹 本機開發環境
+
+        // ✅ 頁面載入時檢查登入狀態
+        document.addEventListener("DOMContentLoaded", async function () {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                window.location.href = "index.html"; // 🔴 未登入 → 跳轉回首頁
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/verify`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                const data = await response.json();
+                if (!response.ok || !data.valid) {
+                    localStorage.removeItem("token");
+                    window.location.href = "index.html";
+                } else {
+                    // 🔄 **自動填入「製單人員」欄位**
+                    document.getElementById("Maker").value = data.username;
+                }
+            } catch (error) {
+                console.error("登入驗證失敗:", error);
+                localStorage.removeItem("token");
+                window.location.href = "index.html";
+            }
+        });
+    </script>
+
+    <!-- ✅ 外部函式庫（載入順序：先基礎工具類，後進階功能） -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
+
+    <!-- ✅ UI & 工具 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js" defer></script>
+
+    <!-- ✅ 核心功能（載入順序：主處理器 -> 各個模組） -->
     <script src="Export_core/MainHandler.js" defer></script>
     <script src="Export_core/addonsAndTips.js" defer></script>
     <script src="Export_core/cccCode.js" defer></script>
@@ -1169,6 +1183,7 @@ Alt + 2 指定項次">攤重</button>
     <script src="Export_core/xmlHandler.js" defer></script>
     <script src="Export_core/exportToPDF.js" defer></script>
 
+    <!-- ✅ 特定客戶轉換規則 -->
     <script src="transfer-customer/22099408.js" defer></script>
     <script src="transfer-customer/23570158.js" defer></script>
     <script src="transfer-customer/27951609.js" defer></script>
