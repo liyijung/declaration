@@ -69,7 +69,7 @@ def login():
     if stored_password and password == stored_password:
         token = jwt.encode({
             "username": username,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
         }, SECRET_KEY, algorithm="HS256")
 
         return jsonify({"token": token})
@@ -122,7 +122,7 @@ def refresh():
         # 🔄 **產生新的 Token，延長 1 小時**
         new_token = jwt.encode({
             "username": username,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
         }, SECRET_KEY, algorithm="HS256")
 
         return jsonify({"token": new_token})
