@@ -234,19 +234,20 @@
 
                 const data = await response.json();
                 if (response.ok && data.token) {
-                    localStorage.setItem("token", data.token); // 儲存 Token
+                    localStorage.setItem("token", data.token);
+                    sessionStorage.setItem("loggedInUser", username); // 保持登入狀態
                     showUserInfo(username);
-                    closeModal(); // 關閉登入視窗
+                    closeModal(); 
                 } else {
                     alert(data.message); // 失敗時顯示錯誤訊息
                 }
+
             });
 
             // ✅ 檢查登入狀態
             async function checkLoginStatus() {
                 const token = localStorage.getItem("token");
                 if (!token) {
-                    event.preventDefault();
                     return;
                 }
 
@@ -260,37 +261,40 @@
                 const data = await response.json();
                 if (!response.ok || !data.valid) {
                     localStorage.removeItem("token");
-                    event.preventDefault();
-                    window.location.href = "index.html";
+                    sessionStorage.removeItem("loggedInUser");
                 } else {
-                    window.location.href = page;
+                    showUserInfo(sessionStorage.getItem("loggedInUser"));
                 }
+            }
+
+            if (sessionStorage.getItem("loggedInUser")) {
+                showUserInfo(sessionStorage.getItem("loggedInUser"));
             }
 
             // 🔓 登出
             logoutBtn.addEventListener('click', function () {
                 localStorage.removeItem("token");
+                sessionStorage.removeItem("loggedInUser");
                 loginBtn.classList.remove('d-none');
                 userInfo.classList.add('d-none');
+                window.location.reload();
             });
 
             // 🎯 顯示使用者名稱
-            async function showUserInfo(username) {
+            function showUserInfo(username) {
                 loginBtn.classList.add('d-none');
                 userInfo.classList.remove('d-none');
                 userNameSpan.textContent = `👤 ${username}`;
 
-                // 🎯 顯示使用者權限
-                const response = await fetch(`${API_URL}/verify`, {
+                fetch(`${API_URL}/verify`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ token: localStorage.getItem("token") })
+                }).then(res => res.json()).then(data => {
+                    if (data.role) {
+                        userNameSpan.textContent += `（${data.role.toUpperCase()}）`;
+                    }
                 });
-
-                const data = await response.json();
-                if (response.ok && data.role) {
-                    userNameSpan.textContent += `（${data.role.toUpperCase()}）`;
-                }
             }
 
             // 🎯 關閉登入彈跳視窗
@@ -304,22 +308,23 @@
         });
 
         // 🔒 防止未登入進入 `Export.html` 或 `Import.html`
-        function checkLogin(event) {
+        function checkLogin(event, page) {
             const token = localStorage.getItem("token");
             if (!token) {
                 event.preventDefault();
                 alert("請先登入！");
+            } else {
+                window.location.href = page;
             }
         }
 
-        // 自動顯示公告
+        // 公告視窗
         setTimeout(() => {
             document.getElementById('announcement-box').style.bottom = '20px';
-        }, 0);
-
-        // 點擊關閉
+        }, 1000);
+        
         document.getElementById('close-btn').addEventListener('click', () => {
-            document.getElementById('announcement-box').style.bottom = '-150px';
+            document.getElementById('announcement-box').style.bottom = '-100%';
         });
     </script>
     
