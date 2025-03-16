@@ -207,126 +207,88 @@
 
     <!-- 🔍 權限與登入管理 -->
     <script>
-        // 🔍 自動偵測 Flask API 伺服器
-        const API_URL = window.location.origin.includes("github.io") || window.location.origin.includes("netlify.app")
-            ? "https://declaration-wsmf.onrender.com"
-            : "http://127.0.0.1:5000"; // 本機測試
-
+        const API_URL = "http://127.0.0.1:5000";  // 本地端測試用，請根據實際環境修改
+    
         document.addEventListener("DOMContentLoaded", function () {
-            const loginForm = document.getElementById('login-form');
-            const loginBtn = document.getElementById('login-btn');
-            const userInfo = document.getElementById('user-info');
-            const userNameSpan = document.getElementById('user-name');
-            const logoutBtn = document.getElementById('logout-btn');
-
-            // 🔍 檢查是否已登入
             checkLoginStatus();
-
-            // 🔑 登入
-            loginForm.addEventListener('submit', async function (event) {
+    
+            // 🛠️ 登入表單送出
+            document.getElementById("login-form").addEventListener("submit", async function (event) {
                 event.preventDefault();
                 const username = document.getElementById("username").value;
                 const password = document.getElementById("password").value;
-
+    
                 const response = await fetch(`${API_URL}/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ username, password })
                 });
-
+    
                 const data = await response.json();
                 if (response.ok && data.token) {
                     localStorage.setItem("token", data.token);
-                    sessionStorage.setItem("loggedInUser", username); // 保持登入狀態
-                    sessionStorage.setItem("userRoles", JSON.stringify(data.roles || [])); // ✅ 立即更新角色
-                    
-                    showUserInfo(username);
-                    closeModal(); 
-                } else {
-                    alert(data.message); // 失敗時顯示錯誤訊息
-                }
+                    sessionStorage.setItem("loggedInUser", username);
+                    sessionStorage.setItem("userRoles", JSON.stringify(data.roles || []));
+                    sessionStorage.setItem("Maker", username); // ✅ 也存入 Maker
 
+                    showUserInfo(username, data.roles);
+                    closeLoginModal(); // ✅ 關閉彈跳框
+                } else {
+                    alert("登入失敗，請檢查帳號密碼");
+                }
             });
-
-            async function checkLoginStatus() {
-                const token = localStorage.getItem("token");
-                if (!token) {
-                    return;
-                }
-
-                // 🛠️ 確保清除舊的角色資訊，避免殘留
-                sessionStorage.removeItem("loggedInUser");
-                sessionStorage.removeItem("userRoles");
-                
-                // 🛠️ 向後端請求驗證 Token
-                const response = await fetch(`${API_URL}/verify`, {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-
-                const data = await response.json();
-                if (!response.ok || !data.valid) {
-                    localStorage.removeItem("token");
-                    sessionStorage.clear();
-                } else {
-                    // **✅ 確保覆蓋舊的角色資訊**
-                    sessionStorage.setItem("loggedInUser", data.username);
-                    sessionStorage.setItem("userRoles", JSON.stringify(data.roles || [])); // 🛠️ 確保角色為陣列
-                    
-                    showUserInfo(data.username);
-                }
-            }
-
-            // 🔓 登出
-            logoutBtn.addEventListener('click', async function () {
-                const token = localStorage.getItem("token");
-
-                if (token) {
-                    await fetch(`${API_URL}/logout`, {
-                        method: "POST",
-                        headers: { "Authorization": `Bearer ${token}` }
-                    });
-                }
-
-                // 清除本地 Token
+    
+            // 🔓 登出功能
+            document.getElementById("logout-btn").addEventListener("click", function () {
                 localStorage.removeItem("token");
-                sessionStorage.removeItem("loggedInUser");
-
-                // 更新 UI
-                loginBtn.classList.remove('d-none');
-                userInfo.classList.add('d-none');
-
-                // 重新載入頁面
+                sessionStorage.clear();
                 window.location.reload();
             });
-
-            // 🎯 顯示使用者名稱
-            function showUserInfo(username) {
-                loginBtn.classList.add('d-none');
-                userInfo.classList.remove('d-none');
-                userNameSpan.textContent = `👤 ${username}`;
-
-                fetch(`${API_URL}/verify`, {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
-                }).then(res => res.json()).then(data => {
-                    if (data.role) {
-                        userNameSpan.textContent += `（${data.roles.join(", ").toUpperCase()}）`;
-                    }
-                });
-            }
-
-            // 🎯 關閉登入彈跳視窗
-            function closeModal() {
-                let modal = document.getElementById('loginModal');
-                let modalInstance = bootstrap.Modal.getInstance(modal);
-                if (modalInstance) modalInstance.hide();
-                document.body.classList.remove('modal-open');
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-            }
         });
 
-        // 🔒 防止未登入進入 `Export.html` 或 `Import.html`
+        function closeLoginModal() {
+            let loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+            if (loginModal) {
+                loginModal.hide(); // ✅ 隱藏登入彈跳框
+            }
+
+            // ✅ 修正背景變暗的問題
+            document.body.classList.remove("modal-open"); // 移除 modal-open
+            let backdrop = document.querySelector(".modal-backdrop");
+            if (backdrop) {
+                backdrop.remove(); // 移除黑色遮罩
+            }
+        }
+
+        // 🔍 檢查登入狀態
+        function checkLoginStatus() {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+    
+            fetch(`${API_URL}/verify`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.valid) {
+                    sessionStorage.setItem("loggedInUser", data.username);
+                    sessionStorage.setItem("userRoles", JSON.stringify(data.roles || []));
+                    showUserInfo(data.username);
+                } else {
+                    localStorage.removeItem("token");
+                }
+            });
+        }
+    
+        // 🛠️ 顯示登入後資訊
+        function showUserInfo(username) {
+            document.getElementById("login-btn").classList.add("d-none"); // 隱藏登入按鈕
+            document.getElementById("user-info").classList.remove("d-none"); // 顯示使用者資訊
+            document.getElementById("user-name").textContent = `👤 ${username}`;
+        }
+    
+        // 🔐 驗證點擊報單權限
         function checkLogin(event, page) {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -334,26 +296,21 @@
                 alert("請先登入！");
                 return;
             }
-
-            // 🛠️ 取得角色資訊，並確保 JSON 解析不會出錯
-            const userRolesString = sessionStorage.getItem("userRoles");
-            const userRoles = userRolesString && userRolesString !== "" ? JSON.parse(userRolesString) : [];
-
-            console.log("🔎 目前使用者角色:", userRoles);  // 確認前端是否獲取最新的角色
-
-            // 角色權限檢查
+    
+            const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || "[]");
+    
             if (page.includes("Export") && !userRoles.includes("export")) {
                 event.preventDefault();
-                alert("❌ 無出口權限！");
+                alert("❌ 無權限進入【出口報單】");
                 return;
             }
+    
             if (page.includes("Import") && !userRoles.includes("import")) {
                 event.preventDefault();
-                alert("❌ 無進口權限！");
+                alert("❌ 無權限進入【進口報單】");
                 return;
             }
-
-            // 如果權限允許，導向指定頁面
+    
             window.location.href = page;
         }
 
@@ -365,7 +322,8 @@
         document.getElementById('close-btn').addEventListener('click', () => {
             document.getElementById('announcement-box').style.bottom = '-100%';
         });
-    </script>
+
+    </script> 
     
 </body>
 </html>
