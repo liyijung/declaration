@@ -3,7 +3,7 @@ name: Deploy Flask API
 on:
   push:
     branches:
-      - main  # 監聽 main 分支的 push 事件
+      - main  # 🚀 監聽 main 分支的 push 事件
 
 jobs:
   deploy:
@@ -23,20 +23,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 設定 API_URL 環境變數
+      - name: 設定環境變數
         run: echo "API_URL=${{ secrets.API_URL }}" >> $GITHUB_ENV
 
-      - name: 啟動 Flask 伺服器（僅供測試，正式佈署需修改）
+      - name: 啟動 Flask 伺服器（僅供測試）
         run: |
           python app.py &
-
-      - name: 部署到 GitHub Pages
-        run: |
-          git config --global user.email "your-email@example.com"
-          git config --global user.name "GitHub Actions"
-          git checkout --orphan gh-pages
-          git rm -rf .
-          cp -r * .
-          git add .
-          git commit -m "🚀 自動部署 Flask API"
-          git push --force origin gh-pages
