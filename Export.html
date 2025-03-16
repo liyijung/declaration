@@ -1158,8 +1158,7 @@ Alt + 2 指定項次">攤重</button>
                 return;
             }
             
-            const API_URL = "API_URL_PLACEHOLDER";
-            fetch(`${API_URL}/verify`, {
+            fetch("https://declaration-wsmf.onrender.com", {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
             })
