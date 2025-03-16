@@ -15,7 +15,9 @@ jobs:
 
       - name: 替換 API_URL
         run: |
-          find . -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|API_URL_PLACEHOLDER|${{ secrets.API_URL }}|g' {} +
+          find ./ -type f -name "*.js" -o -name "*.html" | while read file; do
+            sed -i 's|API_URL_PLACEHOLDER|${{ secrets.API_URL }}|g' "$file"
+          done
 
       - name: ✅ 確認替換結果
         run: grep -r "API_URL_PLACEHOLDER" . || echo "✅ API_URL 替換成功"
