@@ -1157,7 +1157,8 @@ Alt + 2 指定項次">攤重</button>
                 window.location.href = "index.html"; // 如果沒 Token，直接回登入頁
                 return;
             }
-        
+            
+            const API_URL = "API_URL_PLACEHOLDER";
             fetch(`${API_URL}/verify`, {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
