@@ -120,9 +120,9 @@
             🔑 登入
         </button>
         
-        <!-- 👤 登入後顯示帳號資訊 -->
+        <!-- 🧑‍💻 登入後顯示帳號資訊 -->
         <div id="user-info" class="d-none d-flex align-items-center">
-            <span class="me-3 text-light fw-bold" id="user-name">👤 使用者</span>
+            <span class="me-3 text-light fw-bold" id="user-name">🧑‍💻 使用者</span>
             <button id="logout-btn" class="btn btn-outline-warning">🔓 登出</button>
         </div>
     </nav>
@@ -286,7 +286,7 @@
         function showUserInfo(username) {
             document.getElementById("login-btn").classList.add("d-none"); // 隱藏登入按鈕
             document.getElementById("user-info").classList.remove("d-none"); // 顯示使用者資訊
-            document.getElementById("user-name").textContent = `👤 ${username}`;
+            document.getElementById("user-name").textContent = `🧑‍💻 ${username}`;
         }
     
         // 🔐 驗證點擊報單權限
