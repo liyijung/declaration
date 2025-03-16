@@ -13,11 +13,9 @@ jobs:
       - name: 🚀 取得最新程式碼
         uses: actions/checkout@v3
 
-      - name: 🔍 置換 API_URL
+      - name: 替換 API_URL
         run: |
-          find ./ -type f -name "*.js" -o -name "*.html" | while read file; do
-            sed -i 's|API_URL_PLACEHOLDER|${{ secrets.API_URL }}|g' "$file"
-          done
+          find . -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|API_URL_PLACEHOLDER|${{ secrets.API_URL }}|g' {} +
 
       - name: ✅ 確認替換結果
         run: grep -r "API_URL_PLACEHOLDER" . || echo "✅ API_URL 替換成功"
