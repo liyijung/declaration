@@ -1,9 +1,9 @@
-name: Deploy to Render
+name: Deploy Frontend
 
 on:
   push:
     branches:
-      - main  # ✅ 監聽 main 分支的變更
+      - main  # 監聽 main 分支的變更
 
 jobs:
   deploy:
@@ -13,22 +13,12 @@ jobs:
       - name: 🔄 檢出 GitHub Repository
         uses: actions/checkout@v3
 
-      - name: 🛠️ 設定 Python 環境
-        uses: actions/setup-python@v3
+      - name: 📝 替換 API_URL 環境變數
+        run: |
+          sed -i "s|API_URL_PLACEHOLDER|${{ secrets.API_URL }}|g" index.html Export.html
+
+      - name: 🚀 部署至 GitHub Pages 或 S3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          python-version: '3.9'
-
-      - name: 📦 安裝相依套件
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: 🚀 佈署至 Render
-        env:
-          API_URL: ${{ secrets.API_URL }}
-        run: |
-          echo "使用 API_URL: $API_URL"
-          curl -X POST "https://api.render.com/deploy/srv-xxxxx" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            --data '{"clearCache": true}'
+          branch: gh-pages
+          folder: .  # 部署整個專案
