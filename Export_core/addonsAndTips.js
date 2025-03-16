@@ -13,7 +13,7 @@ function summarizeOrgCountry() {
     // 讀取 countryMapping.csv 文件並解析
     const loadCountryMapping = async () => {
         try {
-            const response = await fetch('./Export_format/countryMapping.csv');
+            const response = await fetch('countryMapping.csv');
             const csvText = await response.text();
 
             // 解析 CSV 文件
