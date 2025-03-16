@@ -3,30 +3,38 @@ name: Deploy with API_URL Replacement
 on:
   push:
     branches:
-      - main  # 只在 main 分支推送時執行
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      API_URL: ${{ secrets.API_URL }}  # 👈 確保 GitHub Actions 讀取 Secrets
 
     steps:
       - name: 🚀 取得最新程式碼
         uses: actions/checkout@v3
 
-      - name: 🔍 檢查 API_URL
-        run: echo "API_URL is: ${{ secrets.API_URL }}"
+      - name: ❗ 檢查 API_URL 是否為空
+        run: |
+          if [[ -z "$API_URL" ]]; then
+            echo "❌ API_URL 未設定，請檢查 GitHub Secrets"
+            exit 1
+          else
+            echo "✅ API_URL 已設定: $API_URL"
+          fi
 
       - name: 替換 API_URL
         run: |
-          find ./ -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i "s|API_URL_PLACEHOLDER|${{ secrets.API_URL }}|g" {} +
+          find ./ -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i "s|API_URL_PLACEHOLDER|$API_URL|g" {} +
 
       - name: ✅ 確認替換結果
-        run: grep -r "API_URL_PLACEHOLDER" . || echo "✅ API_URL 替換成功"
+        run: grep -r "API_URL_PLACEHOLDER" . || echo "✅ API_URL 替換成功！"
 
-      - name: 📤 推送變更（如果需要）
+      - name: 📤 推送變更
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
-          git add .
+          git add -A
           git commit -m "🚀 自動替換 API_URL" || echo "✅ 無需提交變更"
           git push || echo "✅ 無需推送"
