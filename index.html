@@ -207,7 +207,9 @@
 
     <!-- 🔍 權限與登入管理 -->
     <script>
-        const API_URL = "http://127.0.0.1:5000";  // 本地端測試用，請根據實際環境修改
+        const API_URL = window.location.origin.includes("localhost")
+          ? "http://127.0.0.1:5000"
+          : "https://declaration-wsmf.onrender.com";
     
         document.addEventListener("DOMContentLoaded", function () {
             checkLoginStatus();
