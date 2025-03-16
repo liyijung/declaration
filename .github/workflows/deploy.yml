@@ -1,31 +1,34 @@
-name: Deploy Flask API
+name: Deploy to Render
 
 on:
   push:
     branches:
-      - main  # 🚀 監聽 main 分支的 push 事件
+      - main  # ✅ 監聽 main 分支的變更
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 取得最新程式碼
+      - name: 🔄 檢出 GitHub Repository
         uses: actions/checkout@v3
 
-      - name: 設定 Python 環境
+      - name: 🛠️ 設定 Python 環境
         uses: actions/setup-python@v3
         with:
           python-version: '3.9'
 
-      - name: 安裝相依套件
+      - name: 📦 安裝相依套件
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 設定環境變數
-        run: echo "API_URL=${{ secrets.API_URL }}" >> $GITHUB_ENV
-
-      - name: 啟動 Flask 伺服器（僅供測試）
+      - name: 🚀 佈署至 Render
+        env:
+          API_URL: ${{ secrets.API_URL }}
         run: |
-          python app.py &
+          echo "使用 API_URL: $API_URL"
+          curl -X POST "https://api.render.com/deploy/srv-xxxxx" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"clearCache": true}'
