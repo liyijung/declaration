@@ -1158,7 +1158,7 @@ Alt + 2 指定項次">攤重</button>
                 return;
             }
         
-            fetch("https://declaration-wsmf.onrender.com", {
+            fetch(`${API_URL}/verify`, {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
             })
