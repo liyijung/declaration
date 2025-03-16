@@ -1114,54 +1114,41 @@ Alt + 2 指定項次">攤重</button>
         生成 PDF 需等候，請勿重複點選。
     </div>
 
-    <script>
-        // ✅ 設定 Flask API 伺服器網址（避免多次運行 `window.location.origin.includes`）
-        const API_URL = location.origin.includes("github.io") || location.origin.includes("netlify.app")
-            ? "https://declaration-wsmf.onrender.com"  // 🔹 Render 部署的 Flask API
-            : "http://127.0.0.1:5000";  // 🔹 本機開發環境
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            checkExportAccess();
+        });
 
-        // ✅ 頁面載入時檢查登入狀態
-        document.addEventListener("DOMContentLoaded", async function () {
+        function checkExportAccess() {
             const token = localStorage.getItem("token");
+            const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || "[]");
 
-            if (!token) {
-                window.location.href = "index.html"; // 🔴 未登入 → 跳轉回首頁
+            if (!token || userRoles.length === 0) {
+                alert("請先登入！");
+                window.location.href = "index.html";
                 return;
             }
 
-            try {
-                const response = await fetch(`${API_URL}/verify`, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    }
-                });
-
-                const data = await response.json();
-                if (!response.ok || !data.valid) {
-                    localStorage.removeItem("token");
-                    window.location.href = "index.html";
-                } else {
-                    console.log("✅ 使用者登入成功:", data.username);
-                    console.log("✅ 使用者角色:", data.roles);
-
-                    // 🔹 **確保 `sessionStorage` 更新最新角色**
-                    sessionStorage.setItem("userRoles", JSON.stringify(data.roles || []));
-
-                    // 🚨 **檢查角色，若非 `export` 則跳轉**
-                    if (!data.roles.includes("export")) {
-                        window.location.href = "index.html";
-                    }
-
-                    // 🔄 **自動填入「製單人員」欄位**
-                    document.getElementById("Maker").value = data.username;
-                }
-            } catch (error) {
-                console.error("登入驗證失敗:", error);
-                localStorage.removeItem("token");
+            if (!userRoles.includes("export") && !userRoles.includes("manager")) {
+                alert("❌ 無權限進入【出口報單】");
                 window.location.href = "index.html";
+                return;
             }
+
+        }
+
+        // 🔄 **自動填入「製單人員」欄位**
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(() => {
+                const username = sessionStorage.getItem("loggedInUser") || "未設定"; // 預設值「未設定」
+                const makerField = document.getElementById("Maker");
+
+                if (makerField) {
+                    makerField.value = username;
+                } else {
+                    console.error("❌ 找不到 Maker 欄位！");
+                }
+            }, 500); // ⏳ 加入 500ms 延遲，確保 DOM 載入完成
         });
 
     </script>
