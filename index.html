@@ -335,7 +335,7 @@
                 return;
             }
         
-            fetch(`${API_URL}/verify`, {
+            fetch("https://declaration-wsmf.onrender.com", {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
             })
