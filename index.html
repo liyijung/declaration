@@ -327,6 +327,35 @@
             document.getElementById('announcement-box').style.bottom = '-100%';
         });
 
+        // 🔄 每 12 小時檢查 Token 是否過期
+        function checkTokenExpiration() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "index.html"; // 如果沒 Token，直接回登入頁
+                return;
+            }
+        
+            fetch("https://declaration-wsmf.onrender.com", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.valid) {
+                    localStorage.removeItem("token"); // 清除 Token
+                    sessionStorage.clear(); // 清除用戶資訊
+                    window.location.href = "index.html"; // 跳回登入頁
+                }
+            })
+            .catch(() => console.log("⚠️ 無法驗證 Token，可能是伺服器問題"));
+        }
+        
+        // **每 12 小時檢查一次**
+        setInterval(checkTokenExpiration, 12 * 60 * 60 * 1000);
+        
+        // **頁面載入時立即檢查**
+        document.addEventListener("DOMContentLoaded", checkTokenExpiration);
+
     </script> 
     
 </body>
