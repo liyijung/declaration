@@ -1124,7 +1124,6 @@ Alt + 2 指定項次">攤重</button>
             const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || "[]");
 
             if (!token || userRoles.length === 0) {
-                alert("請先登入！");
                 window.location.href = "index.html";
                 return;
             }
