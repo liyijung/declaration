@@ -703,8 +703,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // 初始化時更新REMARK1的值
     updateRemark1();
 
-    // 初次調用以填充下拉選單
-    addTextarea();
 });
 
 // 當按下計算運費按鈕時，觸發 calculateFreight 函數
@@ -1205,23 +1203,6 @@ function navigateTextarea(currentTextarea, direction) {
     }
 }
 
-// 添加文本域的示例函數
-function addTextarea() {
-    const container = document.getElementById('textarea-container');
-    if (!container) {
-        console.error("找不到 #textarea-container，請檢查 HTML");
-        return;
-    }
-
-    const textareaHTML = createTextareaField('example-textarea', '這是初始值');
-    if (!textareaHTML) {
-        console.error("createTextareaField 回傳空值，請檢查函式");
-        return;
-    }
-
-    container.innerHTML += textareaHTML;
-}
-
 // 創建輸入域
 function createInputField(name, value, isVisible, iscalcWtValue) {
     let originalValue = value; // 儲存原始值，確保在錯誤時可讀取
@@ -1625,11 +1606,6 @@ function updateDocOtrDesc() {
     // 更新文本框的值，將現有描述和新的描述結合
     docOtrDescElement.value = currentDesc + copyDesc;
 }
-
-// 添加事件監聽器到所有checkbox以更新相關變量
-document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', updateVariables);
-});
 
 // 更新REMARK1的值
 function updateRemark1() {
