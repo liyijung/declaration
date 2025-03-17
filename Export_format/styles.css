@@ -683,12 +683,6 @@ input[type="checkbox"]:hover {
     width: 24px;
 }
 
-/* 靠左對齊 .video-link 區塊 */
-.video-link {
-    text-align: left;
-    margin-bottom: 10px;
-}
-
 .button-group button,
 #summarizeButton {
     margin-top: 2px;
