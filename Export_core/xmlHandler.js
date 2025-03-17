@@ -174,6 +174,11 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("COPY_QTY: " + copyQty.value);
     }
 
+    // 添加事件監聽器到報單副本選項
+    document.querySelectorAll('input[type="checkbox"][name="copy_option"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateRemark1);
+    });
+    
     async function exportToXML() {
         updateVariables(); // 在匯出XML之前更新變數
 
