@@ -1157,6 +1157,10 @@ Alt + 2 指定項次">攤重</button>
                 window.location.href = "index.html"; // 如果沒 Token，直接回登入頁
                 return;
             }
+
+            const API_URL = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
+                ? "http://127.0.0.1:5000" 
+                : "https://declaration-wsmf.onrender.com";
             
             fetch(`${API_URL}/verify`, {
                 method: "POST",
