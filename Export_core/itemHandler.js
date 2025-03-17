@@ -271,7 +271,6 @@ function closeItemModal() {
     cccCodeInput.classList.remove('highlight-ccc');
     
     // 移除事件監聽器
-    document.removeEventListener('keydown', handleEscKeyForCancel);
     document.removeEventListener('keydown', handleAltSForSave);
 }
 
