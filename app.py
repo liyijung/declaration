@@ -21,20 +21,20 @@ if not ENCRYPTION_KEY:
     raise ValueError("❌ 錯誤：ENCRYPTION_KEY 未設置！")
 
 # 加密/解密密碼的密鑰
-cipher_key = os.getenv("CIPHER_KEY", "").encode()  # 從環境變數讀取密鑰
-cipher_suite = Fernet(cipher_key) if cipher_key else None  # 確保密鑰存在
+cipher_key = os.getenv("CIPHER_KEY", "").encode()
+cipher_suite = Fernet(cipher_key) if cipher_key else None
 
 def decrypt_password(encrypted_password):
-    """解密密碼，解密失敗則回傳原始密文"""
+    """嘗試解密密碼，若失敗則直接回傳原密碼"""
     if not encrypted_password:
         return None
     try:
         return cipher_suite.decrypt(encrypted_password.encode()).decode()
     except Exception:
-        return encrypted_password  # 解密失敗時，回傳原始密文
+        return encrypted_password  # 可能是明文密碼，直接回傳
 
 def get_users():
-    """取得所有用戶的帳號與密碼，密碼解密失敗時回傳原始密文"""
+    """取得所有用戶的帳號與密碼，允許解密失敗時回傳原密碼"""
     users = {}
 
     for key, value in os.environ.items():
@@ -44,7 +44,7 @@ def get_users():
             encrypted_password = os.getenv(f"USER_{user_index}", "")
             password = decrypt_password(encrypted_password)
             if username and password:
-                users[username] = password  # 解密失敗時，密碼仍然保留
+                users[username] = password  # 允許明文密碼
     return users
 
 # 🔍 取得使用者權限
@@ -54,14 +54,14 @@ def get_user_role(username):
             user_index = key.split("_")[-1]
             role = os.getenv(f"ROLE_{user_index}", "").lower()
 
-            # 🔹 修正：確保 `role` 不會是空字串
+            # 🔹 確保 `role` 不會是空字串
             if role == "manager":
                 return ["manager", "export", "import"]
             elif role == "export":
                 return ["export"]
             elif role == "import":
                 return ["import"]
-            return []  # 🛑 確保不是 `""` 而是 `[]`
+            return []
     return []
 
 # 🔑 **登入 API**
@@ -75,13 +75,13 @@ def login():
     stored_password = users.get(username)
 
     if stored_password and password == stored_password:
-        roles = get_user_role(username)  # ✅ 獲取角色
+        roles = get_user_role(username)
         token = jwt.encode({
             "username": username,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
         }, SECRET_KEY, algorithm="HS256")
 
-        return jsonify({"token": token, "roles": roles})  # ✅ 一併回傳角色資訊
+        return jsonify({"token": token, "roles": roles})
 
     return jsonify({"message": "登入失敗"}), 401
 
@@ -99,15 +99,15 @@ def verify():
         username = decoded["username"]
 
         users = get_users()
-        if username not in users:  # 🛑 若帳號已刪除，則拒絕請求
+        if username not in users:
             return jsonify({"valid": False, "message": "帳戶不存在"}), 401
 
-        roles = get_user_role(username)  # ✅ 確保這裡回傳的是最新的角色資訊
-        
+        roles = get_user_role(username)
+
         return jsonify({
             "valid": True,
             "username": username,
-            "roles": roles if roles else []  # 🔹 確保 roles 不會是 None 或空字串
+            "roles": roles if roles else []
         })
 
     except jwt.ExpiredSignatureError:
@@ -132,7 +132,7 @@ def refresh():
         if username not in users or not users[username]:
             return jsonify({"valid": False, "message": "驗證失敗"}), 401
 
-        # 🔄 **產生新的 Token，延長 1 小時**
+        # 🔄 **產生新的 Token，延長 12 小時**
         new_token = jwt.encode({
             "username": username,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
@@ -145,6 +145,7 @@ def refresh():
     except jwt.InvalidTokenError:
         return jsonify({"valid": False, "message": "無效的 Token"}), 401
 
+# 🚪 **登出 API（無效化 Token）**
 revoked_tokens = set()  # 存放已登出的 Token
 
 @app.route('/logout', methods=['POST'])
