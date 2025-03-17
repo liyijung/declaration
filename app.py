@@ -5,6 +5,7 @@ import datetime
 import os
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet
+import base64
 
 # 讀取 `.env` 變數
 load_dotenv()
@@ -25,13 +26,15 @@ cipher_key = os.getenv("CIPHER_KEY", "").encode()
 cipher_suite = Fernet(cipher_key) if cipher_key else None
 
 def decrypt_password(encrypted_password):
-    """嘗試解密密碼，若失敗則直接回傳原密碼"""
+    """解密密碼，解密失敗則回傳原始密碼"""
     if not encrypted_password:
         return None
     try:
-        return cipher_suite.decrypt(encrypted_password.encode()).decode()
+        # ✅ 先嘗試 Base64 轉回 bytes
+        encrypted_password_bytes = base64.urlsafe_b64decode(encrypted_password.encode())  
+        return cipher_suite.decrypt(encrypted_password_bytes).decode()
     except Exception:
-        return encrypted_password  # 可能是明文密碼，直接回傳
+        return encrypted_password  # 解密失敗，可能是明文密碼
 
 def get_users():
     """取得所有用戶的帳號與密碼，允許解密失敗時回傳原密碼"""
