@@ -20,29 +20,31 @@ ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY")
 if not ENCRYPTION_KEY:
     raise ValueError("❌ 錯誤：ENCRYPTION_KEY 未設置！")
 
-# 🔐 建立 Fernet 加密物件
-cipher_suite = Fernet(ENCRYPTION_KEY.encode())
+# 加密/解密密碼的密鑰
+cipher_key = os.getenv("CIPHER_KEY", "").encode()  # 從環境變數讀取密鑰
+cipher_suite = Fernet(cipher_key) if cipher_key else None  # 確保密鑰存在
 
-# 🛠 **解密密碼**
 def decrypt_password(encrypted_password):
-    if not encrypted_password:  # 避免 `None` 傳入 Fernet，導致錯誤
+    """解密密碼，解密失敗則回傳原始密文"""
+    if not encrypted_password:
         return None
     try:
         return cipher_suite.decrypt(encrypted_password.encode()).decode()
     except Exception:
-        return None  # 如果解密失敗，回傳 None，避免程式崩潰
+        return encrypted_password  # 解密失敗時，回傳原始密文
 
-# 🔒 取得帳號密碼
 def get_users():
+    """取得所有用戶的帳號與密碼，密碼解密失敗時回傳原始密文"""
     users = {}
 
     for key, value in os.environ.items():
         if key.startswith("USERNAME_"):
             user_index = key.split("_")[-1]
             username = value
-            password = decrypt_password(os.getenv(f"USER_{user_index}", ""))
+            encrypted_password = os.getenv(f"USER_{user_index}", "")
+            password = decrypt_password(encrypted_password)
             if username and password:
-                users[username] = password
+                users[username] = password  # 解密失敗時，密碼仍然保留
     return users
 
 # 🔍 取得使用者權限
