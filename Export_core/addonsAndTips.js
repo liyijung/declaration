@@ -985,8 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
             input.id === 'specific-range' || 
             input.id === 'specific-weight' ||
             input.id === 'exchange-rate' ||
-            input.id === 'start-number' ||
-            input.id === 'Maker') {
+            input.id === 'start-number') {
             return;
         }
 
@@ -1137,21 +1136,6 @@ document.addEventListener('DOMContentLoaded', () => {
             clearBtn.style.backgroundColor = '#e6e6e6';
         });
     });
-});
-
-// 當頁面載入時，檢查 localStorage 是否有儲存的製單人員資料
-window.addEventListener('DOMContentLoaded', () => {
-    const savedMaker = localStorage.getItem('Maker');
-    if (savedMaker !== null) {
-        document.getElementById('Maker').value = savedMaker;
-    }
-});
-
-// 按下儲存按鈕時，將製單人員名稱儲存到 localStorage
-document.getElementById('saveMaker').addEventListener('click', () => {
-    const maker = document.getElementById('Maker').value;
-    localStorage.setItem('Maker', maker);
-    alert('製單人員已儲存！');
 });
 
 document.addEventListener("DOMContentLoaded", function () {
