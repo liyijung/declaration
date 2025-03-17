@@ -697,11 +697,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         checkbox.addEventListener('change', updateDocOtrDesc);
     });
 
-    // 添加事件監聽器到報單副本選項
-    document.querySelectorAll('input[type="checkbox"][name="copy_option"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateRemark1);
-    });
-
     // 添加事件監聽器到所有checkbox以更新相關變量
     document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('change', updateVariables);
