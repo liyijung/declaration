@@ -70,13 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// 【影片說明】
-function updateVideoLink() {
-    var selector = document.getElementById("videoSelector");
-    var videoLink = document.getElementById("videoLink");
-    videoLink.href = selector.value;
-}
-
 // 滾動到頂部
 function scrollToTop() {
     window.scrollTo({
