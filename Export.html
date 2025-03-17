@@ -113,7 +113,7 @@
             <div class="header-group">
                 <label for="CNEE_BAN_ID" style="background: #ffffff00;">買方統一編號</label>
                 <input type="text" id="CNEE_BAN_ID" name="CNEE_BAN_ID" oninput="filterAlphanumeric(this)"
-                placeholder="(買方國家代碼為TW，此欄需填列)" onkeydown="preventArrowKeyAdjustment(event)">
+                placeholder="(買方國家代碼為TW，此欄需填列)">
                 <a href="https://fbfh.trade.gov.tw/fb/web/queryBasicf.do" target="_blank" rel="noopener noreferrer" 
                 style="padding-left: 4px; padding-top: 4px; font-weight: normal; color: #005feec5;" tabindex="-1">
                     廠商基本資料查詢
@@ -150,7 +150,7 @@
         <div class="header-section">
             <div class="header-group">
                 <label for="TOT_CTN">總件數</label>
-                <input type="number" id="TOT_CTN" name="TOT_CTN" min="1" step="1" onkeydown="preventArrowKeyAdjustment(event)">
+                <input type="number" id="TOT_CTN" name="TOT_CTN" min="1" step="1">
             </div>
             <div class="header-group">
                 <label for="DOC_CTN_UM">總件數單位</label>
@@ -164,11 +164,11 @@
             </div>
             <div class="header-group">
                 <label for="DCL_GW">總毛重</label>
-                <input type="number" id="DCL_GW" name="DCL_GW" onkeydown="preventArrowKeyAdjustment(event)">
+                <input type="number" id="DCL_GW" name="DCL_GW">
             </div>
             <div class="header-group">
                 <label for="DCL_NW">總淨重</label>
-                <input type="number" id="DCL_NW" name="DCL_NW" onkeydown="preventArrowKeyAdjustment(event)">
+                <input type="number" id="DCL_NW" name="DCL_NW">
             </div>
         </div>
 
@@ -216,32 +216,31 @@
                 <label for="CAL_IP_TOT_ITEM_AMT">總金額</label>
                 <input type="number" id="CAL_IP_TOT_ITEM_AMT" name="CAL_IP_TOT_ITEM_AMT"
                 placeholder="(若為台幣總金額不可有小數點、EXW 總金額不含應加費用)"
-                onblur="checkTotalAmount();"
-                onkeydown="preventArrowKeyAdjustment(event)">
+                onblur="checkTotalAmount();">
             </div>
             <hr>
             <div class="header-group">
                 <label for="FRT_AMT">運費</label>
                 <input type="number" id="FRT_AMT" name="FRT_AMT" tabindex="-1"
-                placeholder="(CFR、CIF 需填列運費，EXW 不得填列運費)" onkeydown="preventArrowKeyAdjustment(event)">
+                placeholder="(CFR、CIF 需填列運費，EXW 不得填列運費)">
                 <button id="calculate-freight-button">計算運費</button>
             </div>   
             <div class="header-group">
                 <label for="INS_AMT">保險費</label>
                 <input type="number" id="INS_AMT" name="INS_AMT" tabindex="-1"
-                placeholder="(C&I、CIF 需填列保險費，EXW 不得填列保險費)" onkeydown="preventArrowKeyAdjustment(event)">
+                placeholder="(C&I、CIF 需填列保險費，EXW 不得填列保險費)">
                 <button id="calculate-insurance-button">計算保險費</button>
             </div>
             <div class="header-group">
                 <label for="ADD_AMT">應加費用</label>
                 <input type="number" id="ADD_AMT" name="ADD_AMT" tabindex="-1" style="flex: 1 1 0;"
-                placeholder="(EXW 需填列應加費用)" onkeydown="preventArrowKeyAdjustment(event)">
+                placeholder="(EXW 需填列應加費用)">
                 <button id="calculate-additional-button" style="flex: 1 1 0; max-width: 200px;">計算應加費用(TWD500)</button>
             </div>
             <div class="header-group">
                 <label for="SUBTRACT_AMT">應減費用</label>
                 <input type="number" id="SUBTRACT_AMT" name="SUBTRACT_AMT" tabindex="-1"
-                placeholder="(EXW 不得填列應減費用)" onkeydown="preventArrowKeyAdjustment(event)">
+                placeholder="(EXW 不得填列應減費用)">
             </div>
         </div>
 
