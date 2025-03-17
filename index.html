@@ -120,9 +120,9 @@
             🔑 登入
         </button>
         
-        <!-- 🧑‍💻 登入後顯示帳號資訊 -->
+        <!-- 登入後顯示帳號資訊 -->
         <div id="user-info" class="d-none d-flex align-items-center">
-            <span class="me-3 text-light fw-bold" id="user-name">🧑‍💻 使用者</span>
+            <span class="me-3 text-light fw-bold" id="user-name">使用者</span>
             <button id="logout-btn" class="btn btn-outline-warning">🔓 登出</button>
         </div>
     </nav>
@@ -175,7 +175,7 @@
                         <h3 class="card-title text-success">📦 進口報單製作</h3>
                         <p class="card-text">建立進口報單，查看與編輯申報內容。</p>
                         <a id="import-link" href="#" class="btn btn-success btn-lg w-100"
-                            onclick="checkLogin(event, 'Import.html')">【建置中】</a>
+                            disabled onclick="checkLogin(event, 'Import.html')">【建置中】</a>
                             <!-- 若加 disabled 可避免使用者誤點 -->
                     </div>
                 </div>
@@ -286,7 +286,7 @@
         function showUserInfo(username) {
             document.getElementById("login-btn").classList.add("d-none"); // 隱藏登入按鈕
             document.getElementById("user-info").classList.remove("d-none"); // 顯示使用者資訊
-            document.getElementById("user-name").textContent = `🧑‍💻 ${username}`;
+            document.getElementById("user-name").textContent = `${username}`;
         }
     
         // 🔐 驗證點擊報單權限
