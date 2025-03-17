@@ -269,9 +269,6 @@ function closeItemModal() {
     // 還原 CCC_CODE 背景
     const cccCodeInput = document.getElementById('CCC_CODE');
     cccCodeInput.classList.remove('highlight-ccc');
-    
-    // 移除事件監聽器
-    document.removeEventListener('keydown', handleAltSForSave);
 }
 
 // 儲存新增的項次
