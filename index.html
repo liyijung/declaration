@@ -265,19 +265,31 @@
         function checkLoginStatus() {
             const token = localStorage.getItem("token");
             if (!token) return;
-    
+        
+            // 超時計時器
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 秒超時
+        
             fetch(`${API_URL}/verify`, {
                 method: "POST",
-                headers: { "Authorization": `Bearer ${token}` }
+                headers: { "Authorization": `Bearer ${token}` },
+                signal: controller.signal // 傳遞 signal
             })
             .then(res => res.json())
             .then(data => {
+                clearTimeout(timeoutId); // 若 API 回應正常，清除超時計時器
                 if (data.valid) {
                     sessionStorage.setItem("loggedInUser", data.username);
                     sessionStorage.setItem("userRoles", JSON.stringify(data.roles || []));
                     showUserInfo(data.username);
                 } else {
-                    localStorage.removeItem("token");
+                    handleSessionTimeout(); // 若 token 無效則登出
+                }
+            })
+            .catch(error => {
+                if (error.name === "AbortError") {
+                    console.warn("API 逾時，登出...");
+                    handleSessionTimeout("伺服器無回應，請重新登入！");
                 }
             });
         }
