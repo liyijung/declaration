@@ -1,0 +1,13 @@
+name: Keep Render Service Awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # 每 10 分鐘執行一次
+  workflow_dispatch:  # 允許手動觸發
+
+jobs:
+  keep-awake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render API
+        run: curl -s https://declaration-wi4s.onrender.com/api/health > /dev/null
