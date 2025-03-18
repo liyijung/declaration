@@ -1,6 +1,7 @@
 // 開啟攤重彈跳框
 function openSpreadWeightModal(mode = "1") {
     const modal = document.getElementById("spread-weight-modal");
+    const overlay = document.getElementById("drag-overlay");
     const confirmButton = document.getElementById("confirm-button");
     const spreadMode = document.getElementById("spread-mode");
     const specificRange = document.getElementById("specific-range");
@@ -16,8 +17,9 @@ function openSpreadWeightModal(mode = "1") {
     const specificOptions = document.getElementById("specific-options");
     specificOptions.style.display = mode === "2" ? "block" : "none";
 
-    // 顯示彈跳框
+    // 顯示彈跳框與透明遮罩
     modal.style.display = "block";
+    overlay.style.display = "block"; // 顯示透明遮罩
 
     // 焦點設置根據模式
     if (mode === "1") {
@@ -33,9 +35,11 @@ function openSpreadWeightModal(mode = "1") {
 // 關閉攤重彈跳框
 function closeSpreadWeightModal() {
     const modal = document.getElementById("spread-weight-modal");
+    const overlay = document.getElementById("drag-overlay");
 
-    // 隱藏彈跳框
+    // 隱藏彈跳框與透明遮罩
     modal.style.display = "none";
+    overlay.style.display = "none"; // 隱藏透明遮罩
 
     // 確保 focusHandler 存在才移除監聽
     if (focusHandler) {
