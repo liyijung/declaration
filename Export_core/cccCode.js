@@ -718,6 +718,11 @@ function calculateSTQTYForMTK() {
 
 // 初始化寬度和長度欄位的監聽器
 function initializeDimensionListeners(itemRow) {
+    if (!itemRow) {
+        console.error("❌ 錯誤: itemRow 為 null，無法初始化欄位監聽器");
+        return;
+    }
+    
     const wide = itemRow.querySelector('.WIDE');
     const wideum = itemRow.querySelector('.WIDE_UM');
     const lengt = itemRow.querySelector('.LENGT_');
