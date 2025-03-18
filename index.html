@@ -293,7 +293,14 @@
                 }
             });
         }
-    
+
+        function handleSessionTimeout(message = "登入已過期，請重新登入！") {
+            alert(message);
+            localStorage.removeItem("token"); // 清除 token
+            sessionStorage.clear(); // 清除 session
+            window.location.href = "/login"; // 重新導向到登入頁
+        }
+
         // 🛠️ 顯示登入後資訊
         function showUserInfo(username) {
             document.getElementById("login-btn").classList.add("d-none"); // 隱藏登入按鈕
