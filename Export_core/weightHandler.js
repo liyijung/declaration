@@ -37,8 +37,11 @@ function closeSpreadWeightModal() {
     // 隱藏彈跳框
     modal.style.display = "none";
 
-    // 停止焦點循環
-    document.removeEventListener("keydown", focusHandler);
+    // 確保 focusHandler 存在才移除監聽
+    if (focusHandler) {
+        document.removeEventListener("keydown", focusHandler);
+        focusHandler = null; // 清除變數
+    }
 }
 
 // 初始化事件（只執行一次）
@@ -86,6 +89,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+let focusHandler = null;
+
 // 啟用焦點循環
 function trapFocus(modal) {
     const focusableElements = modal.querySelectorAll(
@@ -94,7 +99,7 @@ function trapFocus(modal) {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-    const focusHandler = (event) => {
+    focusHandler = (event) => {
         if (event.key === "Tab") {
             if (event.shiftKey && document.activeElement === firstElement) {
                 lastElement.focus();
