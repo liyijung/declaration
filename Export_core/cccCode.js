@@ -98,11 +98,19 @@ function parseCSVToObject(csvData) {
     return result;
 }
     
-function searchTariff(inputElement, isModal = false) {
+function searchTariff(inputElement, isModal = true) {
     let keyword = inputElement.value.toLowerCase();
     keyword = keyword.replace(/[.\-\s]/g, ''); // 移除 '.'、'-' 以及所有的空格
-    const resultsDiv = isModal ? document.getElementById('modal-results') : document.getElementById('results');
-    resultsDiv.innerHTML = '';
+    const resultsDiv = document.getElementById('modal-results');
+
+    console.log("searchTariff 執行, resultsDiv:", resultsDiv); // 調試用
+
+    if (!resultsDiv) {
+        console.error("❌ 錯誤：找不到 #modal-results，請檢查 HTML 結構");
+        return; // 防止錯誤繼續發生
+    }
+
+    resultsDiv.innerHTML = '';  // 清空結果
 
     // 加入提示訊息
     const hint = document.createElement('p');
