@@ -41,50 +41,65 @@ def get_users():
     users = {}
 
     for key, value in os.environ.items():
-        if key.startswith("USERNAME_"):
+        if key.startswith("USERID_"):
             user_index = key.split("_")[-1]
-            username = value
+            userid = value
             encrypted_password = os.getenv(f"USER_{user_index}", "")
             password = decrypt_password(encrypted_password)
-            if username and password:
-                users[username] = password  # 允許明文密碼
+            username = os.getenv(f"USERNAME_{user_index}", "未設定")
+            
+            if userid and password:
+                users[userid] = {
+                    "password": password,
+                    "username": username
+                }
+
     return users
 
 # 🔍 取得使用者權限
-def get_user_role(username):
+def get_user_role(userid):
     for key, value in os.environ.items():
-        if key.startswith("USERNAME_") and value == username:
+        if key.startswith("USERID_") and value == userid:
             user_index = key.split("_")[-1]
             role = os.getenv(f"ROLE_{user_index}", "").lower()
+            username = os.getenv(f"USERNAME_{user_index}", "未設定")
 
             # 🔹 確保 `role` 不會是空字串
             if role == "manager":
-                return ["manager", "export", "import"]
+                roles = ["manager", "export", "import"]
             elif role == "export":
-                return ["export"]
+                roles = ["export"]
             elif role == "import":
-                return ["import"]
-            return []
-    return []
+                roles = ["import"]
+            else:
+                roles = []
+
+            return roles, username
+        
+    return [], "未設定"
 
 # 🔑 **登入 API**
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
-    username = data.get("username")
+    userid = data.get("userid")
     password = data.get("password")
 
     users = get_users()
-    stored_password = users.get(username)
+    user_info = users.get(userid)
 
-    if stored_password and password == stored_password:
-        roles = get_user_role(username)
+    if user_info and password == user_info["password"]:
+        roles, username = get_user_role(userid)
         token = jwt.encode({
-            "username": username,
+            "userid": userid,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
         }, SECRET_KEY, algorithm="HS256")
 
-        return jsonify({"token": token, "roles": roles})
+        return jsonify({
+            "token": token,
+            "roles": roles,
+            "username": username
+        })
 
     return jsonify({"message": "登入失敗"}), 401
 
@@ -99,18 +114,21 @@ def verify():
 
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"], options={"require": ["exp"]})
-        username = decoded["username"]
+        userid = decoded["userid"]
 
         users = get_users()
-        if username not in users:
+        user_info = users.get(userid)
+
+        if not user_info:
             return jsonify({"valid": False, "message": "帳戶不存在"}), 401
 
-        roles = get_user_role(username)
+        roles, username = get_user_role(userid)
 
         return jsonify({
             "valid": True,
-            "username": username,
-            "roles": roles if roles else []
+            "userid": userid,
+            "roles": roles,
+            "username": username
         })
 
     except jwt.ExpiredSignatureError:
@@ -129,15 +147,15 @@ def refresh():
 
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"], options={"require": ["exp"]})
-        username = decoded["username"]
+        userid = decoded["userid"]
 
         users = get_users()
-        if username not in users or not users[username]:
+        if userid not in users or not users[userid]:
             return jsonify({"valid": False, "message": "驗證失敗"}), 401
 
         # 🔄 **產生新的 Token，延長 12 小時**
         new_token = jwt.encode({
-            "username": username,
+            "userid": userid,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
         }, SECRET_KEY, algorithm="HS256")
 
