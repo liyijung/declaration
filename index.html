@@ -6,14 +6,27 @@
     <title>報單系統</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 🌟 純漸層背景 */
         body {
-            background: linear-gradient(to bottom, #dfe9f3, #a6c0fe); /* 藍色漸層 */
+            background-image: url('Sky.png');
+            background-size: cover; /* 讓圖片覆蓋整個畫面 */
+            background-position: bottom; /* 圖片對齊底部並置中 */
+            background-repeat: no-repeat; /* 防止圖片重複 */
             font-family: "Segoe UI", sans-serif;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             margin: 0;
+        }
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('sky.png') center bottom / cover no-repeat;
+            filter: blur(1px); /* 讓背景圖片模糊 */
+            z-index: -1; /* 確保不影響前景內容 */
         }
 
         .login-container {
