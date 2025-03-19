@@ -11,4 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Render API
-        run: curl -s https://declaration-wi4s.onrender.com/api/health > /dev/null
+        run: |
+          for i in {1..3}; do
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" https://declaration-wi4s.onrender.com/api/health)
+            echo "HTTP Status: $STATUS"
+            [[ "$STATUS" == "200" ]] && break
+            sleep 5
+          done
+
+
