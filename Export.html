@@ -349,7 +349,7 @@
         <!-- 製單人員 -->
         <div style="margin-top: 10px; margin-bottom: 20px;">
             <label for="Maker">製單人員</label>
-            <input type="text" id="Maker" name="Maker" readonly>
+            <input type="text" id="Maker" name="Maker" style="height: 25px;">
         </div>
         
     </div>
@@ -1028,7 +1028,7 @@ Alt + 2 指定項次">攤重</button>
             </label>
             <label for="DOC_DOC_NO_Last5">報單號碼(後5碼)</label>
             <input type="text" id="DOC_DOC_NO_Last5" name="DOC_DOC_NO_Last5" maxlength="5"
-            oninput="filterAlphanumeric(this)" style="height: 30px;"
+            oninput="filterAlphanumeric(this)" style="height: 25px;"
             placeholder="(限一般倉)">
         </div>
     </div>
@@ -1130,7 +1130,7 @@ Alt + 2 指定項次">攤重</button>
         // 🔄 **自動填入「製單人員」欄位**
         document.addEventListener("DOMContentLoaded", function () {
             setTimeout(() => {
-                const username = sessionStorage.getItem("loggedInUser") || "未設定"; // 預設值「未設定」
+                const username = sessionStorage.getItem("username") || "未設定"; // 預設值「未設定」
                 const makerField = document.getElementById("Maker");
 
                 if (makerField) {
