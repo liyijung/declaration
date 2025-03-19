@@ -141,7 +141,7 @@
                 <div class="modal-body">
                     <form id="login-form">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="username" placeholder="帳號" required>
+                            <input type="text" class="form-control" id="userid" placeholder="帳號" required>
                         </div>
                         <div class="mb-3">
                             <input type="password" class="form-control" id="password" placeholder="密碼" required>
@@ -216,28 +216,30 @@
             // 🛠️ 登入表單送出
             document.getElementById("login-form").addEventListener("submit", async function (event) {
                 event.preventDefault();
-                const username = document.getElementById("username").value;
+                const userid = document.getElementById("userid").value;
                 const password = document.getElementById("password").value;
     
                 const response = await fetch(`${API_URL}/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ userid, password })
                 });
     
                 const data = await response.json();
                 if (response.ok && data.token) {
                     // 🔹 存入 LocalStorage，確保重整後仍可顯示
                     localStorage.setItem("token", data.token);
-                    localStorage.setItem("loggedInUser", username); // 存入使用者名稱
+                    localStorage.setItem("loggedInUser", userid); // 存入使用者名稱
+                    localStorage.setItem("username", data.username);
                     localStorage.setItem("userRoles", JSON.stringify(data.roles || [])); // 存入角色權限
                     
                     // 🔹 存入 SessionStorage，避免返回上一頁後丟失
-                    sessionStorage.setItem("loggedInUser", username);
+                    sessionStorage.setItem("loggedInUser", userid);
+                    sessionStorage.setItem("username", data.username);
                     sessionStorage.setItem("userRoles", JSON.stringify(data.roles || []));
-                    sessionStorage.setItem("Maker", username); // ✅ 存入 Maker
+                    sessionStorage.setItem("Maker", data.username); // ✅ 存入 Maker
 
-                    showUserInfo(username, data.roles);
+                    showUserInfo(data.username);
                     closeLoginModal(); // ✅ 關閉彈跳框
                 } else {
                     alert("登入失敗，請檢查帳號密碼");
@@ -302,7 +304,7 @@
             .then(data => {
                 clearTimeout(timeoutId); // 若 API 回應正常，清除超時計時器
                 if (data.valid) {
-                    sessionStorage.setItem("loggedInUser", data.username);
+                    sessionStorage.setItem("loggedInUser", data.userid);
                     sessionStorage.setItem("userRoles", JSON.stringify(data.roles || []));
                     showUserInfo(data.username);
                 } else {
