@@ -1,8 +1,26 @@
-const API_URL = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
-    ? "http://127.0.0.1:5000" 
-    : "https://declaration-wi4s.onrender.com";
+import { CONFIG } from './config.js';
 
-console.log("API_URL:", API_URL);
+// 設定時區：台灣時間 (UTC+8)
+function isWithinActiveHours() {
+    const now = new Date();
+    const taiwanOffset = 8 * 60; // UTC+8，單位分鐘
+    const taiwanTime = new Date(now.getTime() + (taiwanOffset - now.getTimezoneOffset()) * 60000);
+    const hour = taiwanTime.getHours();
+
+    return hour >= CONFIG.ACTIVE_HOURS.start && hour < CONFIG.ACTIVE_HOURS.end; // 只允許 08:00 - 20:00
+}
+
+// 每 10 分鐘檢查一次
+setInterval(() => {
+    if (isWithinActiveHours()) {
+        fetch(CONFIG.API_URL)
+            .then(response => response.json())
+            .then(data => console.log("✅ 伺服器保持活躍:", data.message))
+            .catch(error => console.error("❌ 無法連線到伺服器:", error));
+    } else {
+        console.log("⏳ 非活躍時段，不發送 ping");
+    }
+}, CONFIG.PING_INTERVAL); // 10 分鐘
 
 document.addEventListener("DOMContentLoaded", function () {
     checkLoginStatus();
