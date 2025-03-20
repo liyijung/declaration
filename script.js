@@ -149,7 +149,7 @@ function showUserInfo(username) {
 }
 
 // 🔐 驗證點擊報單權限
-function checkLogin(event, page) {
+window.checkLogin = function(event, page) {
     const token = localStorage.getItem("token");
     if (!token) {
         event.preventDefault();
@@ -172,10 +172,10 @@ function checkLogin(event, page) {
     }
 
     window.location.href = page;
-}
+};
 
 // 🔍 登入逾時處理
-function handleSessionTimeout(message = "登入逾時，請重新登入！") {
+window.handleSessionTimeout = function(message = "登入逾時，請重新登入！") {
     alert(message);
     localStorage.removeItem("token"); // 清除 token
     localStorage.removeItem("loggedInUser");
@@ -183,7 +183,7 @@ function handleSessionTimeout(message = "登入逾時，請重新登入！") {
     sessionStorage.clear(); // 清除 session
     window.location.reload();
     window.location.href = "https://liyijung.github.io/declaration/"; // 重新導向到登入頁
-}
+};
 
 // 公告視窗
 setTimeout(() => {
