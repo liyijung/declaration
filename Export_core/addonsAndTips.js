@@ -1138,6 +1138,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+let isWeightWarningVisible = false; // 避免重複觸發警告
+
 document.addEventListener("DOMContentLoaded", function () {
     const totCtnInput = document.getElementById("TOT_CTN");
     const dclGwInput = document.getElementById("DCL_GW");
@@ -1148,13 +1150,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!isNaN(totCtn) && totCtn > 0 && !isNaN(dclGw)) {
             const avgWeight = dclGw / totCtn;
+
             if (avgWeight > 70) {
-                iziToast.warning({
-                    title: "注意",
-                    message: "單件超過70公斤，需一般倉通關",
-                    position: "center",
-                    timeout: 4000,
-                    backgroundColor: '#ffeb3b',
+                requestAnimationFrame(() => {
+                    if (!isWeightWarningVisible) { // 確保 `iziToast` 只顯示一次
+                        isWeightWarningVisible = true;
+                        
+                        iziToast.warning({
+                            title: "注意",
+                            message: "單件超過70公斤，需一般倉通關",
+                            position: "topRight",
+                            timeout: 3000,
+                            backgroundColor: '#ffeb3b',
+                            onClosing: function() {
+                                isWeightWarningVisible = false; // `iziToast` 關閉時解除鎖定
+                            }
+                        });
+                    }
                 });
             }
         }
