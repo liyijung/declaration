@@ -173,3 +173,11 @@ setTimeout(() => {
 document.getElementById('close-btn').addEventListener('click', () => {
     document.getElementById('announcement-box').style.bottom = '-100%';
 });
+
+// 載入頁面時同步 Maker
+document.addEventListener("DOMContentLoaded", function () {
+    const savedMaker = sessionStorage.getItem("Maker") || localStorage.getItem("Maker");
+    if (savedMaker) {
+        document.getElementById("Maker").value = savedMaker;
+    }
+});
