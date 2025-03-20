@@ -1817,34 +1817,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }, 500); // ⏳ 加入 500ms 延遲，確保 DOM 載入完成
 });
-
-import { CONFIG } from '../config.js';
-
-// 🔄 每 12 小時檢查 Token 是否過期
-function checkTokenExpiration() {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        window.location.href = "index.html"; // 如果沒 Token，直接回登入頁
-        return;
-    }
-    
-    fetch(`${CONFIG.API_URL}/verify`, {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${token}` }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (!data.valid) {
-            localStorage.removeItem("token"); // 清除 Token
-            sessionStorage.clear(); // 清除用戶資訊
-            window.location.href = "index.html"; // 跳回登入頁
-        }
-    })
-    .catch(() => console.log("⚠️ 無法驗證 Token，可能是伺服器問題"));
-}
-
-// **每 12 小時檢查一次**
-setInterval(checkTokenExpiration, CONFIG.TOKEN_CHECK_INTERVAL);
-
-// **頁面載入時立即檢查**
-document.addEventListener("DOMContentLoaded", checkTokenExpiration);
