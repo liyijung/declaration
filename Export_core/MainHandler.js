@@ -1818,7 +1818,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 500); // ⏳ 加入 500ms 延遲，確保 DOM 載入完成
 });
 
-import { CONFIG } from './config.js';
+import { CONFIG } from '../config.js';
 
 // 🔄 每 12 小時檢查 Token 是否過期
 function checkTokenExpiration() {
