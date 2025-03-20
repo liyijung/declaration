@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem("loggedInUser", userid); // 存入使用者名稱
             localStorage.setItem("username", data.username);
             localStorage.setItem("userRoles", JSON.stringify(data.roles || [])); // 存入角色權限
+            localStorage.setItem("Maker", data.username);
             
             // 🔹 存入 SessionStorage，避免返回上一頁後丟失
             sessionStorage.setItem("loggedInUser", userid);
