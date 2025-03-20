@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const userid = document.getElementById("userid").value;
         const password = document.getElementById("password").value;
 
-        const response = await fetch(`${API_URL}/login`, {
+        const response = await fetch(`${CONFIG.API_URL}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userid, password })
@@ -108,7 +108,7 @@ function checkLoginStatus() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 秒超時
 
-    fetch(`${API_URL}/verify`, {
+    fetch(`${CONFIG.API_URL}/verify`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` },
         signal: controller.signal // 傳遞 signal
