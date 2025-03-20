@@ -1818,6 +1818,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 500); // ⏳ 加入 500ms 延遲，確保 DOM 載入完成
 });
 
+import { CONFIG } from './config.js';
+
 // 🔄 每 12 小時檢查 Token 是否過期
 function checkTokenExpiration() {
     const token = localStorage.getItem("token");
@@ -1825,12 +1827,8 @@ function checkTokenExpiration() {
         window.location.href = "index.html"; // 如果沒 Token，直接回登入頁
         return;
     }
-
-    const API_URL = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
-        ? "http://127.0.0.1:5000" 
-        : "https://declaration-wi4s.onrender.com";
     
-    fetch(`${API_URL}/verify`, {
+    fetch(`${CONFIG.API_URL}/verify`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` }
     })
@@ -1846,7 +1844,7 @@ function checkTokenExpiration() {
 }
 
 // **每 12 小時檢查一次**
-setInterval(checkTokenExpiration, 12 * 60 * 60 * 1000);
+setInterval(checkTokenExpiration, CONFIG.TOKEN_CHECK_INTERVAL);
 
 // **頁面載入時立即檢查**
 document.addEventListener("DOMContentLoaded", checkTokenExpiration);
