@@ -177,6 +177,10 @@ def logout():
         revoked_tokens.add(token)  # 🛑 把 Token 加入黑名單
     return jsonify({"message": "登出成功"})
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    return jsonify({"message": "pong", "status": "active"}), 200
+    
 # ✅ **啟動 Flask 伺服器**
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
