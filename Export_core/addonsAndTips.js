@@ -1159,7 +1159,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         iziToast.warning({
                             title: "注意",
                             message: "單件超過70公斤，需一般倉通關",
-                            position: "topRight",
+                            position: "center",
                             timeout: 3000,
                             backgroundColor: '#ffeb3b',
                             onClosing: function() {
