@@ -1789,7 +1789,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function checkExportAccess() {
     const token = localStorage.getItem("token");
-    const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || "[]");
+    const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || localStorage.getItem("userRoles") || "[]");
 
     if (!token || userRoles.length === 0) {
         window.location.href = "index.html";
@@ -1807,7 +1807,7 @@ function checkExportAccess() {
 // 🔄 **自動填入「製單人員」欄位**
 document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => {
-        const username = sessionStorage.getItem("username") || "未設定"; // 預設值「未設定」
+        const username = sessionStorage.getItem("username") || localStorage.getItem("username") || "未設定"; // 預設值「未設定」
         const makerField = document.getElementById("Maker");
 
         if (makerField) {
