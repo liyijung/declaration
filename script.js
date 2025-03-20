@@ -163,6 +163,7 @@ function handleSessionTimeout(message = "登入逾時，請重新登入！") {
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("userRoles");
     sessionStorage.clear(); // 清除 session
+    window.location.reload();
     window.location.href = "https://liyijung.github.io/declaration/"; // 重新導向到登入頁
 }
 
