@@ -6,12 +6,16 @@ function isWithinActiveHours() {
     const taiwanOffset = 8 * 60; // UTC+8，單位分鐘
     const taiwanTime = new Date(now.getTime() + (taiwanOffset - now.getTimezoneOffset()) * 60000);
     const hour = taiwanTime.getHours();
+    const minute = taiwanTime.getMinutes();
+    const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
 
-    return hour >= CONFIG.ACTIVE_HOURS.start && hour < CONFIG.ACTIVE_HOURS.end; // 只允許 08:00 - 20:00
+    const isActive = hour >= CONFIG.ACTIVE_HOURS.start && hour < CONFIG.ACTIVE_HOURS.end;
+    console.log(`⏰ 台灣時間 ${timeStr} → ${isActive ? '活躍時段 ✅' : '非活躍時段 ⏳'}`);
+    return isActive;
 }
 
-// 每 10 分鐘檢查一次
-setInterval(() => {
+// ✅ 封裝 ping 功能
+function pingServer() {
     if (isWithinActiveHours()) {
         fetch(CONFIG.API_URL)
             .then(response => response.json())
@@ -20,7 +24,13 @@ setInterval(() => {
     } else {
         console.log("⏳ 非活躍時段，不發送 ping");
     }
-}, CONFIG.PING_INTERVAL); // 10 分鐘
+}
+
+// ✅ 頁面載入時立即執行一次
+pingServer();
+
+// ✅ 每 10 分鐘檢查一次
+setInterval(pingServer, CONFIG.PING_INTERVAL);
 
 document.addEventListener("DOMContentLoaded", function () {
     checkLoginStatus();
