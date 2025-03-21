@@ -25,9 +25,10 @@ function isWithinActiveHours() {
 // ✅ 封裝 ping 功能
 function pingServer() {
     if (isWithinActiveHours()) {
-        fetch(CONFIG.API_URL)
-            .then(response => response.json())
-            .then(data => console.log("✅ 伺服器保持活躍:", data.message))
+        fetch(CONFIG.API_URL, { method: 'HEAD' })
+            .then(response => {
+                console.log(`✅ PING 回應狀態碼: ${response.status}`);
+            })
             .catch(error => console.error("❌ 無法連線到伺服器:", error));
     } else {
         console.log("⏳ 非活躍時段，不發送 ping");
