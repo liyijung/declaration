@@ -1,0 +1,19 @@
+name: Keep Render Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # 每 10 分鐘執行一次
+  workflow_dispatch:        # 允許手動觸發
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Server with Output
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://declaration-wi4s.onrender.com)
+          echo "Response Code: $RESPONSE"
+          if [ "$RESPONSE" != "200" ]; then
+            echo "Ping failed or server is not ready"
+            exit 1
+          fi
