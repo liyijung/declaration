@@ -25,7 +25,7 @@ function isWithinActiveHours() {
 // ✅ 封裝 ping 功能
 function pingServer() {
     if (isWithinActiveHours()) {
-        fetch(CONFIG.API_URL, { method: 'HEAD' })
+        fetch(`${CONFIG.API_URL}/ping`, { method: 'HEAD' })
             .then(response => {
                 console.log(`✅ PING 回應狀態碼: ${response.status}`);
             })
