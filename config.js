@@ -4,5 +4,5 @@ export const CONFIG = {
         : "https://declaration-wi4s.onrender.com",
     TOKEN_CHECK_INTERVAL: 43200000, // 12 小時 (毫秒)
     PING_INTERVAL: 600000, // 10 分鐘 (毫秒)
-    ACTIVE_HOURS: { start: 8, end: 20 }, // 活躍時段 08:00 - 20:00
+    ACTIVE_HOURS: { start: 0, end: 12 }, // UTC+8 活躍時段 08:00 - 20:00
 };
