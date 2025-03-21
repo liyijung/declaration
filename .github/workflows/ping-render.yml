@@ -2,18 +2,42 @@ name: Keep Render Alive
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # 每 10 分鐘執行一次
+    - cron: '*/10 * * * *'  # 每 10 分鐘執行一次（UTC 時區）
   workflow_dispatch:        # 允許手動觸發
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Render Server with Output
+      - name: Set Timezone to Asia/Taipei
         run: |
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://declaration-wi4s.onrender.com)
+          sudo apt-get update
+          sudo apt-get install -y tzdata
+          sudo ln -sf /usr/share/zoneinfo/Asia/Taipei /etc/localtime
+          echo "Asia/Taipei" | sudo tee /etc/timezone
+          date
+
+      - name: Check Active Hours (Taiwan Time)
+        id: check-time
+        run: |
+          hour=$(date +"%H")
+          echo "Current Taiwan Hour: $hour"
+          if [ "$hour" -ge 8 ] && [ "$hour" -lt 20 ]; then
+            echo "within_active_hours=true" >> $GITHUB_OUTPUT
+          else
+            echo "within_active_hours=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Ping Render Server with Output (Only in Active Hours)
+        if: steps.check-time.outputs.within_active_hours == 'true'
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://declaration-wi4s.onrender.com/ping)
           echo "Response Code: $RESPONSE"
           if [ "$RESPONSE" != "200" ]; then
             echo "Ping failed or server is not ready"
             exit 1
           fi
+
+      - name: Skip Ping (Outside Active Hours)
+        if: steps.check-time.outputs.within_active_hours == 'false'
+        run: echo "⏳ 非活躍時段，不發送 ping"
