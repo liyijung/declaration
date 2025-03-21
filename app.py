@@ -180,6 +180,10 @@ def logout():
 @app.route('/ping', methods=['GET'])
 def ping():
     return jsonify({"message": "pong", "status": "active"}), 200
+
+@app.route('/')
+def index():
+    return 'Server is awake!'
     
 # ✅ **啟動 Flask 伺服器**
 if __name__ == '__main__':
