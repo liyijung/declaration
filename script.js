@@ -1,14 +1,22 @@
 import { CONFIG } from './config.js';
 
 // 設定時區：台灣時間 (UTC+8)
+function getTaiwanTime() {
+    const formatter = new Intl.DateTimeFormat('zh-TW', {
+        timeZone: 'Asia/Taipei',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    });
+    const parts = formatter.formatToParts(new Date());
+    const hour = parseInt(parts.find(p => p.type === 'hour').value, 10);
+    const minute = parseInt(parts.find(p => p.type === 'minute').value, 10);
+    return { hour, minute };
+}
+    
 function isWithinActiveHours() {
-    const now = new Date();
-    const taiwanOffset = 8 * 60; // UTC+8，單位分鐘
-    const taiwanTime = new Date(now.getTime() + (taiwanOffset - now.getTimezoneOffset()) * 60000);
-    const hour = taiwanTime.getHours();
-    const minute = taiwanTime.getMinutes();
+    const { hour, minute } = getTaiwanTime();
     const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-
     const isActive = hour >= CONFIG.ACTIVE_HOURS.start && hour < CONFIG.ACTIVE_HOURS.end;
     console.log(`⏰ 台灣時間 ${timeStr} → ${isActive ? '活躍時段 ✅' : '非活躍時段 ⏳'}`);
     return isActive;
