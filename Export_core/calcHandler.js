@@ -196,6 +196,11 @@ function calculateAmounts() {
         calculationAlerts = `【${termsSales} 計算公式：${explanation}】\n系統計算的總金額為：${currency} ${calculatedTotalAmount.toFixed(decimalPlaces)}\n----------------------------------------------------\n報單表頭的總金額為：${currency} ${totalDocumentAmount.toFixed(decimalPlaces)}【錯誤！】\n各項次金額的加總為：${currency} ${totalItemsAmount.toFixed(decimalPlaces)}\n`;
     }
 
+    console.log("calculatedTotalAmount:", calculatedTotalAmount);
+    console.log("totalDocumentAmount:", totalDocumentAmount);
+    console.log("toFixed compare:", calculatedTotalAmount.toFixed(2) === totalDocumentAmount.toFixed(2));
+    console.log("difference:", Math.abs(calculatedTotalAmount - totalDocumentAmount));
+        
     // 定義關鍵字分類及對應的提示訊息
     const keywordMessages = {
         additionalCosts: ["COST", "FEE", "CHARGE", "FREIGHT", "INSURANCE", "DISCOUNT", "SHIPPING", "POSTAGE"], // 其他費用
