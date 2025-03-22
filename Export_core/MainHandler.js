@@ -1121,26 +1121,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    checkExportAccess();
-});
-
-function checkExportAccess() {
-    const token = localStorage.getItem("token");
-    const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || localStorage.getItem("userRoles") || "[]");
-
-    if (!token || userRoles.length === 0) {
-        window.location.href = "index.html";
-        return;
-    }
-
-    if (!userRoles.includes("export") && !userRoles.includes("manager")) {
-        window.location.href = "index.html";
-        return;
-    }
-
-}
-
 // 🔄 **自動填入「製單人員」欄位**
 document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => {
