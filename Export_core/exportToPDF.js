@@ -905,38 +905,6 @@ async function exportToPDF() {
 // 為輸出PDF按鈕添加事件監聽器
 document.getElementById('export-to-pdf').addEventListener('click', exportToPDF);
 
-async function fetchDateRange() {
-    try {
-        const response = await fetch('gc331_current.json');
-        if (!response.ok) {
-            throw new Error('無法讀取 gc331_current.json');
-        }
-        const data = await response.json();
-
-        // 將西元年轉換為民國年
-        function convertToTaiwanDateFormat(dateStr) {
-            if (dateStr.length !== 8) {
-                throw new Error("日期格式錯誤，應為 YYYYMMDD");
-            }
-            const year = parseInt(dateStr.substring(0, 4), 10); // 取出西元年
-            const monthDay = dateStr.substring(4);              // 取出 MMDD
-            const taiwanYear = year - 1911;                     // 民國年 = 西元年 - 1911
-            return taiwanYear.toString() + monthDay;            // 組合民國年與 MMDD
-        }
-
-        return {
-            startDate: convertToTaiwanDateFormat(data.start), // 動態讀取並轉換開始日期
-            endDate: convertToTaiwanDateFormat(data.end)      // 動態讀取並轉換結束日期
-        };
-    } catch (error) {
-        console.error('讀取日期區間時發生錯誤：', error);
-        return {
-            startDate: '0000000', // 默認值：民國年格式
-            endDate: '9999999'
-        };
-    }
-}
-
 let cachedAeoMapping = null;
 
 // 取得 AEO 對照表並快取
@@ -968,41 +936,6 @@ async function getAeoMapping() {
 async function getAeoNumber(shprBanId) {
     const aeoMapping = await getAeoMapping();
     return aeoMapping[shprBanId] || '';  // 若查不到則返回空字串
-}
-
-// 全域變數：快取匯率數據，避免頻繁請求
-let cachedExchangeRates = null;
-
-// 從 gc331_current.json 檔案中獲取匯率數據（使用快取）
-async function fetchExchangeRates() {
-    if (cachedExchangeRates) {
-        return cachedExchangeRates; // 若已有快取則直接返回
-    }
-
-    try {
-        const response = await fetch('gc331_current.json');
-        if (!response.ok) {
-            throw new Error(`HTTP 錯誤！狀態碼：${response.status}，URL：${response.url}`);
-        }
-        const data = await response.json();
-        
-        // 轉換為 { "TWD": { buyValue: "1", sellValue: "1" }, ... } 格式
-        const exchangeRates = {};
-        if (data.items) {
-            data.items.forEach(item => {
-                exchangeRates[item.code] = {
-                    buyValue: item.buyValue,
-                    sellValue: item.sellValue
-                };
-            });
-        }
-
-        cachedExchangeRates = exchangeRates; // 快取數據
-        return exchangeRates;
-    } catch (error) {
-        console.error('獲取匯率數據時出錯:', error.message);
-        return {}; // 返回空物件，避免 `null` 造成 TypeError
-    }
 }
 
 // 查找並更新匯率
