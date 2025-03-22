@@ -67,6 +67,8 @@ def get_user_role(userid):
             # 🔹 確保 `role` 不會是空字串
             if role == "manager":
                 roles = ["manager", "export", "import"]
+            elif role == "export,import":
+                roles = ["export", "import"]
             elif role == "export":
                 roles = ["export"]
             elif role == "import":
