@@ -464,3 +464,160 @@ function removeHighlight(element) {
         row.classList.remove('highlight-row');
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /**
+     * 檢查元素是否可見（排除 display: none、visibility: hidden、hidden 屬性、.hidden 類別）
+     * @param {HTMLElement} el - 欲檢查的元素
+     * @returns {boolean} - 是否可見
+     */
+    function isVisible(el) {
+        return (
+            el.offsetParent !== null &&
+            !el.hasAttribute("hidden") &&
+            !el.classList.contains("hidden") &&
+            getComputedStyle(el).visibility !== "hidden"
+        );
+    }
+
+    /**
+     * 套用 Alt + 上下鍵 切換功能至指定區塊
+     * @param {string} containerSelector - 區塊的 CSS 選擇器
+     */
+    function enableAltArrowNavigation(containerSelector) {
+        // 取得區塊內所有 input 與 textarea 欄位
+        const focusableElements = Array.from(
+            document.querySelectorAll(`${containerSelector} input, ${containerSelector} textarea`)
+        );
+
+        // 對每個欄位綁定 Alt + 上下鍵事件
+        focusableElements.forEach((el, index) => {
+            el.addEventListener("keydown", (e) => {
+                // Alt + ↑：跳到上一個可見欄位
+                if (e.altKey && e.key === "ArrowUp") {
+                    e.preventDefault();
+                    let prevIndex = index - 1;
+                    while (prevIndex >= 0) {
+                        if (isVisible(focusableElements[prevIndex])) {
+                            focusableElements[prevIndex].focus();
+                            break;
+                        }
+                        prevIndex--;
+                    }
+                }
+                // Alt + ↓：跳到下一個可見欄位
+                else if (e.altKey && e.key === "ArrowDown") {
+                    e.preventDefault();
+                    let nextIndex = index + 1;
+                    while (nextIndex < focusableElements.length) {
+                        if (isVisible(focusableElements[nextIndex])) {
+                            focusableElements[nextIndex].focus();
+                            break;
+                        }
+                        nextIndex++;
+                    }
+                }
+            });
+        });
+    }
+
+    // 套用於報單表頭
+    enableAltArrowNavigation("#header");
+
+    // 套用於新增項次彈跳框
+    enableAltArrowNavigation("#item-modal");
+
+});
+
+// 使用事件代理處理所有 type="number" 的輸入框
+document.addEventListener('keydown', function(event) {
+    const target = event.target;
+
+    // 當目標是 type="number" 的輸入框，禁止調整數值
+    if (target.tagName === 'INPUT' && target.type === 'number') {
+        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+            event.preventDefault();
+        }
+    }
+});
+
+// 防止數字輸入框的滾輪調整，但允許頁面滾動
+document.addEventListener('wheel', function(event) {
+    const target = event.target;
+
+    // 當目標是 type="number" 的輸入框且輸入框處於聚焦狀態時，禁止滾輪調整數值
+    if (target.tagName === 'INPUT' && target.type === 'number' && target === document.activeElement) {
+        event.preventDefault(); // 禁止滾輪調整數值
+    }
+}, { passive: false }); // 使用 { passive: false } 以便可以調用 preventDefault
+
+let isWeightWarningVisible = false; // 避免重複觸發警告
+
+document.addEventListener("DOMContentLoaded", function () {
+    const totCtnInput = document.getElementById("TOT_CTN");
+    const dclGwInput = document.getElementById("DCL_GW");
+
+    function checkWeightLimit() {
+        const totCtn = parseInt(totCtnInput.value, 10);
+        const dclGw = parseFloat(dclGwInput.value);
+
+        if (!isNaN(totCtn) && totCtn > 0 && !isNaN(dclGw)) {
+            const avgWeight = dclGw / totCtn;
+
+            if (avgWeight > 70) {
+                requestAnimationFrame(() => {
+                    if (!isWeightWarningVisible) { // 確保 `iziToast` 只顯示一次
+                        isWeightWarningVisible = true;
+                        
+                        iziToast.warning({
+                            title: "注意",
+                            message: "單件超過70公斤，需一般倉通關",
+                            position: "center",
+                            timeout: 3000,
+                            backgroundColor: '#ffeb3b',
+                            onClosing: function() {
+                                isWeightWarningVisible = false; // `iziToast` 關閉時解除鎖定
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    totCtnInput.addEventListener("input", checkWeightLimit);
+    dclGwInput.addEventListener("input", checkWeightLimit);
+});
+
+// 啟用事件監聽，處理貿易條件的樣式變更
+handleTradeTerms('TERMS_SALES');
+
+function handleTradeTerms(inputId) {
+    // 根據輸入的貿易條件，動態調整運費、保險費、應加費用及應減費用欄位的樣式
+    document.getElementById(inputId).addEventListener('input', function () {
+        let tradeTerm = this.value.toUpperCase().trim(); // 轉換為大寫並去除空白
+        let fieldActions = {
+            'EXW': { freight: false, insurance: false, add: true, subtract: false },
+            'FOB': { freight: false, insurance: false, add: false, subtract: false },
+            'CFR': { freight: true, insurance: false, add: false, subtract: false },
+            'C&I': { freight: false, insurance: true, add: false, subtract: false },
+            'CIF': { freight: true, insurance: true, add: false, subtract: false },
+            'default': { freight: true, insurance: true, add: true, subtract: true }
+        };
+        
+        let config = fieldActions[tradeTerm] || fieldActions['default'];
+        updateFieldStyle('FRT_AMT', config.freight);  // 運費
+        updateFieldStyle('INS_AMT', config.insurance); // 保險費
+        updateFieldStyle('ADD_AMT', config.add); // 應加費用
+        updateFieldStyle('SUBTRACT_AMT', config.subtract); // 應減費用
+    });
+}
+
+function updateFieldStyle(fieldId, removeStyle) {
+    // 根據條件，新增或移除指定欄位的背景樣式
+    let label = document.querySelector(`label[for="${fieldId}"]`);
+    if (label) {
+        removeStyle ? label.removeAttribute('style') : label.setAttribute('style', 'background: #ffffff00;');
+    }
+}
