@@ -13,16 +13,16 @@ jobs:
       - name: Checkout public repository
         uses: actions/checkout@v3
 
-      - name: Clone private config repository
+      - name: Clone private config repository and copy config.js
         env:
           TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
           USER: ${{ secrets.GIT_USERNAME }}
         run: |
           git clone https://${USER}:${TOKEN}@github.com/${USER}/declaration_config.git temp-config
           cp temp-config/config.js ./config.js
-          ls -al
+          rm -rf temp-config  # 🔥 移除 submodule 來源，避免 Git 警告
 
-      - name: Deploy to GitHub Pages
+      - name: Setup Git identity and push to gh-pages
         env:
           TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
           USER: ${{ secrets.GIT_USERNAME }}
