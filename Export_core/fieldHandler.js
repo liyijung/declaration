@@ -15,6 +15,9 @@ function openSpecifyFieldModal() {
     // 檢查是否顯示 "起始編號" 或 "填列內容"
     checkFieldDisplay();
 
+    // 更新源項次下拉選單
+    populateSourceItemDropdown();
+
     // 監聽 ESC 鍵，表示取消
     document.addEventListener('keydown', handleEscKeyForSpecifyFieldCancel);
 }
@@ -68,7 +71,6 @@ function toggleSpecifyMode() {
     if (specifyMode === 'copy') {
         customContent.style.display = 'none';
         copyContent.style.display = 'block';
-        populateSourceItemDropdown();
 
         // 隱藏「符合條件」及「不符合條件」選項
         optionsToHide.forEach(option => option.style.display = 'none');
