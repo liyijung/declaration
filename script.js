@@ -193,6 +193,32 @@ window.checkLogin = function(event, page) {
     window.location.href = page;
 };
 
+document.addEventListener("DOMContentLoaded", function () {
+    checkExportAccess();
+});
+
+function checkExportAccess() {
+    const token = localStorage.getItem("token");
+    const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || localStorage.getItem("userRoles") || "[]");
+    const currentPage = window.location.pathname;
+
+    if (!token || userRoles.length === 0) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    if (currentPage.includes("Export") && !userRoles.includes("export") && !userRoles.includes("manager")) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    if (currentPage.includes("Import") && !userRoles.includes("import") && !userRoles.includes("manager")) {
+        window.location.href = "index.html";
+        return;
+    }
+
+}
+
 // 🔍 登入逾時處理
 window.handleSessionTimeout = function(message = "登入逾時，請重新登入！") {
     alert(message);
