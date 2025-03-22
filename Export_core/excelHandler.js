@@ -567,3 +567,11 @@ function exportToExcel() {
     // 下載 Excel 文件
     XLSX.writeFile(workbook, exportFileName);
 }
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    // 添加事件監聽器到匯入Excel按鈕
+    document.getElementById('import-excel').addEventListener('change', importToExcel, false);
+
+    // 添加事件監聽器到匯出Excel按鈕
+    document.getElementById('export-excel').addEventListener('click', exportToExcel);
+});
