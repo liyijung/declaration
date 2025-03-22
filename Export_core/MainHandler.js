@@ -1,3 +1,24 @@
+// 🔐 驗證權限
+document.addEventListener("DOMContentLoaded", function () {
+    checkExportAccess();
+});
+
+function checkExportAccess() {
+    const token = localStorage.getItem("token");
+    const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || localStorage.getItem("userRoles") || "[]");
+    const currentPage = window.location.pathname;
+
+    if (!token || userRoles.length === 0) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    if (currentPage.includes("Export") && !userRoles.includes("export") && !userRoles.includes("manager")) {
+        window.location.href = "index.html";
+        return;
+    }
+}
+
 // 游標在頁面載入後自動聚焦到 文件編號 欄位
 window.onload = function() {
     document.getElementById("FILE_NO").focus();
