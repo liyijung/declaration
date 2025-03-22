@@ -1135,7 +1135,6 @@ function checkExportAccess() {
     }
 
     if (!userRoles.includes("export") && !userRoles.includes("manager")) {
-        alert("❌ 無權限進入【出口報單】");
         window.location.href = "index.html";
         return;
     }
