@@ -1140,14 +1140,6 @@ function setupCneeCNameWatcher() {
         updateCneeLabelText(); // **確保標題同步變更**
     }
 
-    function updateCneeLabelText() {
-        if (cneeCNameGroup.classList.contains("hidden")) {
-            toggleLabel.textContent = "買方中/英名稱";
-        } else {
-            toggleLabel.textContent = "買方英文名稱";
-        }
-    }
-
     // 監聽手動輸入變化
     cneeCNameInput.addEventListener("input", updateVisibility);
     cneeCNameInput.addEventListener("change", updateVisibility);
