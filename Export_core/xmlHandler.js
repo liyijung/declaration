@@ -96,6 +96,11 @@ function importXML(event) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    // 添加事件監聽器到匯入XML按鈕
+    document.getElementById('import-xml').addEventListener('change', importXML, false);
+});
+
 // 匯出XML的功能(含檢查)
 document.addEventListener('DOMContentLoaded', function () {
     // 為 QTY 和 DOC_UNIT_P 輸入框添加事件監聽器
