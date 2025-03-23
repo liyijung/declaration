@@ -317,7 +317,7 @@ function showHint(input, message) {
     hint.style.border = '1px solid rgba(255, 0, 0, 0.5)';
     hint.style.padding = '2px 6px';
     hint.style.borderRadius = '4px';
-    hint.style.fontSize = '12px';
+    hint.style.fontSize = '14px';
     hint.style.color = 'rgba(255, 0, 0, 0.8)';
     hint.style.whiteSpace = 'nowrap';
     hint.style.top = `${input.offsetTop - input.offsetHeight}px`;
