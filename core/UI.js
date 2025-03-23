@@ -312,7 +312,6 @@ function showHint(input, message) {
     hint.textContent = message;
 
     hint.style.position = 'absolute';
-    hint.style.zIndex = '1000';
     hint.style.backgroundColor = '#fff';
     hint.style.border = '1px solid rgba(255, 0, 0, 0.5)';
     hint.style.padding = '2px 6px';
