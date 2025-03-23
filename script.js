@@ -125,7 +125,7 @@ function checkLoginStatus() {
 
     // 超時計時器
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 7000); // 7 秒超時
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 秒超時
 
     fetch(`${CONFIG.API_URL}/verify`, {
         method: "POST",
