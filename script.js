@@ -144,10 +144,13 @@ function checkLoginStatus() {
         }
     })
     .catch(error => {
+        clearTimeout(timeoutId);
         if (error.name === "AbortError") {
-            console.warn("API 逾時，登出...");
-            handleSessionTimeout();
+            console.warn("⏱ API 逾時，自動登出");
+        } else {
+            console.error("❌ 發生錯誤：", error);
         }
+        handleSessionTimeout();
     });
 }
 
