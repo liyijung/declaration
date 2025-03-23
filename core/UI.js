@@ -311,6 +311,20 @@ function showHint(input, message) {
     hint.className = 'input-hint';
     hint.textContent = message;
 
+    hint.style.position = 'absolute';
+    hint.style.zIndex = '1000';
+    hint.style.backgroundColor = '#fff';
+    hint.style.border = '1px solid rgba(255, 0, 0, 0.5)';
+    hint.style.padding = '2px 6px';
+    hint.style.borderRadius = '4px';
+    hint.style.fontSize = '12px';
+    hint.style.color = 'rgba(255, 0, 0, 0.8)';
+    hint.style.whiteSpace = 'nowrap';
+    hint.style.top = `${input.offsetTop - input.offsetHeight}px`;
+    hint.style.left = `${input.offsetLeft}px`;
+
+    input.parentNode.style.position = 'relative';
+    
     if (!input.nextElementSibling || input.nextElementSibling.className !== 'input-hint') {
         input.insertAdjacentElement('afterend', hint);
 
