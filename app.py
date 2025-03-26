@@ -13,10 +13,10 @@ load_dotenv()
 app = Flask(__name__)
 
 # ✅ 允許前端（GitHub Pages）請求後端 API
-CORS(app, origins=[
+CORS(app, resources={r"/*": {"origins": [
     "http://127.0.0.1:5500",
     "https://liyijung.github.io"
-])
+]}}, supports_credentials=True)
 
 # 🔐 取得環境變數中的密鑰
 SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
