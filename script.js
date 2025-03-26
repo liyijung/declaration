@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const response = await fetch(`${CONFIG.API_URL}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ userid, password })
         });
 
