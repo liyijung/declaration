@@ -911,7 +911,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 組合備註內容，"一般倉" 放最前面
         let remarks = [];
-        if (generalWarehouseChecked) {
+        if (generalWarehouseChecked || dclDocType === 'F5') {
             remarks.push("一般倉");
         }
         if (remarkElement) {
