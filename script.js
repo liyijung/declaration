@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const response = await fetch(`${CONFIG.API_URL}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            credentials: "include", // ✅ 跨域必加
             body: JSON.stringify({ userid, password })
         });
 
@@ -81,8 +81,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 🔓 登出功能
     document.getElementById("logout-btn").addEventListener("click", function () {
+        const token = localStorage.getItem("token");
+
+        // 如果有登入才呼叫 logout API
+        if (token) {
+            fetch(`${CONFIG.API_URL}/logout`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` },
+                credentials: "include" // ✅ 跨域必加
+            }).then(res => res.json())
+            .then(data => console.log(data.message || "已登出"));
+        }
+
+        // 不論是否成功都清除本地資訊
         localStorage.removeItem("token");
-        localStorage.removeItem("loggedInUser");  // ✅ 確保登出時清除
+        localStorage.removeItem("loggedInUser");
         localStorage.removeItem("userRoles");
         sessionStorage.clear();
         window.location.reload();
@@ -131,8 +144,8 @@ function checkLoginStatus() {
     fetch(`${CONFIG.API_URL}/verify`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` },
-        credentials: "include",
-        signal: controller.signal // 傳遞 signal
+        credentials: "include", // ✅ 跨域必加
+        signal: controller.signal
     })
     .then(res => res.json())
     .then(data => {
