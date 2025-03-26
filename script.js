@@ -131,6 +131,7 @@ function checkLoginStatus() {
     fetch(`${CONFIG.API_URL}/verify`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` },
+        credentials: "include",
         signal: controller.signal // 傳遞 signal
     })
     .then(res => res.json())
