@@ -123,7 +123,7 @@ def verify():
         # ✅ 檢查是否是被登出的 token（黑名單）
         if token in revoked_tokens:
             return jsonify({"valid": False, "message": "Token 已登出"}), 401
-            
+
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"], options={"require": ["exp"]})
         userid = decoded["userid"]
 
