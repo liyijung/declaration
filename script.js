@@ -1,4 +1,9 @@
-import { CONFIG } from './config.js';
+import { CONFIG, detectAPI } from './config.js';
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await detectAPI(); // ⬅️ 自動設定好 API_URL
+    pingServer();
+});
 
 // 設定時區：台灣時間 (UTC+8)
 function getTaiwanTime() {
@@ -22,21 +27,20 @@ function isWithinActiveHours() {
     return isActive;
 }
 
-// ✅ 封裝 ping 功能
+// ✅ 封裝 ping 功能，顯示正在 ping 哪個伺服器
 function pingServer() {
     if (isWithinActiveHours()) {
         fetch(`${CONFIG.API_URL}/ping`, { method: 'HEAD' })
             .then(response => {
-                console.log(`✅ PING 回應狀態碼: ${response.status}`);
+                console.log(`✅ PING 回應狀態碼: ${response.status}（來自 ${CONFIG.API_URL}）`);
             })
-            .catch(error => console.error("❌ 無法連線到伺服器:", error));
+            .catch(error => {
+                console.error(`❌ 無法連線到伺服器：${CONFIG.API_URL}`, error);
+            });
     } else {
         console.log("⏳ 非活躍時段，不發送 ping");
     }
 }
-
-// ✅ 頁面載入時立即執行一次
-pingServer();
 
 // ✅ 每 10 分鐘檢查一次
 setInterval(pingServer, CONFIG.PING_INTERVAL);
