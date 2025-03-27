@@ -1,10 +1,5 @@
 import { CONFIG, detectAPI } from './config.js';
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await detectAPI(); // ⬅️ 自動設定好 API_URL
-    pingServer();
-});
-
 // 設定時區：台灣時間 (UTC+8)
 function getTaiwanTime() {
     const formatter = new Intl.DateTimeFormat('zh-TW', {
@@ -45,8 +40,12 @@ function pingServer() {
 // ✅ 每 10 分鐘檢查一次
 setInterval(pingServer, CONFIG.PING_INTERVAL);
 
-document.addEventListener("DOMContentLoaded", function () {
-    checkLoginStatus();
+document.addEventListener("DOMContentLoaded", async () => {
+    await detectAPI(); // 等待 API_URL 設定好
+    console.log("✅ API_URL 設定為：", CONFIG.API_URL);
+
+    pingServer();       // OK：開始 ping
+    checkLoginStatus(); // OK：確認登入狀態
 
     // 🛠️ 登入表單送出
     document.getElementById("login-form").addEventListener("submit", async function (event) {
@@ -166,8 +165,15 @@ function checkLoginStatus() {
         clearTimeout(timeoutId);
         if (error.name === "AbortError") {
             console.warn("⏱ API 逾時，自動登出");
+            handleSessionTimeout();
         } else {
             console.error("❌ 發生錯誤：", error);
+            
+            // 若是 fetch 無法連線 API，不立即登出，只顯示警告
+            if (CONFIG.API_URL.includes("github.io")) {
+                console.warn("⚠️ API_URL 尚未設定或錯誤，略過登入檢查");
+                return;
+            }
         }
         handleSessionTimeout();
     });
