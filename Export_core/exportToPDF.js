@@ -938,51 +938,6 @@ async function getAeoNumber(shprBanId) {
     return aeoMapping[shprBanId] || '';  // 若查不到則返回空字串
 }
 
-// 查找並更新匯率
-async function lookupExchangeRate() {
-    const currencyInput = document.getElementById("CURRENCY");
-    const errorSpan = document.getElementById("currency-error");
-    const exchangeRateInput = document.getElementById("exchange-rate"); // 匯率欄位
-    const usdExchangeRateInput = document.getElementById("usd-exchange-rate"); // 美金匯率欄位
-
-    // 取得輸入的幣別並轉換為大寫
-    const currencyCode = currencyInput.value.trim().toUpperCase();
-
-    // 只在輸入滿 3 碼時進行查找
-    if (currencyCode.length < 3) {
-        errorSpan.style.display = "none";
-        exchangeRateInput.value = ""; // 清空匯率欄位
-        return;
-    }
-
-    // 獲取匯率數據
-    const exchangeRates = await fetchExchangeRates();
-
-    // 當旬匯率日期區間
-    var { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
-    const { startDate, endDate } = await fetchDateRange();
-
-    // 先處理 USD 匯率（不論輸入什麼幣別都要顯示）
-    if (exchangeRates["USD"]) {
-        usdExchangeRateInput.value = exchangeRates["USD"].buyValue;
-    } else {
-        usdExchangeRateInput.value = "";
-    }
-    
-    // 檢查是否存在該幣別
-    if (exchangeRates[currencyCode] && (Fymd >= startDate && Fymd <= endDate)) {
-        const buyValue = exchangeRates[currencyCode].buyValue;
-        exchangeRateInput.value = buyValue; // 顯示買入價
-        errorSpan.style.display = "none";
-    } else if (Fymd < startDate || Fymd > endDate) {
-        exchangeRateInput.value = ""; // 清空匯率欄位
-        errorSpan.style.display = "none";
-    } else {
-        exchangeRateInput.value = ""; // 清空匯率欄位
-        errorSpan.style.display = "inline";
-    }
-}
-
 // 解析 FILE_NO 取得報關日期
 function getCustomsDeclarationDate() {
     var today = new Date();
