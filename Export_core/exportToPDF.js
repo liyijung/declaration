@@ -904,36 +904,3 @@ async function exportToPDF() {
 
 // 為輸出PDF按鈕添加事件監聽器
 document.getElementById('export-to-pdf').addEventListener('click', exportToPDF);
-
-let cachedAeoMapping = null;
-
-// 取得 AEO 對照表並快取
-async function getAeoMapping() {
-    if (cachedAeoMapping) return cachedAeoMapping;  // 若已有緩存，直接返回
-
-    try {
-        const response = await fetch('AEO_mapping.csv');
-        const csvText = await response.text();
-        const aeoData = Papa.parse(csvText, {
-            header: true,
-            skipEmptyLines: true
-        }).data;
-
-        const aeoMapping = {};
-        aeoData.forEach(row => {
-            aeoMapping[row['統一編號']] = row['AEO編號'];  // 儲存 AEO 編號
-        });
-
-        cachedAeoMapping = aeoMapping;  // 快取對照表
-        return aeoMapping;
-    } catch (error) {
-        console.error('載入 AEO 對照表時發生錯誤:', error);
-        return {};
-    }
-}
-
-// 取得 AEO 編號的通用函數
-async function getAeoNumber(shprBanId) {
-    const aeoMapping = await getAeoMapping();
-    return aeoMapping[shprBanId] || '';  // 若查不到則返回空字串
-}
