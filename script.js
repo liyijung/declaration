@@ -41,9 +41,7 @@ function pingServer() {
 setInterval(pingServer, CONFIG.PING_INTERVAL);
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await detectAPI(); // 等待 API_URL 設定好
-    console.log("✅ API_URL 設定為：", CONFIG.API_URL);
-
+    await detectAPI();  // 等待 API_URL 設定好
     pingServer();       // OK：開始 ping
     checkLoginStatus(); // OK：確認登入狀態
 
