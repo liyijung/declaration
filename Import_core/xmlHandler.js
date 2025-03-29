@@ -17,9 +17,6 @@ function importXML(event) {
         const matchRemark = file.name.match(/【(.*?)】/);
         let fileRemark = matchRemark ? matchRemark[1] : ''; // 若無則回傳空字串
 
-        // 若包含 "一般倉，" 則移除
-        fileRemark = fileRemark.replace(/^一般倉，?/, '').trim();
-
         document.getElementById('REMARK').value = fileRemark;
 
         const reader = new FileReader();
@@ -29,31 +26,12 @@ function importXML(event) {
 
             // 解析表頭資料
             const headerFields = xmlDoc.getElementsByTagName("head")[0].getElementsByTagName("fields");
-            let warehouseChecked = false; // 預設不勾選「一般倉」
             Array.from(headerFields).forEach(field => {
                 const fieldName = field.getElementsByTagName("field_name")[0].textContent;
                 const fieldValue = unescapeXml(field.getElementsByTagName("field_value")[0].textContent);
                 const element = document.getElementById(fieldName);
                 if (element) {
                     element.value = fieldValue;
-                }
-
-                // 若 WAREHOUSE 欄位為 C2036 或 C2040，則勾選「一般倉」
-                if (fieldName === "WAREHOUSE") {
-                    if (fieldValue === "C2036" || fieldValue === "C2040") {
-                        warehouseChecked = true;
-                    }
-                }
-
-                // 解析 DCL_DOC_NO 取 **第 5 個字段**
-                if (fieldName === "DCL_DOC_NO") {
-                    const cleanValue = fieldValue.trim(); // 移除前後空格
-                    const parts = cleanValue.split('/'); // 依照 `/` 切割
-        
-                    // 確保有 **至少 5 個字段**，否則 `DOC_DOC_NO_Last5` 保持空白
-                    const last5Chars = parts.length >= 5 ? parts[4] : "";
-        
-                    document.getElementById("DOC_DOC_NO_Last5").value = last5Chars;
                 }
             });
 
@@ -129,23 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
             examType.value = '';
             copyQty.value = '0';
         }
-
-        // 檢查統計方式及輸出許可號碼欄位，決定是否更新 EXAM_TYPE 為 '8'
-        let shouldSetExamType = false;
-        document.querySelectorAll("#item-container .item-row").forEach((item) => {
-            const stMtdValue = item.querySelector('.ST_MTD')?.value.toUpperCase() || '';
-            const expNoValue = item.querySelector('.EXP_NO')?.value.trim() || '';
-            const expSeqNoValue = item.querySelector('.EXP_SEQ_NO')?.value.trim() || ''; // 確保這裡正確初始化 expSeqNoValue
-        
-            // 判斷 ST_MTD 是否為 '1A', '8A', '8D'，或 EXP_NO 是否為 14 碼，或 EXP_NO 與 EXP_SEQ_NO 皆有值
-            if (['1A', '8A', '8D'].includes(stMtdValue) || expNoValue.length === 14 || (expNoValue && expSeqNoValue)) {
-                shouldSetExamType = true;
-            }
-        });
-    
-        if (shouldSetExamType) {
-            // examType.value = '8'; 暫取消查驗
-        }
         
         // 用於顯示變數值的控制台日誌
         console.log("APP_DUTY_REFUND: " + appDutyRefund.value);
@@ -164,12 +125,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const requiredFields = [
             { id: 'FILE_NO', name: '文件編號' },
-            { id: 'SHPR_BAN_ID', name: '出口人統一編號' },
-            { id: 'SHPR_C_NAME', name: '出口人中文名稱' },
-            { id: 'SHPR_C_ADDR', name: '出口人中文地址' },
-            { id: 'CNEE_COUNTRY_CODE', name: '買方國家代碼' },
-            { id: 'TO_CODE', name: '目的地(代碼)' },
-            { id: 'TO_DESC', name: '目的地(名稱)' },
+            { id: 'SHPR_BAN_ID', name: '進口人統一編號' },
+            { id: 'SHPR_C_NAME', name: '進口人中文名稱' },
+            { id: 'SHPR_C_ADDR', name: '進口人中文地址' },
+            { id: 'CNEE_COUNTRY_CODE', name: '賣方國家代碼' },
+            { id: 'TO_CODE', name: '裝貨港(代碼)' },
+            { id: 'TO_DESC', name: '裝貨港(名稱)' },
             { id: 'TOT_CTN', name: '總件數' },
             { id: 'DOC_CTN_UM', name: '總件數單位' },
             { id: 'DCL_GW', name: '總毛重' },
@@ -213,17 +174,15 @@ document.addEventListener('DOMContentLoaded', function () {
             (!cneeCName || !cneeCName.value.trim()) &&
             (!cneeEName || !cneeEName.value.trim())
         ) {
-            missingFields.push('買方中/英名稱');
+            missingFields.push('賣方中/英名稱');
         }        
 
         // 單獨檢查 CNEE_COUNTRY_CODE
         let countryCodeElement = document.getElementById('CNEE_COUNTRY_CODE');
         if (countryCodeElement && countryCodeElement.value.trim() === 'TW') {
-            // 檢查 CNEE_BAN_ID、BUYER_E_NAME、BUYER_E_ADDR 是否填寫
+            // 檢查 CNEE_BAN_ID 是否填寫
             const additionalFields = [
-                { id: 'CNEE_BAN_ID', name: '買方統一編號' },
-                { id: 'BUYER_E_NAME', name: '收方名稱' },
-                { id: 'BUYER_E_ADDR', name: '收方地址' }
+                { id: 'CNEE_BAN_ID', name: '買方統一編號' }
             ];
 
             additionalFields.forEach(field => {
@@ -238,18 +197,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (missingFields.length > 0) {
             alert(`以下欄位為空，請填寫後再匯出：\n${missingFields.join('、')}`);
             return; // 中止匯出過程
-        }
-
-        // 檢查CNEE_COUNTRY_CODE是否為TW，並確認BUYER_E_NAME, BUYER_E_ADDR是否有值
-        let cneeCountryCode = document.getElementById('CNEE_COUNTRY_CODE')?.value.trim().toUpperCase();
-        if (cneeCountryCode === 'TW') {
-            let buyerEName = document.getElementById('BUYER_E_NAME')?.value.trim();
-            let buyerEAddr = document.getElementById('BUYER_E_ADDR')?.value.trim();
-
-            if (!buyerEName || !buyerEAddr) {
-                alert('買方為台灣營業公司需填列：收方名稱、收方地址');
-                return; // 中止匯出過程
-            }
         }
         
         // 檢查總毛重是否大於總淨重
@@ -327,31 +274,29 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'DOC_TOT_P', name: '金額' },
             { className: 'TRADE_MARK', name: '商標' },
             { className: 'CCC_CODE', name: '稅則' },
-            { className: 'ST_MTD', name: '統計方法' },
+            { className: 'ST_MTD', name: '納稅辦法' },
             { className: 'NET_WT', name: '淨重' }
         ];
 
-        // 檢查 DCL_DOC_TYPE 是否為 B8 或 B9，並確保 SHPR_BONDED_ID 或 FAC_BONDED_ID_EX 其中一欄需有值
-        if (['B8', 'B9'].includes(dclDocType)) {
+        // 檢查 DCL_DOC_TYPE 是否為 B6，並確保 SHPR_BONDED_ID 需有值
+        if (['B6'].includes(dclDocType)) {
             let shprBondedId = document.getElementById('SHPR_BONDED_ID')?.value.trim();
-            let facBondedIdEx = document.getElementById('FAC_BONDED_ID_EX')?.value.trim();
-            let facBanIdEx = document.getElementById('FAC_BAN_ID_EX')?.value.trim();
 
-            // 如果 SHPR_BONDED_ID 和 FAC_BONDED_ID_EX 都為空，則顯示錯誤訊息並中止匯出
-            if (!shprBondedId && !facBondedIdEx) {
-                alert('當報單類別為 B8 或 B9 時，海關監管編號需填列\n(若為合作外銷案件，則改填保稅相關信息—保稅廠欄位)');
+            // 如果 SHPR_BONDED_ID 為空，則顯示錯誤訊息並中止匯出
+            if (!shprBondedId) {
+                alert('當報單類別為 B6 時，海關監管編號需填列');
                 return; // 中止匯出過程
             }
         }
         
-        // 如果 DCL_DOC_TYPE 是 B8、B9、D5 或 F5，還需要檢查 SELLER_ITEM_CODE 和 BOND_NOTE
-        if (['B8', 'B9', 'D5', 'F5'].includes(dclDocType)) {
+        // 如果 DCL_DOC_TYPE 是 B6，還需要檢查 SELLER_ITEM_CODE 和 BOND_NOTE
+        if (['B6'].includes(dclDocType)) {
             itemRequiredFields.push(
-                { className: 'SELLER_ITEM_CODE', name: '賣方料號' },
+                { className: 'SELLER_ITEM_CODE', name: '買方料號' },
                 { className: 'BOND_NOTE', name: '保稅貨物註記' }
             );
         } else {
-            // 如果 DCL_DOC_TYPE 不是 B8、B9、D5 或 F5，則 SHPR_BONDED_ID、SELLER_ITEM_CODE 和 BOND_NOTE 不得填列
+            // 如果 DCL_DOC_TYPE 不是 B6，則 SHPR_BONDED_ID、SELLER_ITEM_CODE 和 BOND_NOTE 不得填列
             let invalidFields = [];
 
             // 檢查 SHPR_BONDED_ID 是否有值
@@ -365,13 +310,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 ['SELLER_ITEM_CODE', 'BOND_NOTE'].forEach(className => {
                     let element = item.querySelector(`.${className}`);
                     if (element && element.value && element.value.trim()) { // 確保 element 存在且 value 有值
-                        invalidFields.push(className === 'SELLER_ITEM_CODE' ? '賣方料號' : '保稅貨物註記');
+                        invalidFields.push(className === 'SELLER_ITEM_CODE' ? '買方料號' : '保稅貨物註記');
                     }
                 });
             });
 
             if (invalidFields.length > 0) {
-                alert(`報單類別不是 B8、B9、D5、F5 ，下列欄位不得填列：\n${invalidFields.join('、')}`);
+                alert(`報單類別不是 B6，下列欄位不得填列：\n${invalidFields.join('、')}`);
                 return; // 中止匯出過程
             }
         }
@@ -425,12 +370,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 成對欄位檢查
                 let expNoAlreadyChecked = false;
                 const pairedFields = [
-                    { fields: ['ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM'], names: ['原進口報單號碼', '原進口報單項次'] },
+                    { fields: ['ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM'], names: ['原出口報單號碼', '原出口報單項次'] },
                     { fields: ['CERT_NO', 'CERT_NO_ITEM'], names: ['產證號碼', '產證項次'] },
                     { fields: ['WIDE', 'WIDE_UM'], names: ['寬度(幅寬)', '寬度單位'] },
                     { fields: ['LENGT_', 'LENGTH_UM'], names: ['長度(幅長)', '長度單位'] },
                     { fields: ['ST_QTY', 'ST_UM'], names: ['統計數量', '統計單位'] },
-                    { fields: ['EXP_NO', 'EXP_SEQ_NO'], names: ['輸出許可號碼', '輸出許可項次'] }
+                    { fields: ['EXP_NO', 'EXP_SEQ_NO'], names: ['輸入許可號碼', '輸入許可項次'] }
                 ];
 
                 // 檢查成對欄位是否同時有值
@@ -461,15 +406,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
-                // 如果 ST_MTD 包含 1A, 8A 或 8D，EXP_NO 和 EXP_SEQ_NO 不可為空
-                if (!expNoAlreadyChecked) { // 只有在成對欄位檢查中未提示過的情況下才進行此檢查
-                    const stMtdValue = item.querySelector('.ST_MTD')?.value.trim();
-                    if (['1A', '8A', '8D'].includes(stMtdValue) && 
-                        (!item.querySelector('.EXP_NO')?.value.trim() || !item.querySelector('.EXP_SEQ_NO')?.value.trim())) {
-                        itemMissingFields.push('統計方式包含 1A、8A、8D，輸出許可號碼 和 輸出許可項次 不可為空');
-                    }
-                }
-
                 // 檢查淨重是否為零
                 let netWtElement = item.querySelector('.NET_WT');
                 if (netWtElement && parseFloat(netWtElement.value.trim()) === 0) {
@@ -493,8 +429,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const fieldLengthChecks = [
             { id: 'FILE_NO', name: '文件編號', validLengths: [10, 11] },
             { id: 'SHPR_BONDED_ID', name: '海關監管編號', validLengths: [5] },
-            { id: 'CNEE_COUNTRY_CODE', name: '買方國家代碼', validLengths: [2] },
-            { id: 'TO_CODE', name: '目的地(代碼)', validLengths: [5] },
+            { id: 'CNEE_COUNTRY_CODE', name: '賣方國家代碼', validLengths: [2] },
+            { id: 'TO_CODE', name: '裝貨港(代碼)', validLengths: [5] },
             { id: 'DOC_CTN_UM', name: '總件數單位', validLengths: [3] },
             { id: 'DCL_DOC_TYPE', name: '報單類別', validLengths: [2] },
             { id: 'TERMS_SALES', name: '貿易條件', validLengths: [3] },
@@ -523,12 +459,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const itemFieldLengthChecks = [
             { className: 'DOC_UM', name: '單位', validLengths: [3] },
             { className: 'CCC_CODE', name: '稅則', validLengths: [11] },
-            { className: 'ST_MTD', name: '統計方式', validLengths: [2] },
+            { className: 'ST_MTD', name: '納稅辦法', validLengths: [2] },
             { className: 'ORG_COUNTRY', name: '生產國別', validLengths: [2] },
-            { className: 'ORG_IMP_DCL_NO', name: '原進口報單號碼', validLengths: [14] },
+            { className: 'ORG_IMP_DCL_NO', name: '原出口報單號碼', validLengths: [14] },
             { className: 'BOND_NOTE', name: '保稅貨物註記', validLengths: [2] },
             { className: 'CERT_NO', name: '產證號碼', validLengths: [11] },
-            { className: 'EXP_NO', name: '輸出許可號碼', validLengths: [14] },
+            { className: 'EXP_NO', name: '輸入許可號碼', validLengths: [14] },
             { className: 'WIDE_UM', name: '寬度單位', validLengths: [3] },
             { className: 'LENGTH_UM', name: '長度單位', validLengths: [3] },
             { className: 'ST_UM', name: '統計單位', validLengths: [3] }
@@ -578,9 +514,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // 檢查這四個欄位並顯示對應的中文名稱
             [
-                { className: 'ORG_IMP_DCL_NO_ITEM', name: '原進口報單項次' },
+                { className: 'ORG_IMP_DCL_NO_ITEM', name: '原出口報單項次' },
                 { className: 'CERT_NO_ITEM', name: '產證項次' },
-                { className: 'EXP_SEQ_NO', name: '輸出許可項次' }
+                { className: 'EXP_SEQ_NO', name: '輸入許可項次' }
             ].forEach(field => {
                 let element = item.querySelector(`.${field.className}`);
                 if (element && element.value.trim() && !isInteger(element.value.trim())) {
@@ -622,13 +558,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // 買方及收方名稱及地址欄位不可全數字
+        // 賣方名稱及地址欄位不可全數字
         const nonNumericFields = [
-            { id: 'CNEE_C_NAME', name: '買方中文名稱' },
-            { id: 'CNEE_E_NAME', name: '買方中/英名稱' },
-            { id: 'CNEE_E_ADDR', name: '買方中/英地址' },
-            { id: 'BUYER_E_NAME', name: '收方名稱' },
-            { id: 'BUYER_E_ADDR', name: '收方地址' }
+            { id: 'CNEE_C_NAME', name: '賣方中文名稱' },
+            { id: 'CNEE_E_NAME', name: '賣方中/英名稱' },
+            { id: 'CNEE_E_ADDR', name: '賣方中/英地址' }
         ];
 
         let allDigitsErrors = [];
@@ -648,7 +582,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return; // 中止匯出過程
         }
 
-        if (['G5', 'G3'].includes(dclDocType)) {
+        if (['G1', 'G7'].includes(dclDocType)) {
             let docMarksDesc = document.getElementById('DOC_MARKS_DESC')?.value.trim().toUpperCase() || '';
             let docOtrDesc = document.getElementById('DOC_OTR_DESC')?.value.trim().toUpperCase() || '';
         
