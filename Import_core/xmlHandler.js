@@ -91,16 +91,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const copy2 = document.getElementById('copy_2');
         const copy3 = document.getElementById('copy_3');
+        const copy4 = document.getElementById('copy_4');
         const copy5 = document.getElementById('copy_5');
-
-        const remark1 = document.getElementById('REMARK1');
 
         // 更新 APP_DUTY_REFUND 和 MARK_TOT_LINES
         appDutyRefund.value = (copy3.checked) ? 'Y' : 'N';
         markTotLines.value = (copy3.checked) ? 'Y' : 'N';
 
         // 更新 EXAM_TYPE 和 COPY_QTY
-        if (copy2.checked || copy3.checked || copy5.checked) {
+        if (copy2.checked || copy3.checked || copy4.checked || copy5.checked) {
             examType.value = '8';
             copyQty.value = '1';
         } else {
