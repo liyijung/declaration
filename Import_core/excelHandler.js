@@ -315,6 +315,7 @@ function checkRemarkOptions(remarks) {
     const options = {
         '申請報單副本第二聯（進口證明用聯）': 'copy_2',
         '申請報單副本第三聯（沖退原料稅用聯）': 'copy_3',
+        '申請報單副本第四聯（留底聯）': 'copy_4',
         '申請報單副本第五聯（其他聯）': 'copy_5'
     };
 
