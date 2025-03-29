@@ -287,10 +287,12 @@ document.getElementById('CURRENCY').addEventListener('input', function () {
 // 總毛重異動 => 清空 運費
 document.getElementById('DCL_GW').addEventListener('input', function () {
     clearFreight();
+    clearInsurance();
 });
 
 // 總金額異動 => 清空 保險費
 document.getElementById('CAL_IP_TOT_ITEM_AMT').addEventListener('input', function () {
+    clearFreight();
     clearInsurance();
 });
 
