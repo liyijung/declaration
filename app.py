@@ -201,6 +201,7 @@ def index():
 def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    response.headers.add('Permissions-Policy', 'interest-cohort=()')  # 🔕 禁用 FLoC
     return response
 
 # ✅ **啟動 Flask 伺服器**
