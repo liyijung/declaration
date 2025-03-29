@@ -195,7 +195,14 @@ def ping():
 @app.route('/')
 def index():
     return 'Server is awake!'
-    
+
+# ✅ CORS 增強：加入標頭允許跨來源請求使用 Authorization / Content-Type
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    return response
+
 # ✅ **啟動 Flask 伺服器**
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
