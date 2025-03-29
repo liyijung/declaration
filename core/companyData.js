@@ -161,7 +161,7 @@ function checkUnregisteredCompany(SHPR_BAN_ID) {
         });
 }
 
-// 出口人統一編號搜尋
+// 統一編號搜尋
 document.getElementById('SHPR_BAN_ID').addEventListener('input', function() {
     searchData(false);
 });
