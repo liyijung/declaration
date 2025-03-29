@@ -154,23 +154,6 @@ document.addEventListener('DOMContentLoaded', function () {
             examType.value = '';
             copyQty.value = '0';
         }
-
-        // 檢查統計方式及輸出許可號碼欄位，決定是否更新 EXAM_TYPE 為 '8'
-        let shouldSetExamType = false;
-        document.querySelectorAll("#item-container .item-row").forEach((item) => {
-            const stMtdValue = item.querySelector('.ST_MTD')?.value.toUpperCase() || '';
-            const expNoValue = item.querySelector('.EXP_NO')?.value.trim() || '';
-            const expSeqNoValue = item.querySelector('.EXP_SEQ_NO')?.value.trim() || ''; // 確保這裡正確初始化 expSeqNoValue
-        
-            // 判斷 ST_MTD 是否為 '1A', '8A', '8D'，或 EXP_NO 是否為 14 碼，或 EXP_NO 與 EXP_SEQ_NO 皆有值
-            if (['1A', '8A', '8D'].includes(stMtdValue) || expNoValue.length === 14 || (expNoValue && expSeqNoValue)) {
-                shouldSetExamType = true;
-            }
-        });
-    
-        if (shouldSetExamType) {
-            // examType.value = '8'; 暫取消查驗
-        }
         
         // 用於顯示變數值的控制台日誌
         console.log("APP_DUTY_REFUND: " + appDutyRefund.value);
