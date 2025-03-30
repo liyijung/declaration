@@ -558,6 +558,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        // 若 validateDclDocType 發現錯誤，則直接返回，中止後續程式碼
+        if (!validateDclDocType()) {
+            return;
+        }
+
         // 賣方名稱及地址欄位不可全數字
         const nonNumericFields = [
             { id: 'CNEE_C_NAME', name: '賣方中文名稱' },
