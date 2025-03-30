@@ -37,49 +37,99 @@ function importToExcel(event) {
         const headerSheet = workbook.Sheets[workbook.SheetNames[0]];
         const headerData = XLSX.utils.sheet_to_json(headerSheet, { header: 1, raw: false });
 
+        // 根據表頭判斷是出口還是進口
+        const header = headerData.map(row => row[0]?.trim()).filter(Boolean);
+        let headerMapping = {};
+
         // 定義中文名稱與欄位 ID 的對應關係
-        const headerMapping = {
-            '文件編號': 'FILE_NO',
-            '運單號': 'LOT_NO',
-            '出口人統一編號': 'SHPR_BAN_ID',
-            '海關監管編號': 'SHPR_BONDED_ID',
-            '出口人中文名稱': 'SHPR_C_NAME',
-            '出口人英文名稱': 'SHPR_E_NAME',
-            '出口人中文地址': 'SHPR_C_ADDR',
-            '出口人英文地址': 'SHPR_E_ADDR',
-            '出口人電話號碼': 'SHPR_TEL',
-            '買方中文名稱': 'CNEE_C_NAME',
-            '買方中/英名稱': 'CNEE_E_NAME',
-            '買方中/英地址': 'CNEE_E_ADDR',
-            '買方國家代碼': 'CNEE_COUNTRY_CODE',
-            '買方統一編號': 'CNEE_BAN_ID',
-            '收方名稱': 'BUYER_E_NAME',
-            '收方地址': 'BUYER_E_ADDR',
-            '目的地(代碼)': 'TO_CODE',
-            '目的地(名稱)': 'TO_DESC',
-            '總件數': 'TOT_CTN',
-            '總件數單位': 'DOC_CTN_UM',
-            '包裝說明': 'CTN_DESC',
-            '總毛重': 'DCL_GW',
-            '總淨重': 'DCL_NW',
-            '報單類別': 'DCL_DOC_TYPE',
-            '貿易條件': 'TERMS_SALES',
-            '幣別': 'CURRENCY',
-            '總金額': 'CAL_IP_TOT_ITEM_AMT',
-            '運費': 'FRT_AMT',
-            '保險費': 'INS_AMT',
-            '應加費用': 'ADD_AMT',
-            '應減費用': 'SUBTRACT_AMT',
-            '標記及貨櫃號碼': 'DOC_MARKS_DESC',
-            '其它申報事項': 'DOC_OTR_DESC',
-            'REMARKS': 'REMARK1',
-            '保稅廠統一編號': 'FAC_BAN_ID_EX',
-            '保稅廠監管編號': 'FAC_BONDED_ID_EX',
-            '出倉保稅倉庫統一編號': 'FAC_BAN_ID',
-            '出倉保稅倉庫代碼': 'FAC_BONDED_ID',
-            '進倉保稅倉庫統一編號': 'IN_BONDED_BAN',
-            '進倉保稅倉庫代碼': 'IN_BONDED_CODE'
-        };
+        if (header.includes('出口人統一編號')) {     
+            // 出口報單   
+            headerMapping = {
+                '文件編號': 'FILE_NO',
+                '運單號': 'LOT_NO',
+                '出口人統一編號': 'SHPR_BAN_ID',
+                '海關監管編號': 'SHPR_BONDED_ID',
+                '出口人中文名稱': 'SHPR_C_NAME',
+                '出口人英文名稱': 'SHPR_E_NAME',
+                '出口人中文地址': 'SHPR_C_ADDR',
+                '出口人英文地址': 'SHPR_E_ADDR',
+                '出口人電話號碼': 'SHPR_TEL',
+                '買方中文名稱': 'CNEE_C_NAME',
+                '買方中/英名稱': 'CNEE_E_NAME',
+                '買方中/英地址': 'CNEE_E_ADDR',
+                '買方國家代碼': 'CNEE_COUNTRY_CODE',
+                '買方統一編號': 'CNEE_BAN_ID',
+                '收方名稱': 'BUYER_E_NAME',
+                '收方地址': 'BUYER_E_ADDR',
+                '目的地(代碼)': 'TO_CODE',
+                '目的地(名稱)': 'TO_DESC',
+                '總件數': 'TOT_CTN',
+                '總件數單位': 'DOC_CTN_UM',
+                '包裝說明': 'CTN_DESC',
+                '總毛重': 'DCL_GW',
+                '總淨重': 'DCL_NW',
+                '報單類別': 'DCL_DOC_TYPE',
+                '貿易條件': 'TERMS_SALES',
+                '幣別': 'CURRENCY',
+                '總金額': 'CAL_IP_TOT_ITEM_AMT',
+                '運費': 'FRT_AMT',
+                '保險費': 'INS_AMT',
+                '應加費用': 'ADD_AMT',
+                '應減費用': 'SUBTRACT_AMT',
+                '標記及貨櫃號碼': 'DOC_MARKS_DESC',
+                '其它申報事項': 'DOC_OTR_DESC',
+                'REMARKS': 'REMARK1',
+                '保稅廠統一編號': 'FAC_BAN_ID_EX',
+                '保稅廠監管編號': 'FAC_BONDED_ID_EX',
+                '出倉保稅倉庫統一編號': 'FAC_BAN_ID',
+                '出倉保稅倉庫代碼': 'FAC_BONDED_ID',
+                '進倉保稅倉庫統一編號': 'IN_BONDED_BAN',
+                '進倉保稅倉庫代碼': 'IN_BONDED_CODE'
+            };
+        } else if (header.includes('進口人統一編號')) {
+            // 進口報單
+            headerMapping = {
+                '文件編號': 'FILE_NO',
+                '運單號': 'LOT_NO',
+                '進口人統一編號': 'SHPR_BAN_ID',
+                '海關監管編號': 'SHPR_BONDED_ID',
+                '進口人中文名稱': 'SHPR_C_NAME',
+                '進口人英文名稱': 'SHPR_E_NAME',
+                '進口人中文地址': 'SHPR_C_ADDR',
+                '進口人英文地址': 'SHPR_E_ADDR',
+                '進口人電話號碼': 'SHPR_TEL',
+                '賣方中文名稱': 'CNEE_C_NAME',
+                '賣方中/英名稱': 'CNEE_E_NAME',
+                '賣方中/英地址': 'CNEE_E_ADDR',
+                '賣方國家代碼': 'CNEE_COUNTRY_CODE',
+                '賣方統一編號': 'CNEE_BAN_ID',
+                '裝貨港(代碼)': 'TO_CODE',
+                '裝貨港(名稱)': 'TO_DESC',
+                '總件數': 'TOT_CTN',
+                '總件數單位': 'DOC_CTN_UM',
+                '包裝說明': 'CTN_DESC',
+                '總毛重': 'DCL_GW',
+                '總淨重': 'DCL_NW',
+                '報單類別': 'DCL_DOC_TYPE',
+                '貿易條件': 'TERMS_SALES',
+                '幣別': 'CURRENCY',
+                '總金額': 'CAL_IP_TOT_ITEM_AMT',
+                '運費': 'FRT_AMT',
+                '保險費': 'INS_AMT',
+                '應加費用': 'ADD_AMT',
+                '應減費用': 'SUBTRACT_AMT',
+                '標記及貨櫃號碼': 'DOC_MARKS_DESC',
+                '其它申報事項': 'DOC_OTR_DESC',
+                'REMARKS': 'REMARK1',
+            };
+        } else {
+            iziToast.error({
+                title: '錯誤',
+                message: '無法辨識是進口或出口報單格式，請確認欄位名稱。',
+                position: 'center'
+            });
+            return;
+        }
 
         headerData.forEach((row) => {
             const fieldName = row[0] ? String(row[0]).trim() : ''; // 取 Excel 的中文名稱
