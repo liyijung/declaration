@@ -18,7 +18,6 @@ function summarizeOrgCountry() {
 
             // 解析 CSV 文件
             const lines = csvText.trim().split('\n');
-            const headers = lines[0].split(','); // 解析標題列
             const dataLines = lines.slice(1);
 
             dataLines.forEach((line) => {
