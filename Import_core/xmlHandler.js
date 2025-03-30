@@ -282,7 +282,8 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'TRADE_MARK', name: '商標' },
             { className: 'CCC_CODE', name: '稅則' },
             { className: 'ST_MTD', name: '納稅辦法' },
-            { className: 'NET_WT', name: '淨重' }
+            { className: 'NET_WT', name: '淨重' },
+            { className: 'ORG_COUNTRY', name: '生產國別' }
         ];
 
         // 檢查 DCL_DOC_TYPE 是否為 B6，並確保 SHPR_BONDED_ID 需有值
