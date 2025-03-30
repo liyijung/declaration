@@ -269,6 +269,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return; // 中止匯出過程
         }
 
+        // 檢查出口報單類別
+        const dclDocType = document.getElementById('DCL_DOC_TYPE').value.trim().toUpperCase();
+        const exportTypes = ['G5', 'G3', 'B8', 'B9', 'D5', 'F5'];
+        if (!exportTypes.includes(dclDocType)) {
+            alert(`${dclDocType} 非出口報單類別，請確認！`);
+            return;
+        }
+
         // 檢查貿易條件
         let termsSalesValue = document.getElementById('TERMS_SALES')?.value.trim().toUpperCase();
 
@@ -326,7 +334,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     
-        const dclDocType = document.getElementById('DCL_DOC_TYPE').value.trim().toUpperCase();
         const itemRequiredFields = [
             { className: 'DESCRIPTION', name: '品名' },
             { className: 'QTY', name: '數量' },
