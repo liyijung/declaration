@@ -1,3 +1,132 @@
+// 添加錯誤樣式
+function setError(element, message) {
+    element.classList.add('error');
+    element.title = message; // 顯示提示訊息
+}
+
+// 清除錯誤樣式
+function clearErrors() {
+    document.querySelectorAll('.error').forEach(el => {
+        el.classList.remove('error');
+        el.removeAttribute('title');
+    });
+}
+
+// 執行納稅辦法連號檢查
+function validateDclDocType() {
+    clearErrors(); // 清除之前的錯誤標記
+    const dclDocType = document.getElementById('DCL_DOC_TYPE').value.trim().toUpperCase();
+    let validationErrors = new Set(); // 錯誤訊息，使用 Set 儲存錯誤訊息，避免重複
+    let validationWarnings = new Set(); // 提示訊息（不影響匯出）
+
+    const stMtdGroups = {}; // 用來儲存納稅辦法的連號分組
+
+    const rows = document.querySelectorAll("#item-container .item-row");
+    rows.forEach(item => {
+        const itemNo = item.querySelector(".item-number label")?.textContent.trim();
+        if (itemNo === "*") return; // 忽略 ITEM_NO 為 "*" 的項次
+
+        const stMtdValue = item.querySelector(".ST_MTD")?.value.trim().toUpperCase();
+
+        // 納稅辦法連號檢查
+        if (stMtdValue) {
+            const match = stMtdValue.match(/^(\d+)([A-Z]?)$/);
+            if (match) {
+                const numPart = parseInt(match[1], 10);
+                const letterPart = match[2] || "";
+                if (!stMtdGroups[letterPart]) {
+                    stMtdGroups[letterPart] = [];
+                }
+                stMtdGroups[letterPart].push(numPart);
+            }
+        }
+    });
+
+    Object.entries(stMtdGroups).forEach(([letter, numbers]) => {
+        if (numbers.length > 1) {
+            let tempSequence = [numbers[0]];
+            let resultSequences = [];
+
+            numbers.sort((a, b) => a - b); // 先排序
+
+            for (let i = 1; i < numbers.length; i++) {
+                const current = numbers[i];
+                const prev = tempSequence[tempSequence.length - 1];
+
+                if (current === prev || current === prev + 1) {
+                    if (current !== prev) {
+                        tempSequence.push(current);
+                    }
+                } else {
+                    if (tempSequence.length >= 2) {
+                        resultSequences.push([...tempSequence]);
+                    }
+                    tempSequence = [current];
+                }
+            }
+
+            if (tempSequence.length >= 2) {
+                resultSequences.push([...tempSequence]);
+            }
+
+            resultSequences.forEach(seq => {
+                const combinedValues = seq
+                    .map(n => (letter === "" ? n.toString().padStart(2, '0') : n.toString()) + letter)
+                    .join(", ");
+                validationWarnings.add(`※ 納稅辦法連號：${combinedValues}`);
+            });
+        }
+    });
+
+    // 檢查納稅辦法、生產國別、報單類別
+    let allTW = true;
+    let countTW = 0;
+    let totalValidRows = 0;
+
+    rows.forEach(item => {
+        const isItemChecked = item.querySelector(".ITEM_NO")?.checked;
+        if (isItemChecked) return;
+
+        const orgCountry = item.querySelector(".ORG_COUNTRY")?.value.trim().toUpperCase();
+        const stMtd = item.querySelector(".ST_MTD")?.value.trim();
+
+        if (orgCountry) {
+            totalValidRows++;
+
+            if (orgCountry === "TW") {
+                countTW++;
+                if (stMtd !== "55" && stMtd !== "99") {
+                    validationErrors.add("生產國別為 TW，納稅辦法應為 55 或 99");
+                    setError(item.querySelector(".ORG_COUNTRY"), "生產國別為 TW，納稅辦法應為 55 或 99");
+                    setError(item.querySelector(".ST_MTD"), "納稅辦法應為 55 或 99");
+                }
+            } else {
+                allTW = false;
+            }
+        }
+    });
+
+    if (totalValidRows > 0 && countTW === totalValidRows && dclDocType !== "G7") {
+        validationErrors.add("全部項次生產國別皆為 TW，報單類別應為 G7");
+        setError(document.getElementById("DCL_DOC_TYPE"), "應為 G7（國貨復進口）");
+    }
+
+    // 提示與警告
+    if (validationErrors.size > 0 || validationWarnings.size > 0) {
+        const messages = [];
+        if (validationErrors.size > 0) {
+            messages.push("❌ 錯誤：\n" + Array.from(validationErrors).join("\n"));
+        }
+        if (validationWarnings.size > 0) {
+            messages.push("⚠️ 提示（不中止匯出）：\n" + Array.from(validationWarnings).join("\n"));
+        }
+        alert(messages.join("\n\n"));
+        return validationErrors.size === 0;
+    }
+
+    return true; // 無錯誤，允許繼續處理
+}
+
 // 長期委任字號：
 const excelFilePath = './Import_format/進口長委登記表.xlsx';
 
