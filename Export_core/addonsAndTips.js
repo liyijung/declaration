@@ -908,7 +908,8 @@ document.addEventListener('DOMContentLoaded', () => {
             input.id === 'specific-range' || 
             input.id === 'specific-weight' ||
             input.id === 'exchange-rate' ||
-            input.id === 'start-number') {
+            input.id === 'start-number' ||
+            input.id === 'Maker') {
             return;
         }
 
