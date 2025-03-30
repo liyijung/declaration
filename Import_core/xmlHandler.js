@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 'SHPR_BAN_ID', name: '進口人統一編號' },
             { id: 'SHPR_C_NAME', name: '進口人中文名稱' },
             { id: 'SHPR_C_ADDR', name: '進口人中文地址' },
+            { id: 'CNEE_E_ADDR', name: '賣方中/英地址' },
             { id: 'CNEE_COUNTRY_CODE', name: '賣方國家代碼' },
             { id: 'TO_CODE', name: '裝貨港(代碼)' },
             { id: 'TO_DESC', name: '裝貨港(名稱)' },
