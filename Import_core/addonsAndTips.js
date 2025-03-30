@@ -357,6 +357,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'BUYER_E_NAME':
                     document.getElementById('BUYER_BAN').value = '';
                     break;
+                case 'CNEE_COUNTRY_CODE':
+                    let cneeFields = ['CNEE_BAN_ID'];
+                    cneeFields.forEach(fieldId => {
+                        let label = document.querySelector(`label[for="${fieldId}"]`);
+                        if (label) {
+                            label.style.background = 'transparent'; // 恢復背景透明
+                        }
+                    });
+                    document.getElementById('CNEE_COUNTRY_CODE').value = '';
+                    break;
                 case 'TO_CODE':
                     document.getElementById('TO_DESC').value = '';
                     break;
