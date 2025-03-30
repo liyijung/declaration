@@ -452,21 +452,21 @@ function validateDclDocType() {
         // 檢查條件 4：報單類別與統計方式是否相符
         if (allCondition1 && dclDocType !== "G5") {
             validationErrors.add("統計方式屬於國貨出口，報單類別應為 G5");
-            setError(document.getElementById("DCL_DOC_TYPE"));
+            setError(document.getElementById("DCL_DOC_TYPE"), "應為 G5（國貨出口）");
         }
         if (allCondition2 && dclDocType !== "G3") {
             validationErrors.add("統計方式屬於外貨復出口，報單類別應為 G3");
-            setError(document.getElementById("DCL_DOC_TYPE"));
+            setError(document.getElementById("DCL_DOC_TYPE"), "應為 G3（外貨復出口）");
         }
     
         // 檢查條件 5：根據 totalCondition1 和 totalCondition2 判斷 dclDocType
         if (totalCondition1 > 0 && totalCondition2 > 0) {
             if (totalCondition1 > totalCondition2 && dclDocType !== "G5") {
                 validationErrors.add("國貨的加總金額大於外貨，報單類別應為 G5");
-                setError(document.getElementById("DCL_DOC_TYPE"));
+                setError(document.getElementById("DCL_DOC_TYPE"), "應為 G5（國貨出口）");
             } else if (totalCondition1 < totalCondition2 && dclDocType !== "G3") {
                 validationErrors.add("外貨的加總金額大於國貨，報單類別應為 G3");
-                setError(document.getElementById("DCL_DOC_TYPE"));
+                setError(document.getElementById("DCL_DOC_TYPE"), "應為 G3（外貨復出口）");
             }
         }
 
@@ -498,7 +498,7 @@ function validateDclDocType() {
             validationErrors.add("B8 及 G5 不得合併申報，必須拆分或以 B9 申報（B9 項次在前）");
         } else if (allCondition1 && !allCondition2) {
             validationErrors.add("所有項次為國貨統計方式，報單類別應為 B9");
-            setError(document.getElementById("DCL_DOC_TYPE"));
+            setError(document.getElementById("DCL_DOC_TYPE"), "應為 B9（保稅廠產品出口）");
         }
     }
 
