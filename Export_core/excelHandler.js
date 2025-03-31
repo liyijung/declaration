@@ -298,15 +298,11 @@ function importToExcel(event) {
             '商標': 'TRADE_MARK',
             '稅則': 'CCC_CODE',
             '統計方式': 'ST_MTD',
-            '納稅辦法': 'ST_MTD', // ✅ 多個中文可對應同一欄位
             '淨重': 'NET_WT',
             '生產國別': 'ORG_COUNTRY',
             '原進口報單號碼': 'ORG_IMP_DCL_NO',
-            '原出口報單號碼': 'ORG_IMP_DCL_NO',
             '原進口報單項次': 'ORG_IMP_DCL_NO_ITEM',
-            '原出口報單項次': 'ORG_IMP_DCL_NO_ITEM',
             '賣方料號': 'SELLER_ITEM_CODE',
-            '買方料號': 'SELLER_ITEM_CODE', // ✅ 如果有兩種稱呼也可並存
             '保稅貨物註記': 'BOND_NOTE',
             '型號': 'GOODS_MODEL',
             '規格': 'GOODS_SPEC',
