@@ -279,7 +279,6 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'DOC_UM', name: '單位' },
             { className: 'DOC_UNIT_P', name: '單價' },
             { className: 'DOC_TOT_P', name: '金額' },
-            { className: 'TRADE_MARK', name: '商標' },
             { className: 'CCC_CODE', name: '稅則' },
             { className: 'ST_MTD', name: '納稅辦法' },
             { className: 'NET_WT', name: '淨重' },
@@ -640,10 +639,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const itemFields = [
             'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P',
-            'TRADE_MARK', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT', 'ORG_COUNTRY', 
+            'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT', 'ORG_COUNTRY', 
+            'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC',
             'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
-            'GOODS_MODEL', 'GOODS_SPEC', 'CERT_NO', 'CERT_NO_ITEM', 
-            'EXP_NO', 'EXP_SEQ_NO', 
+            'CERT_NO', 'CERT_NO_ITEM', 'EXP_NO', 'EXP_SEQ_NO', 
             'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY' ,'ST_UM',
         ];
         
