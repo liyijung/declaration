@@ -1,7 +1,7 @@
 // 匯入Excel的功能
 function importToExcel(event) {
     clearField(); // 清空輸入框內容
-    
+
     // 清空 calculation-status
     document.getElementById('calculation-status').value = "";
     
@@ -289,8 +289,59 @@ function importToExcel(event) {
             "THERMOSTAT": "9032100000",
         };
 
+        // 對應系統欄位與 Excel 標題名稱
+        const reverseColumnMap = {
+            '數量': 'QTY',
+            '單位': 'DOC_UM',
+            '單價': 'DOC_UNIT_P',
+            '金額': 'DOC_TOT_P',
+            '商標': 'TRADE_MARK',
+            '稅則': 'CCC_CODE',
+            '統計方式': 'ST_MTD',
+            '納稅辦法': 'ST_MTD', // ✅ 多個中文可對應同一欄位
+            '淨重': 'NET_WT',
+            '生產國別': 'ORG_COUNTRY',
+            '原進口報單號碼': 'ORG_IMP_DCL_NO',
+            '原出口報單號碼': 'ORG_IMP_DCL_NO',
+            '原進口報單項次': 'ORG_IMP_DCL_NO_ITEM',
+            '原出口報單項次': 'ORG_IMP_DCL_NO_ITEM',
+            '賣方料號': 'SELLER_ITEM_CODE',
+            '買方料號': 'SELLER_ITEM_CODE', // ✅ 如果有兩種稱呼也可並存
+            '保稅貨物註記': 'BOND_NOTE',
+            '型號': 'GOODS_MODEL',
+            '規格': 'GOODS_SPEC',
+            '產證號碼': 'CERT_NO',
+            '產證項次': 'CERT_NO_ITEM',
+            '原進倉報單號碼': 'ORG_DCL_NO',
+            '原進倉報單項次': 'ORG_DCL_NO_ITEM',
+            '輸出許可號碼': 'EXP_NO',
+            '輸出許可項次': 'EXP_SEQ_NO',
+            '寬度(幅寬)': 'WIDE',
+            '寬度單位': 'WIDE_UM',
+            '長度(幅長)': 'LENGT_',
+            '長度單位': 'LENGTH_UM',
+            '統計數量': 'ST_QTY',
+            '統計單位': 'ST_UM'
+        };
+
+        // 建立欄位名稱對應表（項次用）
+        const headerIndexMap = {};
+        headers.forEach((header, index) => {
+            const fieldId = reverseColumnMap[header?.trim()];
+            if (fieldId) {
+                headerIndexMap[fieldId] = index;
+            }
+        });
+
         const allItemsEmpty = itemsData.slice(1).every(row => !row[0]); // 檢查項次是否完全空
+
+        // 將報單項次數據填入表單
         itemsData.slice(1).forEach((row, index) => {
+            const getValue = (row, field) => {
+                const index = headerIndexMap[field];
+                return index !== undefined ? row[index] : '';
+            };
+
             const hasItemNo = row[0]; // 判斷項次是否有數據
 
             if (hasItemNo || allItemsEmpty || index === 0) {
@@ -305,13 +356,12 @@ function importToExcel(event) {
 
                 currentDescription = description;
 
-                let cccCode = String(row[descriptionIndices[descriptionIndices.length - 1] + 6] || '').trim();
+                let cccCode = String(getValue(row, 'CCC_CODE') || '').trim();
 
                 // 檢查CCC_CODE為空並匹配稅則
                 if (!cccCode) {
                     // 將描述內容轉為大寫
                     const upperCaseDescription = currentDescription.toUpperCase();
-                    
                     const matchedCode = Object.keys(tariffCodeMapping).find(key =>
                         upperCaseDescription.split('\n').some(line => line.trim().startsWith(key.toUpperCase()))
                     );
@@ -323,47 +373,44 @@ function importToExcel(event) {
                 currentItem = createItemRow({
                     ITEM_NO: String(row[0] || ''), // 將數據轉為字串
                     DESCRIPTION: currentDescription || '',
-                    QTY: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 1] || '')),
-                    DOC_UM: String(row[descriptionIndices[descriptionIndices.length - 1] + 2] || ''),
-                    DOC_UNIT_P: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 3] || '')),
-                    DOC_TOT_P: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 4] || '')),
-                    TRADE_MARK: String(row[descriptionIndices[descriptionIndices.length - 1] + 5] || ''),
+                    QTY: removeThousandsSeparator(String(getValue(row, 'QTY') || '')),
+                    DOC_UM: String(getValue(row, 'DOC_UM') || ''),
+                    DOC_UNIT_P: removeThousandsSeparator(String(getValue(row, 'DOC_UNIT_P') || '')),
+                    DOC_TOT_P: removeThousandsSeparator(String(getValue(row, 'DOC_TOT_P') || '')),
+                    TRADE_MARK: String(getValue(row, 'TRADE_MARK') || ''),
                     CCC_CODE: cccCode, // 使用匹配稅則或原始值
-                    ST_MTD: String(row[descriptionIndices[descriptionIndices.length - 1] + 7] || '').toUpperCase(),
-                    NET_WT: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 8] || '')),
-                    ORG_COUNTRY: String(row[descriptionIndices[descriptionIndices.length - 1] + 9] || '').toUpperCase(),
-                    ORG_IMP_DCL_NO: String(row[descriptionIndices[descriptionIndices.length - 1] + 10] || '').toUpperCase(),
-                    ORG_IMP_DCL_NO_ITEM: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 11] || '')),
-                    SELLER_ITEM_CODE: String(row[descriptionIndices[descriptionIndices.length - 1] + 12] || ''),
-                    BOND_NOTE: String(row[descriptionIndices[descriptionIndices.length - 1] + 13] || '').toUpperCase(),
-                    GOODS_MODEL: String(row[descriptionIndices[descriptionIndices.length - 1] + 14] || ''),
-                    GOODS_SPEC: String(row[descriptionIndices[descriptionIndices.length - 1] + 15] || ''),
-                    CERT_NO: String(row[descriptionIndices[descriptionIndices.length - 1] + 16] || '').toUpperCase(),
-                    CERT_NO_ITEM: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 17] || '')),
-                    ORG_DCL_NO: String(row[descriptionIndices[descriptionIndices.length - 1] + 18] || '').toUpperCase(),
-                    ORG_DCL_NO_ITEM: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 19] || '')),
-                    EXP_NO: String(row[descriptionIndices[descriptionIndices.length - 1] + 20] || '').toUpperCase(),
-                    EXP_SEQ_NO: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 21] || '')),
-                    WIDE: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 22] || '')),
-                    WIDE_UM: String(row[descriptionIndices[descriptionIndices.length - 1] + 23] || ''),
-                    LENGT_: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 24] || '')),
-                    LENGTH_UM: String(row[descriptionIndices[descriptionIndices.length - 1] + 25] || ''),
-                    ST_QTY: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 26] || '')),
-                    ST_UM: String(row[descriptionIndices[descriptionIndices.length - 1] + 27] || ''),
+                    ST_MTD: String(getValue(row, 'ST_MTD') || '').toUpperCase(),
+                    NET_WT: removeThousandsSeparator(String(getValue(row, 'NET_WT') || '')),
+                    ORG_COUNTRY: String(getValue(row, 'ORG_COUNTRY') || '').toUpperCase(),
+                    ORG_IMP_DCL_NO: String(getValue(row, 'ORG_IMP_DCL_NO') || '').toUpperCase(),
+                    ORG_IMP_DCL_NO_ITEM: removeThousandsSeparator(String(getValue(row, 'ORG_IMP_DCL_NO_ITEM') || '')),
+                    SELLER_ITEM_CODE: String(getValue(row, 'SELLER_ITEM_CODE') || ''),
+                    BOND_NOTE: String(getValue(row, 'BOND_NOTE') || '').toUpperCase(),
+                    GOODS_MODEL: String(getValue(row, 'GOODS_MODEL') || ''),
+                    GOODS_SPEC: String(getValue(row, 'GOODS_SPEC') || ''),
+                    CERT_NO: String(getValue(row, 'CERT_NO') || '').toUpperCase(),
+                    CERT_NO_ITEM: removeThousandsSeparator(String(getValue(row, 'CERT_NO_ITEM') || '')),
+                    ORG_DCL_NO: String(getValue(row, 'ORG_DCL_NO') || '').toUpperCase(),
+                    ORG_DCL_NO_ITEM: removeThousandsSeparator(String(getValue(row, 'ORG_DCL_NO_ITEM') || '')),
+                    EXP_NO: String(getValue(row, 'EXP_NO') || '').toUpperCase(),
+                    EXP_SEQ_NO: removeThousandsSeparator(String(getValue(row, 'EXP_SEQ_NO') || '')),
+                    WIDE: removeThousandsSeparator(String(getValue(row, 'WIDE') || '')),
+                    WIDE_UM: String(getValue(row, 'WIDE_UM') || ''),
+                    LENGT_: removeThousandsSeparator(String(getValue(row, 'LENGT_') || '')),
+                    LENGTH_UM: String(getValue(row, 'LENGTH_UM') || ''),
+                    ST_QTY: removeThousandsSeparator(String(getValue(row, 'ST_QTY') || '')),
+                    ST_UM: String(getValue(row, 'ST_UM') || '')
                 });
                 
                 if (row[1] === '*') {
                     currentItem.querySelector('.ITEM_NO').checked = true;
                 }
             } else if (currentItem) {
-                const element = currentItem.querySelector('.DESCRIPTION');
-                if (element) {
-                    descriptionIndices.forEach(i => {
-                        if (row[i]) {
-                            currentDescription += `\n${String(row[i])}`;
-                        }
-                    });
-                }
+                descriptionIndices.forEach(i => {
+                    if (row[i]) {
+                        currentDescription += `\n${String(row[i])}`;
+                    }
+                });
             }
         });
 
