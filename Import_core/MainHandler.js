@@ -330,17 +330,17 @@ function createItemRow(data) {
         ${createInputField('DOC_UM', replaceValue('DOC_UM', data.DOC_UM), true)}
         ${createInputField('DOC_UNIT_P', data.DOC_UNIT_P, true)}
         ${createInputField('DOC_TOT_P', data.DOC_TOT_P, true)}
-        ${createInputField('TRADE_MARK', data.TRADE_MARK, true)}
         ${createInputField('CCC_CODE', replaceValue('CCC_CODE', data.CCC_CODE), true)}
         ${createInputField('ST_MTD', data.ST_MTD, true)}
         ${createInputField('NET_WT', data.NET_WT, fieldsToShow.NET_WT, data.ISCALC_WT)}
         ${createInputField('ORG_COUNTRY', data.ORG_COUNTRY, fieldsToShow.ORG_COUNTRY)}
+        ${createInputField('TRADE_MARK', data.TRADE_MARK, true)}
+        ${createInputField('GOODS_MODEL', data.GOODS_MODEL, fieldsToShow.GOODS_MODEL)}
+        ${createInputField('GOODS_SPEC', data.GOODS_SPEC, fieldsToShow.GOODS_SPEC)}        
         ${createInputField('ORG_IMP_DCL_NO', data.ORG_IMP_DCL_NO, fieldsToShow.ORG_IMP_DCL_NO)}
         ${createInputField('ORG_IMP_DCL_NO_ITEM', data.ORG_IMP_DCL_NO_ITEM, fieldsToShow.ORG_IMP_DCL_NO_ITEM)}
         ${createInputField('SELLER_ITEM_CODE', data.SELLER_ITEM_CODE, fieldsToShow.SELLER_ITEM_CODE)}
         ${createInputField('BOND_NOTE', data.BOND_NOTE, fieldsToShow.BOND_NOTE)}        
-        ${createInputField('GOODS_MODEL', data.GOODS_MODEL, fieldsToShow.GOODS_MODEL)}
-        ${createInputField('GOODS_SPEC', data.GOODS_SPEC, fieldsToShow.GOODS_SPEC)}
         ${createInputField('CERT_NO', data.CERT_NO, fieldsToShow.CERT_NO)}
         ${createInputField('CERT_NO_ITEM', data.CERT_NO_ITEM, fieldsToShow.CERT_NO_ITEM)}
         ${createInputField('EXP_NO', data.EXP_NO, fieldsToShow.EXP_NO)}
@@ -497,21 +497,21 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
             DOC_UM: "單位",
             DOC_UNIT_P: "單價",
             DOC_TOT_P: "金額",
-            TRADE_MARK: "商標",
             CCC_CODE: "稅則",
-            ST_MTD: "統計方式",
+            ST_MTD: "納稅辦法",
             NET_WT: "淨重",
             ORG_COUNTRY: "生產國別",
-            ORG_IMP_DCL_NO: "原進口報單號碼",
-            ORG_IMP_DCL_NO_ITEM: "原進口報單項次",
-            SELLER_ITEM_CODE: "賣方料號",
-            BOND_NOTE: "保稅貨物註記",
+            TRADE_MARK: "商標",
             GOODS_MODEL: "型號",
-            GOODS_SPEC: "規格",
+            GOODS_SPEC: "規格",            
+            ORG_IMP_DCL_NO: "原出口報單號碼",
+            ORG_IMP_DCL_NO_ITEM: "原出口報單項次",
+            SELLER_ITEM_CODE: "買方料號",
+            BOND_NOTE: "保稅貨物註記",
             CERT_NO: "產證號碼",
             CERT_NO_ITEM: "產證項次",
-            EXP_NO: "輸出許可號碼",
-            EXP_SEQ_NO: "輸出許可項次",
+            EXP_NO: "輸入許可號碼",
+            EXP_SEQ_NO: "輸入許可項次",
             WIDE: "寬度(幅寬)",
             WIDE_UM: "寬度單位",
             LENGT_: "長度(幅長)",
@@ -851,7 +851,7 @@ function replaceValue(className, value) {
 // 清空現有數據的函數
 function clearExistingData() {
 
-    // 清空出口報單表頭欄位
+    // 清空進口報單表頭欄位
     document.getElementById('FILE_NO').value = '';
     document.getElementById('LOT_NO').value = '';
     document.getElementById('SHPR_BAN_ID').value = '';
@@ -893,7 +893,7 @@ function clearExistingData() {
     document.getElementById('IN_BONDED_BAN').value = '';
     document.getElementById('IN_BONDED_CODE').value = '';
 
-    // 清空出口報單項次欄位
+    // 清空進口報單項次欄位
     var itemContainer = document.getElementById('item-container');
     if (itemContainer) {
         itemContainer.innerHTML = ''; // 清空項次
