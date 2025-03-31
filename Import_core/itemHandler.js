@@ -10,17 +10,17 @@ function openItemModal() {
     document.getElementById('DOC_UM').value = savedItemData.DOC_UM || '';
     document.getElementById('DOC_UNIT_P').value = savedItemData.DOC_UNIT_P || '';
     document.getElementById('DOC_TOT_P').value = savedItemData.DOC_TOT_P || '';
-    document.getElementById('TRADE_MARK').value = savedItemData.TRADE_MARK || '';
     document.getElementById('CCC_CODE').value = savedItemData.CCC_CODE || '';
     document.getElementById('ST_MTD').value = savedItemData.ST_MTD || '';
     document.getElementById('NET_WT').value = savedItemData.NET_WT || '';
     document.getElementById('ORG_COUNTRY').value = savedItemData.ORG_COUNTRY || '';
+    document.getElementById('TRADE_MARK').value = savedItemData.TRADE_MARK || '';
+    document.getElementById('GOODS_MODEL').value = savedItemData.GOODS_MODEL || '';
+    document.getElementById('GOODS_SPEC').value = savedItemData.GOODS_SPEC || '';    
     document.getElementById('ORG_IMP_DCL_NO').value = savedItemData.ORG_IMP_DCL_NO || '';
     document.getElementById('ORG_IMP_DCL_NO_ITEM').value = savedItemData.ORG_IMP_DCL_NO_ITEM || '';
     document.getElementById('SELLER_ITEM_CODE').value = savedItemData.SELLER_ITEM_CODE || '';
     document.getElementById('BOND_NOTE').value = savedItemData.BOND_NOTE || '';    
-    document.getElementById('GOODS_MODEL').value = savedItemData.GOODS_MODEL || '';
-    document.getElementById('GOODS_SPEC').value = savedItemData.GOODS_SPEC || '';
     document.getElementById('CERT_NO').value = savedItemData.CERT_NO || '';
     document.getElementById('CERT_NO_ITEM').value = savedItemData.CERT_NO_ITEM || '';
     document.getElementById('EXP_NO').value = savedItemData.EXP_NO || '';
@@ -118,9 +118,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedItemIndex = copyItemSelect.value;
 
         const itemFields = [
-            'ITEM_NO', 'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'TRADE_MARK', 'CCC_CODE', 
-            'ST_MTD', 'NET_WT', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 
-            'BOND_NOTE', 'GOODS_MODEL', 'GOODS_SPEC', 'CERT_NO', 'CERT_NO_ITEM',
+            'ITEM_NO', 'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 
+            'ST_MTD', 'NET_WT', 'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
+            'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM',
+            'SELLER_ITEM_CODE', 'BOND_NOTE', 'CERT_NO', 'CERT_NO_ITEM',
             'EXP_NO', 'EXP_SEQ_NO', 'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_UM' // 'ST_QTY'不複製
         ];
 
@@ -180,17 +181,17 @@ function rememberItemModalData() {
         DOC_UM: document.getElementById('DOC_UM').value,
         DOC_UNIT_P: document.getElementById('DOC_UNIT_P').value,
         DOC_TOT_P: document.getElementById('DOC_TOT_P').value,
-        TRADE_MARK: document.getElementById('TRADE_MARK').value,
         CCC_CODE: document.getElementById('CCC_CODE').value,
         ST_MTD: document.getElementById('ST_MTD').value,
         NET_WT: document.getElementById('NET_WT').value,        
         ORG_COUNTRY: document.getElementById('ORG_COUNTRY').value,
+        TRADE_MARK: document.getElementById('TRADE_MARK').value,
+        GOODS_MODEL: document.getElementById('GOODS_MODEL').value,
+        GOODS_SPEC: document.getElementById('GOODS_SPEC').value,        
         ORG_IMP_DCL_NO: document.getElementById('ORG_IMP_DCL_NO').value,
         ORG_IMP_DCL_NO_ITEM: document.getElementById('ORG_IMP_DCL_NO_ITEM').value,
         SELLER_ITEM_CODE: document.getElementById('SELLER_ITEM_CODE').value,
         BOND_NOTE: document.getElementById('BOND_NOTE').value,    
-        GOODS_MODEL: document.getElementById('GOODS_MODEL').value,
-        GOODS_SPEC: document.getElementById('GOODS_SPEC').value,
         CERT_NO: document.getElementById('CERT_NO').value,
         CERT_NO_ITEM: document.getElementById('CERT_NO_ITEM').value,
         EXP_NO: document.getElementById('EXP_NO').value,
@@ -214,17 +215,17 @@ function clearAllFields() {
     document.getElementById('DOC_UM').value = '';
     document.getElementById('DOC_UNIT_P').value = '';
     document.getElementById('DOC_TOT_P').value = '';
-    document.getElementById('TRADE_MARK').value = '';
     document.getElementById('CCC_CODE').value = '';
     document.getElementById('ST_MTD').value = '';
     document.getElementById('NET_WT').value = '';
     document.getElementById('ORG_COUNTRY').value = '';
+    document.getElementById('TRADE_MARK').value = '';
+    document.getElementById('GOODS_MODEL').value = '';
+    document.getElementById('GOODS_SPEC').value = '';    
     document.getElementById('ORG_IMP_DCL_NO').value = '';
     document.getElementById('ORG_IMP_DCL_NO_ITEM').value = '';
     document.getElementById('SELLER_ITEM_CODE').value = '';
     document.getElementById('BOND_NOTE').value = '';
-    document.getElementById('GOODS_MODEL').value = '';
-    document.getElementById('GOODS_SPEC').value = '';
     document.getElementById('CERT_NO').value = '';
     document.getElementById('CERT_NO_ITEM').value = '';
     document.getElementById('EXP_NO').value = '';
@@ -280,17 +281,17 @@ function saveItem() {
         DOC_UM: document.getElementById('DOC_UM').value.trim(),
         DOC_UNIT_P: document.getElementById('DOC_UNIT_P').value.trim(),
         DOC_TOT_P: document.getElementById('DOC_TOT_P').value.trim(),
-        TRADE_MARK: document.getElementById('TRADE_MARK').value.trim(),
         CCC_CODE: document.getElementById('CCC_CODE').value.trim(),
         ST_MTD: document.getElementById('ST_MTD').value.trim(),
         NET_WT: document.getElementById('NET_WT').value.trim(),        
         ORG_COUNTRY: document.getElementById('ORG_COUNTRY').value.trim(),
+        TRADE_MARK: document.getElementById('TRADE_MARK').value.trim(),
+        GOODS_MODEL: document.getElementById('GOODS_MODEL').value.trim(),
+        GOODS_SPEC: document.getElementById('GOODS_SPEC').value.trim(),        
         ORG_IMP_DCL_NO: document.getElementById('ORG_IMP_DCL_NO').value.trim(),
         ORG_IMP_DCL_NO_ITEM: document.getElementById('ORG_IMP_DCL_NO_ITEM').value.trim(),
         SELLER_ITEM_CODE: document.getElementById('SELLER_ITEM_CODE').value.trim(),
         BOND_NOTE: document.getElementById('BOND_NOTE').value.trim(),        
-        GOODS_MODEL: document.getElementById('GOODS_MODEL').value.trim(),
-        GOODS_SPEC: document.getElementById('GOODS_SPEC').value.trim(),
         CERT_NO: document.getElementById('CERT_NO').value.trim(),
         CERT_NO_ITEM: document.getElementById('CERT_NO_ITEM').value.trim(),
         EXP_NO: document.getElementById('EXP_NO').value.trim(),
@@ -351,9 +352,9 @@ function applyToggleFieldsToRow(row) {
 
     // 所有可能的欄位
     const allFields = [
-        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'TRADE_MARK', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
-        'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 
-        'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE', 'GOODS_MODEL', 'GOODS_SPEC', 
+        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
+        'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
+        'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
         'CERT_NO', 'CERT_NO_ITEM', 'EXP_NO', 'EXP_SEQ_NO', 
         'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM'
     ];
