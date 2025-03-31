@@ -197,13 +197,6 @@ const fieldIds = [
 // 對每個欄位設置自動轉換為大寫的功能
 fieldIds.forEach(setupUpperCaseConversion);
 
-// 標記及貨櫃號碼 MADE IN
-function fillText(text) {
-    const textarea = document.getElementById('DOC_MARKS_DESC');
-    textarea.value = textarea.value.trim() + '\n' + text;
-    textarea.focus(); // 將焦點設回欄位
-}
-
 // 其它申報事項備註選單
 document.addEventListener('DOMContentLoaded', () => {
     const dropdown = document.getElementById('doc_otr_desc_dropdown');
