@@ -440,9 +440,6 @@ Alt + 2 指定項次">攤重</button>
                 <div class="form-group DOC_TOT_P" style="width: 80%;">
                     <label>金額</label>
                 </div>
-                <div class="form-group TRADE_MARK" style="width: 80%;">
-                    <label>商標</label>
-                </div>
                 <div class="form-group CCC_CODE" style="width: 105%;">
                     <label>稅則</label>
                 </div>
@@ -462,6 +459,15 @@ Alt + 2 指定項次">攤重</button>
                 <div class="form-group ORG_COUNTRY hidden" style="width: 30%;">
                     <label>生產國別</label>
                 </div>
+                <div class="form-group TRADE_MARK" style="width: 80%;">
+                    <label>商標</label>
+                </div>
+                <div class="form-group GOODS_MODEL hidden" style="width: 60%;">
+                    <label>型號</label>
+                </div>
+                <div class="form-group GOODS_SPEC hidden" style="width: 60%;">
+                    <label>規格</label>
+                </div>                
                 <div class="form-group ORG_IMP_DCL_NO hidden">
                     <label>原出口報單號碼</label>
                 </div>
@@ -473,12 +479,6 @@ Alt + 2 指定項次">攤重</button>
                 </div>
                 <div class="form-group BOND_NOTE hidden" style="width: 30%;">
                     <label>保稅貨物註記</label>
-                </div>
-                <div class="form-group GOODS_MODEL hidden" style="width: 60%;">
-                    <label>型號</label>
-                </div>
-                <div class="form-group GOODS_SPEC hidden" style="width: 60%;">
-                    <label>規格</label>
                 </div>
                 <div class="form-group CERT_NO hidden">
                     <label>產證號碼</label>
@@ -565,15 +565,6 @@ Alt + 2 指定項次">攤重</button>
                 <input type="number" id="DOC_TOT_P" class="DOC_TOT_P" min="0" readonly tabindex="-1">
             </div>
             <div class="header-group">
-                <label for="TRADE_MARK">商標</label>
-                <input type="text" id="TRADE_MARK" class="TRADE_MARK" name="TRADE_MARK" list="trademark-list"
-                    placeholder="範例：NO BRAND(無商標)、FIG(圖樣)、文字(字樣)">
-                <datalist id="trademark-list">
-                    <option value="NO BRAND">無商標</option>
-                    <option value="FIG">圖樣</option>
-                </datalist>
-            </div>
-            <div class="header-group">
                 <label for="CCC_CODE" id="CCC_CODE_LABEL">稅則</label>
                 <input type="text" id="CCC_CODE" class="CCC_CODE"
                     placeholder="可輸入關鍵字按Enter查詢後選取(台灣稅則－共11碼，前6碼國際通用)" onkeydown="handleCCCCodeEnter(event, this)">
@@ -599,6 +590,27 @@ Alt + 2 指定項次">攤重</button>
                 placeholder="範例：US、CN、JP、GB(英文代碼)">
             </div>           
             <hr>
+            <div class="header-group">其他欄位</div>
+            <div class="header-group">
+                <label for="TRADE_MARK">商標</label>
+                <input type="text" id="TRADE_MARK" class="TRADE_MARK" name="TRADE_MARK" list="trademark-list"
+                    placeholder="範例：NO BRAND(無商標)、FIG(圖樣)、文字(字樣)">
+                <datalist id="trademark-list">
+                    <option value="NO BRAND">無商標</option>
+                    <option value="FIG">圖樣</option>
+                </datalist>
+            </div>
+            <div class="header-group">
+                <label for="GOODS_MODEL">型號</label>
+                <input type="text" id="GOODS_MODEL" class="GOODS_MODEL"
+                placeholder="(進口報單會自動加上前綴 MODEL:)">
+            </div>
+            <div class="header-group">
+                <label for="GOODS_SPEC">規格</label>
+                <input type="text" id="GOODS_SPEC" class="GOODS_SPEC"
+                placeholder="(進口報單會自動加上前綴 SPEC:)">
+            </div>
+            <hr>
             <div class="header-group">國貨復進口核銷欄位</div>
             <div class="header-group">
                 <label for="ORG_IMP_DCL_NO">原出口報單號碼</label>
@@ -623,16 +635,6 @@ Alt + 2 指定項次">攤重</button>
             </div>
             <hr>
             <div class="header-group">ECFA產證欄位</div>
-            <div class="header-group">
-                <label for="GOODS_MODEL">型號</label>
-                <input type="text" id="GOODS_MODEL" class="GOODS_MODEL"
-                placeholder="(進口報單會自動加上前綴 MODEL:)">
-            </div>
-            <div class="header-group">
-                <label for="GOODS_SPEC">規格</label>
-                <input type="text" id="GOODS_SPEC" class="GOODS_SPEC"
-                placeholder="(進口報單會自動加上前綴 SPEC:)">
-            </div>
             <div class="header-group">
                 <label for="CERT_NO">產證號碼</label>
                 <input type="text" id="CERT_NO" class="CERT_NO"
@@ -738,11 +740,14 @@ Alt + 2 指定項次">攤重</button>
                         <option value="QTY">數量</option>
                         <option value="DOC_UM">單位</option>
                         <option value="DOC_UNIT_P">單價</option>
-                        <option value="TRADE_MARK">商標</option>
                         <option value="CCC_CODE">稅則</option>
                         <option value="ST_MTD">納稅辦法</option>
                         <option value="NET_WT">淨重</option>
                         <option value="ORG_COUNTRY">生產國別</option>
+                        <option class="separator" disabled>其他欄位</option>
+                        <option value="TRADE_MARK">商標</option>
+                        <option value="GOODS_MODEL">型號</option>
+                        <option value="GOODS_SPEC">規格</option>                        
                         <option class="separator" disabled>國貨復進口核銷欄位</option>
                         <option value="ORG_IMP_DCL_NO">原出口報單號碼</option>
                         <option value="ORG_IMP_DCL_NO_ITEM">原出口報單項次</option>
@@ -750,8 +755,6 @@ Alt + 2 指定項次">攤重</button>
                         <option value="SELLER_ITEM_CODE">買方料號</option>
                         <option value="BOND_NOTE">保稅貨物註記</option>
                         <option class="separator" disabled>ECFA產證欄位</option>
-                        <option value="GOODS_MODEL">型號</option>
-                        <option value="GOODS_SPEC">規格</option>
                         <option value="CERT_NO">產證號碼</option>
                         <option value="CERT_NO_ITEM">產證項次</option>
                                <option class="separator" disabled>管制品欄位</option>
@@ -791,11 +794,14 @@ Alt + 2 指定項次">攤重</button>
                         <option value="QTY">數量</option>
                         <option value="DOC_UM">單位</option>
                         <option value="DOC_UNIT_P">單價</option>
-                        <option value="TRADE_MARK">商標</option>
                         <option value="CCC_CODE">稅則</option>
                         <option value="ST_MTD">納稅辦法</option>
                         <option value="NET_WT">淨重</option>
                         <option value="ORG_COUNTRY">生產國別</option>
+                        <option class="separator" disabled>其他欄位</option>
+                        <option value="TRADE_MARK">商標</option>
+                        <option value="GOODS_MODEL">型號</option>
+                        <option value="GOODS_SPEC">規格</option>                        
                         <option class="separator" disabled>國貨復進口核銷欄位</option>
                         <option value="ORG_IMP_DCL_NO">原出口報單號碼</option>
                         <option value="ORG_IMP_DCL_NO_ITEM">原出口報單項次</option>
@@ -803,8 +809,6 @@ Alt + 2 指定項次">攤重</button>
                         <option value="SELLER_ITEM_CODE">買方料號</option>
                         <option value="BOND_NOTE">保稅貨物註記</option>
                         <option class="separator" disabled>ECFA產證欄位</option>
-                        <option value="GOODS_MODEL">型號</option>
-                        <option value="GOODS_SPEC">規格</option>
                         <option value="CERT_NO">產證號碼</option>
                         <option value="CERT_NO_ITEM">產證項次</option>
                         <option class="separator" disabled>管制品欄位</option>
@@ -862,13 +866,16 @@ Alt + 2 指定項次">攤重</button>
                         <option value="DOC_UM">單位</option>
                         <option value="DOC_UNIT_P">單價</option>
                         <option value="DOC_TOT_P">金額</option>
-                        <option value="TRADE_MARK">商標</option>
                         <option value="CCC_CODE">稅則</option>
                         <option value="ST_MTD">納稅辦法</option>
                         <option value="ISCALC_WT">鎖定</option>
                         <option value="NET_WT">淨重</option>
                         <option value="ORG_COUNTRY">生產國別</option>
                     </optgroup>
+                    <option class="separator" disabled>其他欄位</option>
+                    <option value="TRADE_MARK">商標</option>
+                    <option value="GOODS_MODEL">型號</option>
+                    <option value="GOODS_SPEC">規格</option>                    
                     <option class="separator" disabled>國貨復進口核銷欄位</option>
                     <option value="ORG_IMP_DCL_NO">原出口報單號碼</option>
                     <option value="ORG_IMP_DCL_NO_ITEM">原出口報單項次</option>
@@ -876,8 +883,6 @@ Alt + 2 指定項次">攤重</button>
                     <option value="SELLER_ITEM_CODE">買方料號</option>
                     <option value="BOND_NOTE">保稅貨物註記</option>
                     <option class="separator" disabled>ECFA產證欄位</option>
-                    <option value="GOODS_MODEL">型號</option>
-                    <option value="GOODS_SPEC">規格</option>
                     <option value="CERT_NO">產證號碼</option>
                     <option value="CERT_NO_ITEM">產證項次</option>
                     <option class="separator" disabled>管制品欄位</option>
