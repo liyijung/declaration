@@ -1,7 +1,7 @@
 // 匯入Excel的功能
 function importToExcel(event) {
     clearField(); // 清空輸入框內容
-    
+
     // 清空 calculation-status
     document.getElementById('calculation-status').value = "";
     
@@ -193,91 +193,61 @@ function importToExcel(event) {
 
         const tariffCodeMapping = {
             "IC": "8542390022",
-            "PFC IC": "8542390022",
-            "PWM IC": "8542390022",
-            "PFC+LLC IC": "8542390022",
-            "PROTECT IC": "8542390022",
-            "2ND PROTECTION IC": "8542390022",
-            "VOLTAGE DETECTOR IC": "8542390022",
-            "LED": "8541410090",
-            "BAT CONN.": "8536902000",
-            "N MOS DIP": "8541299000",
-            "N MOS SMD": "8541299000",
-            "P MOS SMD": "8541299000",
-            "POWER MOSFET": "8541299000",
-            "TRANSISTOR": "8541299000",
-            "SWITCHING TRANSISTOR": "8541299000",
-            "NPN TRANSISTOR": "8541299000",
-            "PNP TRANSISTOR": "8541299000",
-            "THERMISTOR": "8533400000",
-            "RESISTOR": "8533400000",
-            "CURRENT SENSOR RESISTOR": "8533400000",
-            "CHIP RESISTOR": "8533400000",
-            "VARIABLE RESISTOR": "8533400000",
-            "NTC RESISTOR": "8533400000",
-            "CAPACITOR": "8532300000",
-            "CHIP CAP.": "8532300000",
-            "KO CAP.": "8532300000",
-            "X1 CAP.": "8532300000",
-            "X2 CAP.": "8532300000",
-            "Y1 CAP.": "8532300000",
-            "Y2 CAP.": "8532300000",
-            "TVS DIP": "8541101000",
-            "TVS SMD": "8541101000", 
-            "ULTRAFAST DIODE": "8541109000",
-            "TVS DIODE": "8541109000",
-            "ZENER DIODE": "8541109000",
-            "SWITCHING DIODE": "8541109000",
-            "RECTIFIER DIODE": "8541109000",
-            "DIODE SMD": "8541109000",
-            "DIODE DIP": "8541109000",
-            "FAST DIODE": "8541109000",
-            "SCHOTTKY DIODE": "8541109000",
-            "SUPERFAST DIODE": "8541109000",
-            "WAFER SMT": "8542390021",
-            "WAFER DIP AC-DC": "8542390021",
-            "INDUCTOR": "8504509000",
-            "POWER INDUCTOR": "8504509000",
-            "INDUCTOR SMD": "8504509000",
-            "PLANAR E CORE": "8504900000",
-            "PLANAR EQ CORE": "8504900000",
-            "PLANAR EEW CORE": "8504900000",
-            "BEAD CORE": "8504900000",
-            "FERRITE CORE": "8504900000",
-            "TOROIDAL CORE": "8504900000",
-            "CINCON LOGO": "8504900000",
-            "BASE OF DC-DC": "8504900000",
-            "CASE OF DC-DC": "8504900000",
-            "CLIPS DC-DC": "8504900000",
-            "CRIMP TERMINAL AC-DC": "8504900000",
-            "VOLTAGE DETECTOR SMD": "8504900000",
-            "BRIDGE RECTIFIER": "8504900000",
-            "ALUMINUM POLYMER CAP.": "8532220000",
-            "ALUMINUM CAP.": "8532220000",
-            "PF CAP.": "8532220000",
-            "CURRENT SHUNT": "8542390022",
-            "HV START UP IC SMD": "8542390022",
-            "CURRENT TRANSFORMER": "8504310000",
-            "DC-DC CONVERTERS": "8504409990",
-            "FEMALE CONNECTOR": "8536909000",
-            "FUSE SMD": "8536100000",
-            "FUSE DIP": "8536100000",
-            "CURRENT FUSE": "8536100000",
-            "HIGH POWER THICK FILM CHIP RESISTORS": "8533210090",
-            "HIGH VOLTAGE THICK FILM RESISTOR SMD": "8533210090",
-            "METAL STRIP RESISTOR SMD": "8533210090",
-            "PCB": "8534000090",
-            "PHOTO COUPLER": "8541490020",
-            "REGULATOR": "9032899000",
-            "TANTALUM": "8532210000",
-            "PIN": "8533900000",
-            "排PIN": "8533900000",
-            "圓PIN": "8533900000",
-            "THERMOSTAT": "9032100000",
         };
 
+        // 對應系統欄位與 Excel 標題名稱
+        const reverseColumnMap = {
+            '數量': 'QTY',
+            '單位': 'DOC_UM',
+            '單價': 'DOC_UNIT_P',
+            '金額': 'DOC_TOT_P',
+            '商標': 'TRADE_MARK',
+            '稅則': 'CCC_CODE',
+            '統計方式': 'ST_MTD',
+            '納稅辦法': 'ST_MTD', // ✅ 多個中文可對應同一欄位
+            '淨重': 'NET_WT',
+            '生產國別': 'ORG_COUNTRY',
+            '原進口報單號碼': 'ORG_IMP_DCL_NO',
+            '原出口報單號碼': 'ORG_IMP_DCL_NO',
+            '原進口報單項次': 'ORG_IMP_DCL_NO_ITEM',
+            '原出口報單項次': 'ORG_IMP_DCL_NO_ITEM',
+            '賣方料號': 'SELLER_ITEM_CODE',
+            '買方料號': 'SELLER_ITEM_CODE', // ✅ 如果有兩種稱呼也可並存
+            '保稅貨物註記': 'BOND_NOTE',
+            '型號': 'GOODS_MODEL',
+            '規格': 'GOODS_SPEC',
+            '產證號碼': 'CERT_NO',
+            '產證項次': 'CERT_NO_ITEM',
+            '原進倉報單號碼': 'ORG_DCL_NO',
+            '原進倉報單項次': 'ORG_DCL_NO_ITEM',
+            '輸出許可號碼': 'EXP_NO',
+            '輸出許可項次': 'EXP_SEQ_NO',
+            '寬度(幅寬)': 'WIDE',
+            '寬度單位': 'WIDE_UM',
+            '長度(幅長)': 'LENGT_',
+            '長度單位': 'LENGTH_UM',
+            '統計數量': 'ST_QTY',
+            '統計單位': 'ST_UM'
+        };
+
+        // 建立欄位名稱對應表（項次用）
+        const headerIndexMap = {};
+        headers.forEach((header, index) => {
+            const fieldId = reverseColumnMap[header?.trim()];
+            if (fieldId) {
+                headerIndexMap[fieldId] = index;
+            }
+        });
+
         const allItemsEmpty = itemsData.slice(1).every(row => !row[0]); // 檢查項次是否完全空
+
+        // 將報單項次數據填入表單
         itemsData.slice(1).forEach((row, index) => {
+            const getValue = (row, field) => {
+                const index = headerIndexMap[field];
+                return index !== undefined ? row[index] : '';
+            };
+
             const hasItemNo = row[0]; // 判斷項次是否有數據
 
             if (hasItemNo || allItemsEmpty || index === 0) {
@@ -292,13 +262,12 @@ function importToExcel(event) {
 
                 currentDescription = description;
 
-                let cccCode = String(row[descriptionIndices[descriptionIndices.length - 1] + 6] || '').trim();
+                let cccCode = String(getValue(row, 'CCC_CODE') || '').trim();
 
                 // 檢查CCC_CODE為空並匹配稅則
                 if (!cccCode) {
                     // 將描述內容轉為大寫
                     const upperCaseDescription = currentDescription.toUpperCase();
-                    
                     const matchedCode = Object.keys(tariffCodeMapping).find(key =>
                         upperCaseDescription.split('\n').some(line => line.trim().startsWith(key.toUpperCase()))
                     );
@@ -310,45 +279,42 @@ function importToExcel(event) {
                 currentItem = createItemRow({
                     ITEM_NO: String(row[0] || ''), // 將數據轉為字串
                     DESCRIPTION: currentDescription || '',
-                    QTY: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 1] || '')),
-                    DOC_UM: String(row[descriptionIndices[descriptionIndices.length - 1] + 2] || ''),
-                    DOC_UNIT_P: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 3] || '')),
-                    DOC_TOT_P: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 4] || '')),
-                    TRADE_MARK: String(row[descriptionIndices[descriptionIndices.length - 1] + 5] || ''),
+                    QTY: removeThousandsSeparator(String(getValue(row, 'QTY') || '')),
+                    DOC_UM: String(getValue(row, 'DOC_UM') || ''),
+                    DOC_UNIT_P: removeThousandsSeparator(String(getValue(row, 'DOC_UNIT_P') || '')),
+                    DOC_TOT_P: removeThousandsSeparator(String(getValue(row, 'DOC_TOT_P') || '')),
                     CCC_CODE: cccCode, // 使用匹配稅則或原始值
-                    ST_MTD: String(row[descriptionIndices[descriptionIndices.length - 1] + 7] || '').toUpperCase(),
-                    NET_WT: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 8] || '')),
-                    ORG_COUNTRY: String(row[descriptionIndices[descriptionIndices.length - 1] + 9] || '').toUpperCase(),
-                    ORG_IMP_DCL_NO: String(row[descriptionIndices[descriptionIndices.length - 1] + 10] || '').toUpperCase(),
-                    ORG_IMP_DCL_NO_ITEM: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 11] || '')),
-                    SELLER_ITEM_CODE: String(row[descriptionIndices[descriptionIndices.length - 1] + 12] || ''),
-                    BOND_NOTE: String(row[descriptionIndices[descriptionIndices.length - 1] + 13] || '').toUpperCase(),
-                    GOODS_MODEL: String(row[descriptionIndices[descriptionIndices.length - 1] + 14] || ''),
-                    GOODS_SPEC: String(row[descriptionIndices[descriptionIndices.length - 1] + 15] || ''),
-                    CERT_NO: String(row[descriptionIndices[descriptionIndices.length - 1] + 16] || '').toUpperCase(),
-                    CERT_NO_ITEM: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 17] || '')),
-                    EXP_NO: String(row[descriptionIndices[descriptionIndices.length - 1] + 18] || '').toUpperCase(),
-                    EXP_SEQ_NO: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 19] || '')),
-                    WIDE: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 20] || '')),
-                    WIDE_UM: String(row[descriptionIndices[descriptionIndices.length - 1] + 21] || ''),
-                    LENGT_: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 22] || '')),
-                    LENGTH_UM: String(row[descriptionIndices[descriptionIndices.length - 1] + 23] || ''),
-                    ST_QTY: removeThousandsSeparator(String(row[descriptionIndices[descriptionIndices.length - 1] + 24] || '')),
-                    ST_UM: String(row[descriptionIndices[descriptionIndices.length - 1] + 25] || ''),
+                    ST_MTD: String(getValue(row, 'ST_MTD') || '').toUpperCase(),
+                    NET_WT: removeThousandsSeparator(String(getValue(row, 'NET_WT') || '')),
+                    ORG_COUNTRY: String(getValue(row, 'ORG_COUNTRY') || '').toUpperCase(),
+                    TRADE_MARK: String(getValue(row, 'TRADE_MARK') || ''),
+                    GOODS_MODEL: String(getValue(row, 'GOODS_MODEL') || ''),
+                    GOODS_SPEC: String(getValue(row, 'GOODS_SPEC') || ''),
+                    ORG_IMP_DCL_NO: String(getValue(row, 'ORG_IMP_DCL_NO') || '').toUpperCase(),
+                    ORG_IMP_DCL_NO_ITEM: removeThousandsSeparator(String(getValue(row, 'ORG_IMP_DCL_NO_ITEM') || '')),
+                    SELLER_ITEM_CODE: String(getValue(row, 'SELLER_ITEM_CODE') || ''),
+                    BOND_NOTE: String(getValue(row, 'BOND_NOTE') || '').toUpperCase(),
+                    CERT_NO: String(getValue(row, 'CERT_NO') || '').toUpperCase(),
+                    CERT_NO_ITEM: removeThousandsSeparator(String(getValue(row, 'CERT_NO_ITEM') || '')),
+                    EXP_NO: String(getValue(row, 'EXP_NO') || '').toUpperCase(),
+                    EXP_SEQ_NO: removeThousandsSeparator(String(getValue(row, 'EXP_SEQ_NO') || '')),
+                    WIDE: removeThousandsSeparator(String(getValue(row, 'WIDE') || '')),
+                    WIDE_UM: String(getValue(row, 'WIDE_UM') || ''),
+                    LENGT_: removeThousandsSeparator(String(getValue(row, 'LENGT_') || '')),
+                    LENGTH_UM: String(getValue(row, 'LENGTH_UM') || ''),
+                    ST_QTY: removeThousandsSeparator(String(getValue(row, 'ST_QTY') || '')),
+                    ST_UM: String(getValue(row, 'ST_UM') || '')
                 });
                 
                 if (row[1] === '*') {
                     currentItem.querySelector('.ITEM_NO').checked = true;
                 }
             } else if (currentItem) {
-                const element = currentItem.querySelector('.DESCRIPTION');
-                if (element) {
-                    descriptionIndices.forEach(i => {
-                        if (row[i]) {
-                            currentDescription += `\n${String(row[i])}`;
-                        }
-                    });
-                }
+                descriptionIndices.forEach(i => {
+                    if (row[i]) {
+                        currentDescription += `\n${String(row[i])}`;
+                    }
+                });
             }
         });
 
@@ -428,8 +394,9 @@ function exportToExcel() {
     // 收集報單項次數據
     const itemsData = [
         ['No.', '項次(非必填，大品名註記以"*"表示，可無編號)', '數量', '單位', '單價', '金額', 
-        '商標', '稅則', '納稅辦法', '淨重', '生產國別', '原出口報單號碼', '原出口報單項次', 
-        '買方料號', '保稅貨物註記', '型號', '規格', '產證號碼', '產證項次', 
+        '稅則', '納稅辦法', '淨重', '生產國別', '商標', '型號', '規格', 
+        '原出口報單號碼', '原出口報單項次', 
+        '買方料號', '保稅貨物註記', '產證號碼', '產證項次', 
         '輸入許可號碼', '輸入許可項次', 
         '寬度(幅寬)', '寬度單位', '長度(幅長)', '長度單位', '統計數量', '統計單位']
     ];
@@ -477,17 +444,17 @@ function exportToExcel() {
             replaceValue('DOC_UM', item.querySelector('.DOC_UM').value || ''), // 單位
             item.querySelector('.DOC_UNIT_P').value || '', // 單價
             item.querySelector('.DOC_TOT_P').value || '', // 金額
-            item.querySelector('.TRADE_MARK').value || '', // 商標
             replaceValue('CCC_CODE', item.querySelector('.CCC_CODE').value || ''), // 稅則
             item.querySelector('.ST_MTD').value || '', // 納稅辦法
             item.querySelector('.NET_WT').value || '', // 淨重
             item.querySelector('.ORG_COUNTRY').value || '', // 生產國別
+            item.querySelector('.TRADE_MARK').value || '', // 商標
+            item.querySelector('.GOODS_MODEL').value || '', // 型號
+            item.querySelector('.GOODS_SPEC').value || '', // 規格            
             item.querySelector('.ORG_IMP_DCL_NO').value || '', // 原出口報單號碼
             item.querySelector('.ORG_IMP_DCL_NO_ITEM').value || '', // 原出口報單項次
             item.querySelector('.SELLER_ITEM_CODE').value || '', // 買方料號
             item.querySelector('.BOND_NOTE').value || '', // 保稅貨物註記
-            item.querySelector('.GOODS_MODEL').value || '', // 型號
-            item.querySelector('.GOODS_SPEC').value || '', // 規格
             item.querySelector('.CERT_NO').value || '', // 產證號碼
             item.querySelector('.CERT_NO_ITEM').value || '', // 產證項次
             item.querySelector('.EXP_NO').value || '', // 輸入許可號碼
