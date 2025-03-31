@@ -36,9 +36,9 @@ function applyToggleFields() {
     const selectedOptions = Array.from(document.getElementById('field-select').selectedOptions).map(option => option.value);
     
     const allFields = [
-        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'TRADE_MARK', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
-        'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 
-        'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE', 'GOODS_MODEL', 'GOODS_SPEC', 
+        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
+        'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
+        'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE', 
         'CERT_NO', 'CERT_NO_ITEM', 'EXP_NO', 'EXP_SEQ_NO', 
         'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM'
     ];
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 預設選中必填欄位
     const defaultRequiredFields = [
-        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'TRADE_MARK', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT', 'ORG_COUNTRY'
+        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT', 'ORG_COUNTRY'
     ];
 
     // 預設選中這些欄位
@@ -82,9 +82,9 @@ function initializeFieldVisibility() {
     const selectedOptions = Array.from(document.getElementById('field-select').selectedOptions).map(option => option.value);
 
     const allFields = [
-        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'TRADE_MARK', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
-        'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 
-        'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE', 'GOODS_MODEL', 'GOODS_SPEC', 
+        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
+        'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
+        'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
         'CERT_NO', 'CERT_NO_ITEM', 'EXP_NO', 'EXP_SEQ_NO', 
         'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM'
     ];
