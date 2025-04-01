@@ -214,6 +214,7 @@ function importToExcel(event) {
             '保稅貨物註記': 'BOND_NOTE',
             '產證號碼': 'CERT_NO',
             '產證項次': 'CERT_NO_ITEM',
+            '稅則附碼': 'TARIFF_CODE',
             '輸入許可號碼': 'EXP_NO',
             '輸入許可項次': 'EXP_SEQ_NO',
             '寬度(幅寬)': 'WIDE',
@@ -290,6 +291,7 @@ function importToExcel(event) {
                     BOND_NOTE: String(getValue(row, 'BOND_NOTE') || '').toUpperCase(),
                     CERT_NO: String(getValue(row, 'CERT_NO') || '').toUpperCase(),
                     CERT_NO_ITEM: removeThousandsSeparator(String(getValue(row, 'CERT_NO_ITEM') || '')),
+                    TARIFF_CODE: String(getValue(row, 'TARIFF_CODE') || '').toUpperCase(),
                     EXP_NO: String(getValue(row, 'EXP_NO') || '').toUpperCase(),
                     EXP_SEQ_NO: removeThousandsSeparator(String(getValue(row, 'EXP_SEQ_NO') || '')),
                     WIDE: removeThousandsSeparator(String(getValue(row, 'WIDE') || '')),
@@ -390,7 +392,7 @@ function exportToExcel() {
         ['No.', '項次(非必填，大品名註記以"*"表示，可無編號)', '數量', '單位', '單價', '金額', 
         '稅則', '納稅辦法', '淨重', '生產國別', '商標', '型號', '規格', 
         '原出口報單號碼', '原出口報單項次', 
-        '買方料號', '保稅貨物註記', '產證號碼', '產證項次', 
+        '買方料號', '保稅貨物註記', '產證號碼', '產證項次', '稅則附碼',
         '輸入許可號碼', '輸入許可項次', 
         '寬度(幅寬)', '寬度單位', '長度(幅長)', '長度單位', '統計數量', '統計單位']
     ];
@@ -451,6 +453,7 @@ function exportToExcel() {
             item.querySelector('.BOND_NOTE').value || '', // 保稅貨物註記
             item.querySelector('.CERT_NO').value || '', // 產證號碼
             item.querySelector('.CERT_NO_ITEM').value || '', // 產證項次
+            item.querySelector('.TARIFF_CODE').value || '', // '稅則附碼'
             item.querySelector('.EXP_NO').value || '', // 輸入許可號碼
             item.querySelector('.EXP_SEQ_NO').value || '', // 輸入許可項次
             item.querySelector('.WIDE').value || '', // 寬度
