@@ -343,6 +343,7 @@ function createItemRow(data) {
         ${createInputField('BOND_NOTE', data.BOND_NOTE, fieldsToShow.BOND_NOTE)}        
         ${createInputField('CERT_NO', data.CERT_NO, fieldsToShow.CERT_NO)}
         ${createInputField('CERT_NO_ITEM', data.CERT_NO_ITEM, fieldsToShow.CERT_NO_ITEM)}
+        ${createInputField('TARIFF_CODE', data.TARIFF_CODE, fieldsToShow.TARIFF_CODE)}
         ${createInputField('EXP_NO', data.EXP_NO, fieldsToShow.EXP_NO)}
         ${createInputField('EXP_SEQ_NO', data.EXP_SEQ_NO, fieldsToShow.EXP_SEQ_NO)}
         ${createInputField('WIDE', data.WIDE, fieldsToShow.WIDE)}
@@ -436,7 +437,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
         // 處理最大四捨五入至小數6位，並移除後面的多餘零
         const roundedValue = (['QTY', 'DOC_UNIT_P', 'NET_WT', 'WIDE', 'LENGT_', 'ST_QTY'].includes(name) && value) ? new Decimal(value).toFixed(6).replace(/\.?0+$/, '') : escapedValue;
         const inputField = `<input type="${inputType}" class="${name} ${name === 'CCC_CODE' ? 'CCC_CODE' : 'tax-code-input'}" value="${roundedValue}" ${onInputAttribute} ${minAttribute} ${readonlyAttribute} ${onFocusAttribute} ${onBlurAttribute} ${onKeyDownAttribute} ${onInputUpperCaseAttribute} style="flex: 1; margin-right: 0;">`;
-    
+
         if (name === 'NET_WT') {
             const isCalcChecked = iscalcWtValue === 'Y' ? 'checked' : ''; // 根據 ISCALC_WT 判斷是否勾選
             return `
@@ -465,7 +466,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
                     ${inputField}
                 </div>
             `;
-        } else if (['ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO_ITEM', 'BOND_NOTE', 'CERT_NO_ITEM', 'EXP_SEQ_NO'].includes(name)) {
+        } else if (['ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO_ITEM', 'BOND_NOTE', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_SEQ_NO'].includes(name)) {
             return `
                 <div class="form-group ${visibilityClass}" style="width: 30%;">
                     ${inputField}
@@ -510,6 +511,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
             BOND_NOTE: "保稅貨物註記",
             CERT_NO: "產證號碼",
             CERT_NO_ITEM: "產證項次",
+            TARIFF_CODE: "稅則附碼",
             EXP_NO: "輸入許可號碼",
             EXP_SEQ_NO: "輸入許可項次",
             WIDE: "寬度(幅寬)",
