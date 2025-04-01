@@ -216,6 +216,7 @@ function applyFieldData() {
     const items = itemContainer.querySelectorAll('.item-row');
     let hasUpdatedCCCCode = false; // 紀錄是否有更新CCC_CODE欄位
     let hasUpdatedQtyOrUnitPrice = false; // 紀錄是否有更新QTY、DOC_UM、DOC_UNIT_P欄位
+    let hasUpdatedCertNoOrCertNoItem = false; // 紀錄是否有更新CERT_NO、CERT_NO_ITEM欄位
 
     // 需要強制轉為大寫的欄位
     const upperCaseFields = [
@@ -346,6 +347,11 @@ function applyFieldData() {
                     if (["QTY", "DOC_UM", "DOC_UNIT_P"].includes(fieldName)) {
                         hasUpdatedQtyOrUnitPrice = true;
                     }
+
+                    // 紀錄是否更新了CERT_NO、CERT_NO_ITEM
+                    if (["CERT_NO", "CERT_NO_ITEM"].includes(fieldName)) {
+                        hasUpdatedCertNoOrCertNoItem = true;
+                    }
                 }
             }
         });
@@ -417,6 +423,10 @@ function applyFieldData() {
                         if (["QTY", "DOC_UM", "DOC_UNIT_P"].includes(fieldName)) {
                             hasUpdatedQtyOrUnitPrice = true;
                         }
+                        // 紀錄是否更新了CERT_NO、CERT_NO_ITEM
+                        if (["CERT_NO", "CERT_NO_ITEM"].includes(fieldName)) {
+                            hasUpdatedCertNoOrCertNoItem = true;
+                        }
                     });
                 }
             });
@@ -447,6 +457,12 @@ function applyFieldData() {
             calculateAmountsForRow(item, decimalPlaces);
             updateST_QTY(item);
             updateNET_WT(item);
+        });
+    }
+    // 檢查是否有更新CERT_NO、CERT_NO_ITEM欄位，若有則對所有更新的欄位執行自動填入稅則附碼為 'PT'
+    if (hasUpdatedCertNoOrCertNoItem) {
+        items.forEach(item => {
+            checkFields(item)
         });
     }
 
