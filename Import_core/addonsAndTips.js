@@ -79,34 +79,37 @@ function validateDclDocType() {
     });
 
     // 檢查納稅辦法、生產國別、報單類別
-    let allTW = true;
-    let countTW = 0;
+    let allOrgCountryTW = true;
     let totalValidRows = 0;
 
     rows.forEach(item => {
         const isItemChecked = item.querySelector(".ITEM_NO")?.checked;
         if (isItemChecked) return;
 
-        const orgCountry = item.querySelector(".ORG_COUNTRY")?.value.trim().toUpperCase();
         const stMtd = item.querySelector(".ST_MTD")?.value.trim();
+        const orgCountry = item.querySelector(".ORG_COUNTRY")?.value.trim().toUpperCase();
 
         if (orgCountry) {
             totalValidRows++;
-
-            if (orgCountry === "TW") {
-                countTW++;
-                if (stMtd !== "55" && stMtd !== "99") {
-                    validationErrors.add("生產國別為 TW，納稅辦法應為 55 或 99");
-                    setError(item.querySelector(".ORG_COUNTRY"), "生產國別為 TW，納稅辦法應為 55 或 99");
-                    setError(item.querySelector(".ST_MTD"), "納稅辦法應為 55 或 99");
+    
+            // 報單類別為 G7 且納稅辦法為 55 或 99 時，生產國別必須為 TW
+            if (dclDocType === "G7" && (stMtd === "55" || stMtd === "99")) {
+                if (orgCountry !== "TW") {
+                    validationErrors.add("納稅辦法為 55 或 99，生產國別必須為 TW");
+                    setError(item.querySelector(".ST_MTD"), "納稅辦法為 55 或 99，生產國別必須為 TW");
+                    setError(item.querySelector(".ORG_COUNTRY"), "生產國別必須為 TW");
                 }
-            } else {
-                allTW = false;
+            }
+    
+            // 累計是否每一筆都是 TW
+            if (orgCountry !== "TW") {
+                allOrgCountryTW = false;
             }
         }
     });
 
-    if (totalValidRows > 0 && countTW === totalValidRows && dclDocType !== "G7") {
+    // 如果全部都是 TW，但報單類別不是 G7，則錯誤
+    if (totalValidRows > 0 && allOrgCountryTW && dclDocType !== "G7") {
         validationErrors.add("全部項次生產國別皆為 TW，報單類別應為 G7");
         setError(document.getElementById("DCL_DOC_TYPE"), "應為 G7（國貨復進口）");
     }
