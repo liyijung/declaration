@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 let expNoAlreadyChecked = false;
                 const pairedFields = [
                     { fields: ['ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM'], names: ['原出口報單號碼', '原出口報單項次'] },
-                    { fields: ['CERT_NO', 'CERT_NO_ITEM'], names: ['產證號碼', '產證項次'] },
+                    { fields: ['CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE'], names: ['產證號碼', '產證項次', '稅則附碼'] },
                     { fields: ['WIDE', 'WIDE_UM'], names: ['寬度(幅寬)', '寬度單位'] },
                     { fields: ['LENGT_', 'LENGTH_UM'], names: ['長度(幅長)', '長度單位'] },
                     { fields: ['ST_QTY', 'ST_UM'], names: ['統計數量', '統計單位'] },
@@ -401,17 +401,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 });
-
-                // 檢查當 'CERT_NO' 和 'CERT_NO_ITEM' 有值時，'GOODS_MODEL' 和 'GOODS_SPEC' 也需要有值
-                let certNo = item.querySelector('.CERT_NO');
-                let certNoItem = item.querySelector('.CERT_NO_ITEM');
-                if (certNo && certNo.value.trim() && certNoItem && certNoItem.value.trim()) {
-                    let goodsModel = item.querySelector('.GOODS_MODEL');
-                    let goodsSpec = item.querySelector('.GOODS_SPEC');
-                    if (!goodsModel || !goodsModel.value.trim() || !goodsSpec || !goodsSpec.value.trim()) {
-                        itemMissingFields.push(`產證號碼 和 產證項次 有值時，型號 及 規格 也必須有值`);
-                    }
-                }
 
                 // 檢查淨重是否為零
                 let netWtElement = item.querySelector('.NET_WT');
@@ -642,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT', 'ORG_COUNTRY', 
             'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC',
             'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
-            'CERT_NO', 'CERT_NO_ITEM', 'EXP_NO', 'EXP_SEQ_NO', 
+            'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_SEQ_NO', 
             'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY' ,'ST_UM',
         ];
         
