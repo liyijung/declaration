@@ -452,6 +452,9 @@ Alt + 2 指定項次">攤重</button>
                 <div class="form-group CCC_CODE" style="width: 105%;">
                     <label>稅則</label>
                 </div>
+                <div class="form-group TAX_RATE" style="width: 40%;">
+                    <label>稅率</label>
+                </div>
                 <div class="form-group ST_MTD" style="width: 30%;">
                     <label>納稅辦法</label>
                 </div>
@@ -581,6 +584,10 @@ Alt + 2 指定項次">攤重</button>
                 <input type="text" id="CCC_CODE" class="CCC_CODE"
                     placeholder="可輸入關鍵字按Enter查詢後選取(台灣稅則－共11碼，前6碼國際通用)" onkeydown="handleCCCCodeEnter(event, this)">
             </div>
+            <div class="header-group">
+                <label for="TAX_RATE" id="TAX_RATE_LABEL">稅率</label>
+                <input type="text" id="TAX_RATE" class="TAX_RATE">
+            </div>            
             <div class="header-group">
                 <label for="ST_MTD">納稅辦法</label>
                 <input type="text" id="ST_MTD" class="ST_MTD" name="ST_MTD" list="method-list">
@@ -757,6 +764,7 @@ Alt + 2 指定項次">攤重</button>
                         <option value="DOC_UM">單位</option>
                         <option value="DOC_UNIT_P">單價</option>
                         <option value="CCC_CODE">稅則</option>
+                        <option value="TAX_RATE">稅率</option>
                         <option value="ST_MTD">納稅辦法</option>
                         <option value="NET_WT">淨重</option>
                         <option value="ORG_COUNTRY">生產國別</option>
@@ -812,6 +820,7 @@ Alt + 2 指定項次">攤重</button>
                         <option value="DOC_UM">單位</option>
                         <option value="DOC_UNIT_P">單價</option>
                         <option value="CCC_CODE">稅則</option>
+                        <option value="TAX_RATE">稅率</option>
                         <option value="ST_MTD">納稅辦法</option>
                         <option value="NET_WT">淨重</option>
                         <option value="ORG_COUNTRY">生產國別</option>
@@ -885,6 +894,7 @@ Alt + 2 指定項次">攤重</button>
                         <option value="DOC_UNIT_P">單價</option>
                         <option value="DOC_TOT_P">金額</option>
                         <option value="CCC_CODE">稅則</option>
+                        <option value="TAX_RATE">稅率</option>
                         <option value="ST_MTD">納稅辦法</option>
                         <option value="ISCALC_WT">鎖定</option>
                         <option value="NET_WT">淨重</option>
