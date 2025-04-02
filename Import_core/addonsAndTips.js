@@ -522,6 +522,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         currencyError.style.display = "none";
                     }
                     break;
+                case 'CCC_CODE':
+                    document.getElementById('TAX_RATE').value = '';
+                    break;                    
                 case 'CERT_NO':
                     document.getElementById('TARIFF_CODE').value = '';
                     break;
