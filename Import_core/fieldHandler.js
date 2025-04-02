@@ -463,6 +463,12 @@ function applyFieldData() {
     if (hasUpdatedCertNoOrCertNoItem) {
         items.forEach(item => {
             checkFields(item)
+
+            const cccInput = item.querySelector('.CCC_CODE');
+            if (cccInput) {
+                const cleanedCode = cccInput.value.trim().replace(/[.\-\s]/g, '');
+                updateTariff(cccInput, cleanedCode);
+            }
         });
     }
 
