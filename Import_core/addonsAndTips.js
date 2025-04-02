@@ -526,10 +526,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('TAX_RATE').value = '';
                     break;                    
                 case 'CERT_NO':
-                    document.getElementById('TARIFF_CODE').value = '';
-                    break;
                 case 'CERT_NO_ITEM':
+                case 'TARIFF_CODE':
                     document.getElementById('TARIFF_CODE').value = '';
+                    triggerUpdateTariff();
                     break;
             }
         });
