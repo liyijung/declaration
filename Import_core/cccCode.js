@@ -523,9 +523,7 @@ function updateTariff(inputElement, keyword = '') {
         const tariffCodeVal = tariffCode?.value?.trim();
     
         if (taxRate && item['第一欄稅率']) {
-            if (!certNoVal && !certNoItemVal && !tariffCodeVal) {
-                taxRate.value = item['第一欄稅率'];
-            }
+            taxRate.value = (certNoVal && certNoItemVal && tariffCodeVal === 'PT') ? '0%' : item['第一欄稅率'];
         }
                 
         updateFields(inputElement, item); // 更新欄位
