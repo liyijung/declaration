@@ -331,6 +331,7 @@ function createItemRow(data) {
         ${createInputField('DOC_UNIT_P', data.DOC_UNIT_P, true)}
         ${createInputField('DOC_TOT_P', data.DOC_TOT_P, true)}
         ${createInputField('CCC_CODE', replaceValue('CCC_CODE', data.CCC_CODE), true)}
+        ${createInputField('TAX_RATE', data.TAX_RATE, true)}
         ${createInputField('ST_MTD', data.ST_MTD, true)}
         ${createInputField('NET_WT', data.NET_WT, fieldsToShow.NET_WT, data.ISCALC_WT)}
         ${createInputField('ORG_COUNTRY', data.ORG_COUNTRY, fieldsToShow.ORG_COUNTRY)}
@@ -478,6 +479,12 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
                     ${inputField}
                 </div>
             `;
+        } else if (['TAX_RATE'].includes(name)) {
+            return `
+                <div class="form-group ${visibilityClass}" style="width: 40%;">
+                    ${inputField}
+                </div>
+            `;
         } else if (['SELLER_ITEM_CODE'].includes(name)) {
             return `
                 <div class="form-group ${visibilityClass}" style="width: 130%;">
@@ -499,6 +506,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
             DOC_UNIT_P: "單價",
             DOC_TOT_P: "金額",
             CCC_CODE: "稅則",
+            TAX_RATE: "稅率",
             ST_MTD: "納稅辦法",
             NET_WT: "淨重",
             ORG_COUNTRY: "生產國別",
