@@ -11,6 +11,7 @@ function openItemModal() {
     document.getElementById('DOC_UNIT_P').value = savedItemData.DOC_UNIT_P || '';
     document.getElementById('DOC_TOT_P').value = savedItemData.DOC_TOT_P || '';
     document.getElementById('CCC_CODE').value = savedItemData.CCC_CODE || '';
+    document.getElementById('TAX_RATE').value = savedItemData.TAX_RATE || '';
     document.getElementById('ST_MTD').value = savedItemData.ST_MTD || '';
     document.getElementById('NET_WT').value = savedItemData.NET_WT || '';
     document.getElementById('ORG_COUNTRY').value = savedItemData.ORG_COUNTRY || '';
@@ -119,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedItemIndex = copyItemSelect.value;
 
         const itemFields = [
-            'ITEM_NO', 'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 
+            'ITEM_NO', 'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'TAX_RATE',
             'ST_MTD', 'NET_WT', 'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
             'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM',
             'SELLER_ITEM_CODE', 'BOND_NOTE', 'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE',
@@ -183,6 +184,7 @@ function rememberItemModalData() {
         DOC_UNIT_P: document.getElementById('DOC_UNIT_P').value,
         DOC_TOT_P: document.getElementById('DOC_TOT_P').value,
         CCC_CODE: document.getElementById('CCC_CODE').value,
+        TAX_RATE: document.getElementById('TAX_RATE').value,
         ST_MTD: document.getElementById('ST_MTD').value,
         NET_WT: document.getElementById('NET_WT').value,        
         ORG_COUNTRY: document.getElementById('ORG_COUNTRY').value,
@@ -218,6 +220,7 @@ function clearAllFields() {
     document.getElementById('DOC_UNIT_P').value = '';
     document.getElementById('DOC_TOT_P').value = '';
     document.getElementById('CCC_CODE').value = '';
+    document.getElementById('TAX_RATE').value = '';
     document.getElementById('ST_MTD').value = '';
     document.getElementById('NET_WT').value = '';
     document.getElementById('ORG_COUNTRY').value = '';
@@ -285,6 +288,7 @@ function saveItem() {
         DOC_UNIT_P: document.getElementById('DOC_UNIT_P').value.trim(),
         DOC_TOT_P: document.getElementById('DOC_TOT_P').value.trim(),
         CCC_CODE: document.getElementById('CCC_CODE').value.trim(),
+        TAX_RATE: document.getElementById('TAX_RATE').value.trim(),
         ST_MTD: document.getElementById('ST_MTD').value.trim(),
         NET_WT: document.getElementById('NET_WT').value.trim(),        
         ORG_COUNTRY: document.getElementById('ORG_COUNTRY').value.trim(),
@@ -356,7 +360,7 @@ function applyToggleFieldsToRow(row) {
 
     // 所有可能的欄位
     const allFields = [
-        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
+        'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'TAX_RATE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
         'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
         'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
         'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_SEQ_NO', 
@@ -409,6 +413,7 @@ function checkFields(inputElement) {
         // 如果產證號碼和產證項次都有值，則自動填入稅則附碼為 'PT'
         if (certNo && certNoItem) {
             document.getElementById('TARIFF_CODE').value = 'PT';
+            document.getElementById('TAX_RATE').value = '0%';
         } else {
             document.getElementById('TARIFF_CODE').value = ''; // 如果任一欄位沒填寫，清空稅則附碼
         }
@@ -417,12 +422,38 @@ function checkFields(inputElement) {
         const certNo = itemRow.querySelector('.CERT_NO').value; // 取得該項次的產證號碼
         const certNoItem = itemRow.querySelector('.CERT_NO_ITEM').value; // 取得該項次的產證項次
         const tariffCodeElement = itemRow.querySelector('.TARIFF_CODE'); // 取得該項次的稅則附碼
+        const taxRateElement = itemRow.querySelector('.TAX_RATE'); // 取得該項次的 TAX_RATE 欄位
 
         // 如果產證號碼和產證項次都有值，則自動填入稅則附碼為 'PT'
         if (certNo && certNoItem) {
             tariffCodeElement.value = 'PT';
+            taxRateElement.value = '0%'; // 設定 TAX_RATE 為 0%
         } else {
             tariffCodeElement.value = ''; // 如果任一欄位沒填寫，清空稅則附碼
         }
     }
 }
+
+document.getElementById('CERT_NO').addEventListener('input', triggerUpdateTariff);
+document.getElementById('CERT_NO_ITEM').addEventListener('input', triggerUpdateTariff);
+document.getElementById('TARIFF_CODE').addEventListener('input', triggerUpdateTariff);
+
+function triggerUpdateTariff() {
+    const cccInput = document.getElementById('CCC_CODE');
+    const cleanedCode = cccInput.value.trim().replace(/[.\-\s]/g, '');
+
+    updateTariff(cccInput, cleanedCode); // 傳入 cleaned CCC_CODE
+}
+
+document.addEventListener('input', function (event) {
+    if (event.target.matches('.CERT_NO, .CERT_NO_ITEM, .TARIFF_CODE')) {
+        const itemRow = event.target.closest('.item-row');
+        if (itemRow) {
+            const cccInput = itemRow.querySelector('.CCC_CODE');
+            if (cccInput) {
+                const cleanedCode = cccInput.value.trim().replace(/[.\-\s]/g, '');
+                updateTariff(cccInput, cleanedCode); // 傳入對應 row 的 CCC_CODE
+            }
+        }
+    }
+});
