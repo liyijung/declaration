@@ -683,3 +683,9 @@ document.addEventListener('focusout', function (event) {
         event.target.classList.add('highlighted-element');
     }
 });
+
+// 使用者關閉或重新整理頁面（例如按 F5）時跳出提示
+window.addEventListener('beforeunload', function (event) {
+    event.preventDefault();
+    event.returnValue = ''; // 必須設置，才能顯示提示框
+});
