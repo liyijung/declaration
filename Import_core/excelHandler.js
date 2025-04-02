@@ -202,6 +202,7 @@ function importToExcel(event) {
             '單價': 'DOC_UNIT_P',
             '金額': 'DOC_TOT_P',
             '稅則': 'CCC_CODE',
+            '稅率': 'TAX_RATE',
             '納稅辦法': 'ST_MTD',
             '淨重': 'NET_WT',
             '生產國別': 'ORG_COUNTRY',
@@ -279,6 +280,7 @@ function importToExcel(event) {
                     DOC_UNIT_P: removeThousandsSeparator(String(getValue(row, 'DOC_UNIT_P') || '')),
                     DOC_TOT_P: removeThousandsSeparator(String(getValue(row, 'DOC_TOT_P') || '')),
                     CCC_CODE: cccCode, // 使用匹配稅則或原始值
+                    TAX_RATE: String(getValue(row, 'TAX_RATE') || ''),
                     ST_MTD: String(getValue(row, 'ST_MTD') || '').toUpperCase(),
                     NET_WT: removeThousandsSeparator(String(getValue(row, 'NET_WT') || '')),
                     ORG_COUNTRY: String(getValue(row, 'ORG_COUNTRY') || '').toUpperCase(),
@@ -390,7 +392,7 @@ function exportToExcel() {
     // 收集報單項次數據
     const itemsData = [
         ['No.', '項次(非必填，大品名註記以"*"表示，可無編號)', '數量', '單位', '單價', '金額', 
-        '稅則', '納稅辦法', '淨重', '生產國別', '商標', '型號', '規格', 
+        '稅則', '稅率', '納稅辦法', '淨重', '生產國別', '商標', '型號', '規格', 
         '原出口報單號碼', '原出口報單項次', 
         '買方料號', '保稅貨物註記', '產證號碼', '產證項次', '稅則附碼',
         '輸入許可號碼', '輸入許可項次', 
@@ -441,6 +443,7 @@ function exportToExcel() {
             item.querySelector('.DOC_UNIT_P').value || '', // 單價
             item.querySelector('.DOC_TOT_P').value || '', // 金額
             replaceValue('CCC_CODE', item.querySelector('.CCC_CODE').value || ''), // 稅則
+            item.querySelector('.TAX_RATE').value || '', // 稅率
             item.querySelector('.ST_MTD').value || '', // 納稅辦法
             item.querySelector('.NET_WT').value || '', // 淨重
             item.querySelector('.ORG_COUNTRY').value || '', // 生產國別
