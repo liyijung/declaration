@@ -444,6 +444,10 @@ function closeTaxModal() {
     // 在關閉彈跳框後，將焦點返回到原輸入框
     if (modal.currentInputElement) {
         modal.currentInputElement.focus();
+
+        // 自動觸發 updateTariff（確保 TAX_RATE、ST_QTY 等欄位刷新）
+        const keyword = modal.currentInputElement.value.toLowerCase().replace(/[.\-\s]/g, '');
+        updateTariff(modal.currentInputElement, keyword);
     }
 }
 
@@ -507,6 +511,23 @@ function updateTariff(inputElement, keyword = '') {
 
     if (results.length > 0) {
         const item = results[0]; // 取首個匹配結果
+        const itemRow = inputElement.closest('.item-row');
+    
+        const taxRate     = itemRow ? itemRow.querySelector('.TAX_RATE')     : document.getElementById('TAX_RATE');
+        const certNo      = itemRow ? itemRow.querySelector('.CERT_NO')      : document.getElementById('CERT_NO');
+        const certNoItem  = itemRow ? itemRow.querySelector('.CERT_NO_ITEM') : document.getElementById('CERT_NO_ITEM');
+        const tariffCode  = itemRow ? itemRow.querySelector('.TARIFF_CODE')  : document.getElementById('TARIFF_CODE');
+    
+        const certNoVal     = certNo?.value?.trim();
+        const certNoItemVal = certNoItem?.value?.trim();
+        const tariffCodeVal = tariffCode?.value?.trim();
+    
+        if (taxRate && item['第一欄稅率']) {
+            if (!certNoVal && !certNoItemVal && !tariffCodeVal) {
+                taxRate.value = item['第一欄稅率'];
+            }
+        }
+                
         updateFields(inputElement, item); // 更新欄位
     } else {
         clearFields(inputElement); // 若無匹配結果，清空相關欄位
@@ -648,17 +669,20 @@ function updateFields(inputElement, item) {
 function clearFields(inputElement) {
     const itemRow = inputElement.closest('.item-row');
 
-    let stqty, stum;
+    let stqty, stum, taxRate;
     if (itemRow) {
         stqty = itemRow.querySelector('.ST_QTY');
         stum = itemRow.querySelector('.ST_UM');
+        taxRate = itemRow.querySelector('.TAX_RATE');
     } else {
         stqty = document.getElementById('ST_QTY');
         stum = document.getElementById('ST_UM');
+        taxRate = document.getElementById('TAX_RATE');
     }
 
     if (stqty) stqty.value = '';
     if (stum) stum.value = '';
+    if (taxRate) taxRate.value = '';
 
     // 移除 '.'、'-' 以及所有的空格
     inputElement.value = inputElement.value.replace(/[.\-\s]/g, '');
