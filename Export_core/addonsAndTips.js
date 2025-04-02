@@ -899,11 +899,6 @@ document.addEventListener("DOMContentLoaded", monitorCountryCodeChange);
 // 啟用事件監聽，處理國家代碼的樣式變更
 handleCountryCodeInput('CNEE_COUNTRY_CODE', ['CNEE_BAN_ID', 'BUYER_E_NAME', 'BUYER_E_ADDR'], 'TW');
 
-window.addEventListener('beforeunload', function (event) {
-    event.preventDefault();
-    event.returnValue = ''; // 必須設置，才能顯示提示框
-});
-
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
         // 排除特定輸入框不顯示清除按鈕
