@@ -522,6 +522,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         currencyError.style.display = "none";
                     }
                     break;
+                case 'CERT_NO':
+                    document.getElementById('TARIFF_CODE').value = '';
+                    break;
+                case 'CERT_NO_ITEM':
+                    document.getElementById('TARIFF_CODE').value = '';
+                    break;
             }
         });
 
