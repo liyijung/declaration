@@ -657,7 +657,6 @@ function updateDocOtrDesc() {
     let copyDescMap = {
         'copy_2': '申請報單副本第二聯（進口證明用聯）',
         'copy_3': '申請報單副本第三聯（沖退原料稅用聯）\n附外銷品使用原料及其供應商資料清表',
-        'copy_4': '申請報單副本第四聯（留底聯）',
         'copy_5': '申請報單副本第五聯（其他聯）'
     };
 
@@ -697,9 +696,6 @@ function updateRemark1() {
     if (document.getElementById('copy_3').checked) {
         additionalDesc += (additionalDesc ? '\n' : '') + '申請報單副本第三聯（沖退原料稅用聯）';
     }
-    if (document.getElementById('copy_4').checked) {
-        additionalDesc += (additionalDesc ? '\n' : '') + '申請報單副本第四聯（留底聯）';
-    }
     if (document.getElementById('copy_5').checked) {
         additionalDesc += (additionalDesc ? '\n' : '') + '申請報單副本第五聯（其他聯）';
     }
@@ -716,7 +712,6 @@ function updateRemark1FromImport() {
 
     document.getElementById('copy_2').checked = remark1Value.includes('申請報單副本第二聯（進口證明用聯）');
     document.getElementById('copy_3').checked = remark1Value.includes('申請報單副本第三聯（沖退原料稅用聯）');
-    document.getElementById('copy_4').checked = remark1Value.includes('申請報單副本第四聯（留底聯）');
     document.getElementById('copy_5').checked = remark1Value.includes('申請報單副本第五聯（其他聯）');
 
     updateRemark1(); // 確保REMARK1欄位值與checkbox狀態同步
@@ -834,7 +829,6 @@ function clearExistingData() {
     // 清空申請報單副本欄位
     document.getElementById('copy_2').checked = false;
     document.getElementById('copy_3').checked = false;
-    document.getElementById('copy_4').checked = false;
     document.getElementById('copy_5').checked = false;
 }
 
