@@ -273,32 +273,6 @@ function searchTariff(inputElement, isModal = true) {
                             if (stum) stum.value = '';
                         }
 
-                        if (cccCode) {
-                            let importReg = item['輸入規定'] ? item['輸入規定'].trim() : '';
-                            let importRegList = importReg.split(/\s+/).filter(reg => reg); // 過濾掉空白項目
-                    
-                            // 取得目的地代碼（TO_CODE）
-                            const toCodeElement = document.getElementById("TO_CODE");
-                            const toCode = toCodeElement ? toCodeElement.value.trim().toUpperCase() : '';
-                            const toCodePrefix = toCode.slice(0, 2); // 取得前兩碼
-                    
-                            // 是否符合條件
-                            const conditionMW0 = importRegList.includes("MW0") && toCodePrefix === "CN";
-                    
-                            // 若包含其他輸入規定 (不只是 MW0)，也要高亮
-                            const hasOtherReg = importRegList.some(reg => !["MW0"].includes(reg));
-                    
-                            // 最終判斷是否高亮
-                            const shouldHighlight = importRegList.length > 0 && 
-                            (conditionMW0 || hasOtherReg);
-                    
-                            if (shouldHighlight) {
-                                cccCode.classList.add("highlight-ccc");
-                            } else {
-                                cccCode.classList.remove("highlight-ccc");
-                            }
-                        }
-
                         // 更新欄位顯示狀態
                         closeTaxModal();
                         inputElement.focus(); // 選中項目後焦點返回輸入框
@@ -637,32 +611,6 @@ function updateFields(inputElement, item) {
         // 如果 '統計數量單位' 為空，將 ST_QTY 和 ST_UM 設置為空
         if (stqty) stqty.value = '';
         if (stum) stum.value = '';
-    }
-
-    if (cccCode) {
-        let importReg = item['輸入規定'] ? item['輸入規定'].trim() : '';
-        let importRegList = importReg.split(/\s+/).filter(reg => reg); // 過濾掉空白項目
-
-        // 取得目的地代碼（TO_CODE）
-        const toCodeElement = document.getElementById("TO_CODE");
-        const toCode = toCodeElement ? toCodeElement.value.trim().toUpperCase() : '';
-        const toCodePrefix = toCode.slice(0, 2); // 取得前兩碼
-
-        // 是否符合條件
-        const conditionMW0 = importRegList.includes("MW0") && toCodePrefix === "CN";
-
-        // 若包含其他輸出規定 (不只是 MW0)，也要高亮
-        const hasOtherReg = importRegList.some(reg => !["MW0"].includes(reg));
-
-        // 最終判斷是否高亮
-        const shouldHighlight = importRegList.length > 0 && 
-        (conditionMW0 || hasOtherReg);
-
-        if (shouldHighlight) {
-            cccCode.classList.add("highlight-ccc");
-        } else {
-            cccCode.classList.remove("highlight-ccc");
-        }
     }
 
     initializeDimensionListeners(itemRow);
