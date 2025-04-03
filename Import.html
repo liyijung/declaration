@@ -119,16 +119,34 @@
             </div>
             <hr>
             <div class="header-group" style="position: relative;">
-                <label for="TO_CODE">裝貨港(代碼)</label>
-                <input type="text" id="TO_CODE" name="TO_CODE" 
-                    placeholder="範例：HKHKG、CNSZX、KRICN、SGSIN(英文代碼)">
+                <label for="ARRIVAL_DATE">進口日期(民國)</label>
+                <input type="text" class="rocDate" id="ARRIVAL_DATE" placeholder="請選擇日期" style="width: 150px;">
             </div>
             <div class="header-group" style="position: relative;">
-                <label for="TO_DESC">裝貨港(名稱)</label>
-                <input type="text" id="TO_DESC" name="TO_DESC" tabindex="-1"
-                    placeholder="(英文名稱，可關鍵字查詢)">
-                <div id="search-results" class="search-results"></div>
+                <label for="ACCEPTANCE_DATE">報關日期(民國)</label>
+                <input type="text" class="rocDate" id="ACCEPTANCE_DATE" placeholder="請選擇日期" style="width: 150px;">
             </div>
+            <div class="header-group" style="position: relative;">
+                <label for="EXIT_DATE">出口日期(民國)</label>
+                <input type="text" class="rocDate" id="EXIT_DATE" placeholder="請選擇日期" style="width: 150px;">
+            </div>
+            <div class="header-group">
+                <label for="JOURNEY_ID">航機班次(空)</label>
+                <input type="text" id="JOURNEY_ID" name="JOURNEY_ID" maxlength="7">
+            </div>
+            <div class="header-group">
+                <label for="LOADING_LOCATION">起運口岸</label>
+                <input type="text" id="LOADING_LOCATION" name="LOADING_LOCATION" maxlength="5" list="LoadingLocation"
+                placeholder="(下拉式選單)">
+                <datalist id="LoadingLocation">
+                    <option value="CNPVG 上海"></option>
+                    <option value="CNCAN 廣州"></option>
+                    <option value="CNSZX 深圳"></option>
+                    <option value="CNNGB 寧波"></option>
+                    <option value="HKHKG 香港"></option>
+                    <option value="MOMFM 澳門"></option>
+                </datalist>
+            </div>            
         </div>
         
         <div class="header-section">
@@ -955,11 +973,14 @@ Alt + 2 指定項次">攤重</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
-
+    
     <!-- ✅ UI & 工具 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js" defer></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     
     <!-- ✅ 核心功能（載入順序：主處理器 -> 各個模組） -->
     <script src="./core/UI.js" defer></script>
