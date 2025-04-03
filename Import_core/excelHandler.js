@@ -48,8 +48,6 @@ function importToExcel(event) {
                 '買方統一編號': 'CNEE_BAN_ID',
                 '收方名稱': 'BUYER_E_NAME',
                 '收方地址': 'BUYER_E_ADDR',
-                '目的地(代碼)': 'TO_CODE',
-                '目的地(名稱)': 'TO_DESC',
                 '總件數': 'TOT_CTN',
                 '總件數單位': 'DOC_CTN_UM',
                 '包裝說明': 'CTN_DESC',
@@ -90,8 +88,11 @@ function importToExcel(event) {
                 '賣方中/英地址': 'CNEE_E_ADDR',
                 '賣方國家代碼': 'CNEE_COUNTRY_CODE',
                 '賣方統一編號': 'CNEE_BAN_ID',
-                '裝貨港(代碼)': 'TO_CODE',
-                '裝貨港(名稱)': 'TO_DESC',
+                '進口日期(民國)': 'ARRIVAL_DATE',
+                '報關日期(民國)': 'ACCEPTANCE_DATE',
+                '出口日期(民國)': 'EXIT_DATE',
+                '航機班次(空)': 'JOURNEY_ID',
+                '起運口岸': 'LOADING_LOCATION',
                 '總件數': 'TOT_CTN',
                 '總件數單位': 'DOC_CTN_UM',
                 '包裝說明': 'CTN_DESC',
@@ -143,7 +144,7 @@ function importToExcel(event) {
 
                     // 需要轉換大寫的所有欄位 ID
                     const fieldIds = [
-                        "LOT_NO", "SHPR_BAN_ID", "SHPR_BONDED_ID", "CNEE_COUNTRY_CODE", "TO_CODE", "DOC_CTN_UM","DCL_DOC_TYPE", "TERMS_SALES", "CURRENCY"
+                        "LOT_NO", "SHPR_BAN_ID", "SHPR_BONDED_ID", "CNEE_COUNTRY_CODE", "DOC_CTN_UM","DCL_DOC_TYPE", "TERMS_SALES", "CURRENCY"
                     ];
                     if (fieldIds.includes(id)) {
                         value = value.toUpperCase();
@@ -369,8 +370,11 @@ function exportToExcel() {
         ['賣方中/英地址', document.getElementById('CNEE_E_ADDR').value],
         ['賣方國家代碼', document.getElementById('CNEE_COUNTRY_CODE').value],
         ['賣方統一編號', document.getElementById('CNEE_BAN_ID').value],
-        ['裝貨港(代碼)', document.getElementById('TO_CODE').value],
-        ['裝貨港(名稱)', document.getElementById('TO_DESC').value],
+        ['進口日期(民國)', document.getElementById('ARRIVAL_DATE').value],
+        ['報關日期(民國)', document.getElementById('ACCEPTANCE_DATE').value],
+        ['出口日期(民國)', document.getElementById('EXIT_DATE').value],
+        ['航機班次(空)', document.getElementById('JOURNEY_ID').value],
+        ['起運口岸', document.getElementById('LOADING_LOCATION').value],
         ['總件數', document.getElementById('TOT_CTN').value],
         ['總件數單位', document.getElementById('DOC_CTN_UM').value],
         ['包裝說明', document.getElementById('CTN_DESC').value],
