@@ -138,7 +138,9 @@
             </div>
             <div class="header-group">
                 <label for="LOADING_LOCATION">起運口岸</label>
-                <input type="text" id="LOADING_LOCATION" name="LOADING_LOCATION" maxlength="5" list="LoadingLocation"
+                <input type="text" id="LOADING_LOCATION" name="LOADING_LOCATION" maxlength="5" 
+                oninput="filterAlphabets(this)"
+                list="LoadingLocation"
                 placeholder="(下拉式選單)">
                 <datalist id="LoadingLocation">
                     <option value="CNPVG 上海"></option>
