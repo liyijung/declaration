@@ -381,59 +381,6 @@ function applyToggleFieldsToRow(row) {
     });
 }
 
-// 監聽產證號碼和產證項次的變動
-document.getElementById('CERT_NO').addEventListener('input', checkFields);
-document.getElementById('CERT_NO_ITEM').addEventListener('input', checkFields);
-
-// 監聽所有項次的產證號碼和產證項次變動
-document.addEventListener('input', function(event) {
-    if (event.target.matches('.CERT_NO, .CERT_NO_ITEM')) {
-        checkFields(event.target); // 只監聽 CERT_NO 或 CERT_NO_ITEM 的變動
-    }
-});
-
-// 檢查產證號碼和產證項次的欄位變動
-function checkFields(inputElement) {
-    // 確保 inputElement 是有效的 DOM 元素
-    if (!(inputElement instanceof HTMLElement)) {
-        return;
-    }
-
-    // 檢查 inputElement 是否有 .closest 方法
-    if (!inputElement.closest) {
-        return;
-    }
-
-    const itemRow = inputElement.closest('.item-row');  // 獲取對應的項次行
-
-    if (!itemRow) {
-        // 若是新增項次的 CERT_NO 和 CERT_NO_ITEM 欄位
-        const certNo = document.getElementById('CERT_NO').value;
-        const certNoItem = document.getElementById('CERT_NO_ITEM').value;
-        // 如果產證號碼和產證項次都有值，則自動填入稅則附碼為 'PT'
-        if (certNo && certNoItem) {
-            document.getElementById('TARIFF_CODE').value = 'PT';
-            document.getElementById('TAX_RATE').value = '0%';
-        } else {
-            document.getElementById('TARIFF_CODE').value = ''; // 如果任一欄位沒填寫，清空稅則附碼
-        }
-    } else {
-        // 若是每個項次的 CERT_NO 和 CERT_NO_ITEM 欄位
-        const certNo = itemRow.querySelector('.CERT_NO').value; // 取得該項次的產證號碼
-        const certNoItem = itemRow.querySelector('.CERT_NO_ITEM').value; // 取得該項次的產證項次
-        const tariffCodeElement = itemRow.querySelector('.TARIFF_CODE'); // 取得該項次的稅則附碼
-        const taxRateElement = itemRow.querySelector('.TAX_RATE'); // 取得該項次的 TAX_RATE 欄位
-
-        // 如果產證號碼和產證項次都有值，則自動填入稅則附碼為 'PT'
-        if (certNo && certNoItem) {
-            tariffCodeElement.value = 'PT';
-            taxRateElement.value = '0%'; // 設定 TAX_RATE 為 0%
-        } else {
-            tariffCodeElement.value = ''; // 如果任一欄位沒填寫，清空稅則附碼
-        }
-    }
-}
-
 document.getElementById('CERT_NO').addEventListener('input', triggerUpdateTariff);
 document.getElementById('CERT_NO_ITEM').addEventListener('input', triggerUpdateTariff);
 document.getElementById('TARIFF_CODE').addEventListener('input', triggerUpdateTariff);
