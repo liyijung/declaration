@@ -43,115 +43,36 @@ document.getElementById('BUYER_E_NAME')?.addEventListener('input', function() {
     }
 });
 
-// 儲存目的地數據
-let destinations = {};
+// 起運口岸：自動只留下代碼
+document.getElementById('LOADING_LOCATION').addEventListener('change', function () {
+    const value = this.value.trim();
+    const code = value.split(' ')[0];
+    this.value = code;
+});
 
-// 讀取 CSV 文件並解析
-fetch('destinations.csv')
-    .then(response => response.text())
-    .then(data => {
-        Papa.parse(data, {
-            header: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-                results.data.forEach(item => {
-                    destinations[item["目的地代碼"]] = {
-                        name: item["目的地名稱"],
-                        chinese: item["中文"]
-                    };
-                });
-            }
-        });
-    });
+// 航機班次自動格式化（input + blur）
+const journeyInput = document.getElementById('JOURNEY_ID');
 
-// 動態篩選並顯示結果
-document.getElementById('TO_DESC').addEventListener('input', function () {
-    const input = this.value.toLowerCase();
-    const resultsDiv = document.getElementById('search-results');
-    const toCodeInput = document.getElementById('TO_CODE');
-
-    resultsDiv.innerHTML = ''; // 清空現有結果
-
-    // 如果輸入為空，不執行篩選，直接隱藏結果框
-    if (!input) {
-        toCodeInput.value = '';  // 清空 TO_CODE
-        resultsDiv.style.display = 'none';
-        return;
-    }
-
-    // 篩選匹配的目的地名稱、代碼或中文
-    const matches = Object.entries(destinations).filter(([code, { name, chinese }]) =>
-        (name && name.toLowerCase().includes(input)) || 
-        (code && code.toLowerCase().includes(input)) || 
-        (chinese && chinese.includes(input))
-    );
-
-    // 如果有匹配結果，顯示下拉選單
-    if (matches.length > 0) {
-        resultsDiv.style.display = 'block';
-        matches.forEach(([code, { name, chinese }], index) => {
-            const optionDiv = document.createElement('div');
-            optionDiv.innerHTML = `
-                <strong>${code}</strong> - ${name || ''} ${chinese || ''}
-            `.trim(); // 結果框中顯示代碼、名稱和中文
-            optionDiv.dataset.code = code;
-
-            // 點擊選項時填入對應值並將焦點移至 TO_CODE
-            optionDiv.addEventListener('click', function () {
-                const code = this.dataset.code;
-                const toCodeInput = document.getElementById('TO_CODE');
-
-                toCodeInput.value = code; // 填入代碼
-                toCodeInput.dispatchEvent(new Event('input')); // 觸發 TO_CODE 的輸入事件
-                toCodeInput.focus(); // 將焦點移至 TO_CODE
-
-                setTimeout(() => {
-                    resultsDiv.style.display = 'none'; // 隱藏下拉框
-                }, 100); // 確保操作完成後隱藏
-            });
-            
-            resultsDiv.appendChild(optionDiv);
-        });
+journeyInput.addEventListener('input', function () {
+    let val = this.value.toUpperCase().replace(/\s+/g, '');
+    if (val.length >= 2) {
+        this.value = val.slice(0, 2) + ' ' + val.slice(2, 6);
     } else {
-        resultsDiv.style.display = 'none'; // 沒有匹配時隱藏
+        this.value = val;
     }
 });
 
-// 監聽 Enter 鍵按下的邏輯
-document.getElementById('TO_DESC').addEventListener('keydown', function (e) {
-    const resultsDiv = document.getElementById('search-results');
+journeyInput.addEventListener('blur', function () {
+    let val = this.value.toUpperCase().replace(/\s+/g, '');
 
-    if (e.key === 'Enter') {
-        e.preventDefault(); // 防止預設行為
-        const input = this.value.toLowerCase();
-
-        // 如果輸入框為空，不執行任何操作
-        if (!input) {
-            resultsDiv.style.display = 'none';
-            return;
-        }
-
-        // 手動觸發輸入事件，強制篩選和顯示下拉框
-        this.dispatchEvent(new Event('input'));
-        resultsDiv.style.display = 'block'; // 顯示結果框
-    }
-});
-
-// 當用戶輸入目的地代碼時，自動填入名稱和中文
-document.getElementById('TO_CODE').addEventListener('input', function () {
-    let code = this.value.toUpperCase();
-    if (destinations[code]) {
-        document.getElementById('TO_DESC').value = destinations[code].name || ''; // 填入名稱
+    // 自動補零 + 補空格
+    let code = val.slice(0, 2);
+    let num = val.slice(2, 6).padStart(4, '0'); // 若不足 4 碼數字，補 0
+    if (code && num) {
+        this.value = code + ' ' + num;
     } else {
-        document.getElementById('TO_DESC').value = ''; // 清空名稱欄位
+        this.value = '';
     }
-});
-
-// 當輸入框失去焦點時隱藏篩選結果框
-document.getElementById('TO_DESC').addEventListener('blur', function () {
-    setTimeout(() => { // 延遲隱藏，確保點擊選項有效
-        document.getElementById('search-results').style.display = 'none';
-    }, 300); // 延遲 300 毫秒
 });
 
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -188,7 +109,7 @@ function setupUpperCaseConversion(id) {
 
 // 需要轉換大寫的所有欄位 ID
 const fieldIds = [
-    "LOT_NO", "SHPR_BAN_ID", "SHPR_BONDED_ID", "CNEE_COUNTRY_CODE", "TO_CODE", "DOC_CTN_UM",
+    "LOT_NO", "SHPR_BAN_ID", "SHPR_BONDED_ID", "CNEE_COUNTRY_CODE", "DOC_CTN_UM",
     "DCL_DOC_TYPE", "TERMS_SALES", "CURRENCY", "DOC_UM", "ST_MTD", "ORG_COUNTRY",
     "ORG_IMP_DCL_NO", "BOND_NOTE", "CERT_NO", "EXP_NO", 
     "WIDE_UM", "LENGTH_UM", "ST_UM"
@@ -403,7 +324,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
     try {
         const visibilityClass = isVisible ? '' : 'hidden';
         const numberFields = ['QTY', 'DOC_UNIT_P', 'DOC_TOT_P', 'NET_WT', 'ORG_IMP_DCL_NO_ITEM', 'CERT_NO_ITEM', 'EXP_SEQ_NO', 'WIDE', 'LENGT_', 'ST_QTY'];
-        const upperCaseFields = ['LOT_NO', 'SHPR_BONDED_ID', 'CNEE_COUNTRY_CODE', 'TO_CODE', 'DOC_CTN_UM', 'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'DOC_UM', 'ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 'BOND_NOTE', 'CERT_NO', 'EXP_NO', 'WIDE_UM', 'LENGTH_UM', 'ST_UM'];
+        const upperCaseFields = ['LOT_NO', 'SHPR_BONDED_ID', 'CNEE_COUNTRY_CODE', 'DOC_CTN_UM', 'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'DOC_UM', 'ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 'BOND_NOTE', 'CERT_NO', 'EXP_NO', 'WIDE_UM', 'LENGTH_UM', 'ST_UM'];
         const inputType = numberFields.includes(name) ? 'number' : 'text';
         const onInputAttribute = numberFields.includes(name) ? 'oninput="calculateAmount(event); validateNumberInput(event)"' : '';
         const minAttribute = numberFields.includes(name) ? 'min="0"' : '';
@@ -876,10 +797,11 @@ function clearExistingData() {
     document.getElementById('CNEE_E_ADDR').value = '';
     document.getElementById('CNEE_COUNTRY_CODE').value = '';
     document.getElementById('CNEE_BAN_ID').value = '';
-    document.getElementById('BUYER_E_NAME').value = '';
-    document.getElementById('BUYER_E_ADDR').value = '';
-    document.getElementById('TO_CODE').value = '';
-    document.getElementById('TO_DESC').value = '';
+    document.getElementById('ARRIVAL_DATE').value = '';
+    document.getElementById('ACCEPTANCE_DATE').value = '';
+    document.getElementById('EXIT_DATE').value = '';
+    document.getElementById('JOURNEY_ID').value = '';
+    document.getElementById('LOADING_LOCATION').value = '';
     document.getElementById('TOT_CTN').value = '';
     document.getElementById('DOC_CTN_UM').value = '';
     document.getElementById('CTN_DESC').value = '';
