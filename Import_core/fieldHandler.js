@@ -507,7 +507,7 @@ function checkFields(inputElement) {
         // 如果產證號碼和產證項次都有值，則自動填入稅則附碼為 'PT'
         if (certNo && certNoItem) {
             document.getElementById('TARIFF_CODE').value = 'PT';
-            document.getElementById('TAX_RATE').value = '0%';
+            document.getElementById('TAX_RATE').value = '0';
         } else {
             document.getElementById('TARIFF_CODE').value = ''; // 如果任一欄位沒填寫，清空稅則附碼
         }
@@ -521,7 +521,7 @@ function checkFields(inputElement) {
         // 如果產證號碼和產證項次都有值，則自動填入稅則附碼為 'PT'
         if (certNo && certNoItem) {
             tariffCodeElement.value = 'PT';
-            taxRateElement.value = '0%'; // 設定 TAX_RATE 為 0%
+            taxRateElement.value = '0'; // 設定 TAX_RATE 為 0%
         } else {
             tariffCodeElement.value = ''; // 如果任一欄位沒填寫，清空稅則附碼
         }
