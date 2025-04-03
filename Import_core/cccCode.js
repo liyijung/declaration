@@ -523,7 +523,7 @@ function updateTariff(inputElement, keyword = '') {
         const tariffCodeVal = tariffCode?.value?.trim();
     
         if (taxRate && item['第一欄稅率']) {
-            taxRate.value = (certNoVal && certNoItemVal) ? '0%' : item['第一欄稅率'];
+            taxRate.value = (certNoVal && certNoItemVal) ? '0' : item['第一欄稅率'];
         }
 
         if (tariffCode && certNoVal && certNoItemVal) {
