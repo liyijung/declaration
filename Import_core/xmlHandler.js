@@ -129,8 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 'SHPR_C_ADDR', name: '進口人中文地址' },
             { id: 'CNEE_E_ADDR', name: '賣方中/英地址' },
             { id: 'CNEE_COUNTRY_CODE', name: '賣方國家代碼' },
-            { id: 'TO_CODE', name: '裝貨港(代碼)' },
-            { id: 'TO_DESC', name: '裝貨港(名稱)' },
             { id: 'TOT_CTN', name: '總件數' },
             { id: 'DOC_CTN_UM', name: '總件數單位' },
             { id: 'DCL_GW', name: '總毛重' },
@@ -182,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (countryCodeElement && countryCodeElement.value.trim() === 'TW') {
             // 檢查 CNEE_BAN_ID 是否填寫
             const additionalFields = [
-                { id: 'CNEE_BAN_ID', name: '買方統一編號' }
+                { id: 'CNEE_BAN_ID', name: '賣方統一編號' }
             ];
 
             additionalFields.forEach(field => {
@@ -427,7 +425,6 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 'FILE_NO', name: '文件編號', validLengths: [10, 11] },
             { id: 'SHPR_BONDED_ID', name: '海關監管編號', validLengths: [5] },
             { id: 'CNEE_COUNTRY_CODE', name: '賣方國家代碼', validLengths: [2] },
-            { id: 'TO_CODE', name: '裝貨港(代碼)', validLengths: [5] },
             { id: 'DOC_CTN_UM', name: '總件數單位', validLengths: [3] },
             { id: 'DCL_DOC_TYPE', name: '報單類別', validLengths: [2] },
             { id: 'TERMS_SALES', name: '貿易條件', validLengths: [3] },
@@ -617,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'SHPR_C_NAME', 'SHPR_E_NAME', 'SHPR_C_ADDR', 'SHPR_E_ADDR', 'SHPR_TEL', 
             'CNEE_C_NAME', 'CNEE_E_NAME', 'CNEE_E_ADDR', 
             'CNEE_COUNTRY_CODE', 'CNEE_BAN_ID',
-            'BUYER_BAN', 'BUYER_E_NAME', 'BUYER_E_ADDR', 'TO_CODE', 'TO_DESC', 
+            'ARRIVAL_DATE', 'ACCEPTANCE_DATE', 'EXIT_DATE', 'JOURNEY_ID', 'LOADING_LOCATION',
             'TOT_CTN', 'DOC_CTN_UM', 'CTN_DESC', 'DCL_GW', 'DCL_NW', 
             'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'CAL_IP_TOT_ITEM_AMT', 
             'FRT_AMT', 'INS_AMT', 'ADD_AMT', 'SUBTRACT_AMT', 
