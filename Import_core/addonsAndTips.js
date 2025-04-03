@@ -500,12 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     document.getElementById('CNEE_COUNTRY_CODE').value = '';
                     break;
-                case 'TO_CODE':
-                    document.getElementById('TO_DESC').value = '';
-                    break;
-                case 'TO_DESC':
-                    document.getElementById('TO_CODE').value = '';
-                    break;
                 case 'TERMS_SALES':
                     let termsFields = ['FRT_AMT', 'INS_AMT', 'ADD_AMT', 'SUBTRACT_AMT'];
                     termsFields.forEach(fieldId => {
