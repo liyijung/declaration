@@ -212,7 +212,7 @@ function applyFieldData() {
     const mode = document.getElementById('specify-mode').value;
     const overwriteOption = document.getElementById('overwrite-option').value;
     
-    // 當覆蓋選項為「符合條件」或「不符合條件」時，檢查原欄位輸入框是否有值
+    // 當覆蓋選項為「條件欄位」時，檢查原欄位輸入框是否有值
     if (overwriteOption === 'matchCondition' || overwriteOption === 'notMatchCondition') {
         const originalField = document.getElementById('original-field-input').value.trim();
         if (originalField === '') {
@@ -332,13 +332,55 @@ function applyFieldData() {
                     }
                 }
 
+                // 取得條件判斷相關欄位
+                const conditionEnabled = overwriteOption === 'condition';
+                const conditionFieldName = document.getElementById('original-field-name')?.value || '';
+                const conditionType = document.getElementById('condition-type')?.value || 'equals';
+                const conditionValueInput = document.getElementById('original-field-input')?.value || '';
+
+                // 判斷是否符合條件
+                let conditionPassed = true;
+                if (conditionEnabled) {
+                    const conditionElem = item.querySelector(`.${conditionFieldName}`);
+                    const fieldValue = conditionElem ? conditionElem.value : '';
+                    const inputVal = conditionValueInput.trim();
+
+                    switch (conditionType) {
+                        case 'equals':
+                            conditionPassed = fieldValue === inputVal;
+                            break;
+                        case 'notEquals':
+                            conditionPassed = fieldValue !== inputVal;
+                            break;
+                        case 'greaterThan':
+                            conditionPassed = parseFloat(fieldValue) > parseFloat(inputVal);
+                            break;
+                        case 'lessThan':
+                            conditionPassed = parseFloat(fieldValue) < parseFloat(inputVal);
+                            break;
+                        case 'startsWith':
+                            conditionPassed = fieldValue.startsWith(inputVal);
+                            break;
+                        case 'endsWith':
+                            conditionPassed = fieldValue.endsWith(inputVal);
+                            break;
+                        case 'includes':
+                            conditionPassed = fieldValue.includes(inputVal);
+                            break;
+                        case 'notIncludes':
+                            conditionPassed = !fieldValue.includes(inputVal);
+                            break;
+                        default:
+                            conditionPassed = true;
+                    }
+                }
+                
                 // 判斷覆蓋條件
                 if (
                     overwriteOption === 'all' ||
                     (overwriteOption === 'empty' && !fieldElement.value) ||
                     (overwriteOption === 'specified' && fieldElement.value) ||
-                    (overwriteOption === 'matchCondition' && fieldElement.value.includes(originalField)) ||
-                    (overwriteOption === 'notMatchCondition' && !fieldElement.value.includes(originalField))
+                    (overwriteOption === 'condition' && conditionPassed)
                 ) {
                     // 如果選擇的是產證序號，則填入指定的編號
                     if (fieldName === 'CERT_NO_ITEM') {
