@@ -594,8 +594,8 @@ function checkTotalAmount() {
                 iziToast.warning({
                     title: '注意',
                     message: `（個人或未向國際貿易署登記出進口廠商資料者，<br>
-                    出口金額限制美金兩萬以下，且通關必驗，<br>
-                    若金額超過美金兩萬需檢附輸出許可證才可出口）`,
+                    進口金額限制美金兩萬以下，且通關必驗，<br>
+                    若金額超過美金兩萬需檢附輸入許可證才可進口）`,
                     position: 'center',
                     timeout: 5000,
                     backgroundColor: '#ffeb3b',
