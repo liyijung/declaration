@@ -881,15 +881,42 @@ Alt + 2 指定項次">攤重</button>
                     <option value="all">全部覆蓋</option>
                     <option value="empty">覆蓋未填列之項次</option>
                     <option value="specified">覆蓋已填列之項次</option>
-                    <option value="matchCondition">符合條件</option>
-                    <option value="notMatchCondition">不符合條件</option>
+                    <option value="condition">條件判斷</option>
                 </select>
             </div>
-            <!-- 當選擇「符合條件」或「不符合條件」時，顯示原欄位輸入框 -->
-            <div class="header-group" id="original-field-container" style="display: none;">
-                <label for="original-field-input" id="original-field-label">條件：原欄位 = </label>
-                <input type="text" id="original-field-input">
+            
+            <!-- 條件判斷區塊：欄位、類型、值，同一排顯示 -->
+            <div class="header-group" id="condition-row">
+                <!-- 條件欄位 -->
+                <select id="original-field-name">
+                    <option value="DESCRIPTION">品名</option>
+                    <option value="QTY">數量</option>
+                    <option value="DOC_UM">單位</option>
+                    <option value="DOC_UNIT_P">單價</option>
+                    <option value="DOC_TOT_P">金額</option>
+                    <option value="TRADE_MARK">商標</option>
+                    <option value="CCC_CODE">稅則</option>
+                    <option value="ST_MTD">統計方式</option>
+                    <option value="NET_WT">淨重</option>
+                    <option value="ORG_COUNTRY">生產國別</option>
+                </select>
+
+                <!-- 條件類型 -->
+                <select id="condition-type">
+                    <option value="equals">等於</option>
+                    <option value="notEquals">不等於</option>
+                    <option value="greaterThan">大於</option>
+                    <option value="lessThan">小於</option>
+                    <option value="startsWith">起始為</option>
+                    <option value="endsWith">結束為</option>
+                    <option value="includes">包含</option>
+                    <option value="notIncludes">不包含</option>
+                </select>
+
+                <!-- 條件值 -->
+                <input type="text" id="original-field-input" placeholder="條件值">
             </div>
+            
             <div class="floating-buttons">
                 <button onclick="applyFieldData()">儲存</button>
                 <button onclick="closeSpecifyFieldModal()">取消</button>
