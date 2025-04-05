@@ -266,10 +266,10 @@ function adjustFreightAndInsurance() {
 
 // 計算應加費用並顯示結果
 function calculateAdditional() {
-    const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase();
-    
+    const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase().trim();
+
     if (!termsSales) {
-        iziToast.warning({
+        showToastOnce('terms-empty', {
             title: '提示',
             message: '請先填列貿易條件',
             position: 'center',
@@ -277,17 +277,18 @@ function calculateAdditional() {
         });
         return;
     }
-    
+
     if (termsSales !== 'EXW') {
-        iziToast.warning({
+        showToastOnce('terms-not-exw', {
             title: '提示',
-            message: '貿易條件非 EXW',
+            message: '貿易條件非 EXW，不可使用應加費用換算',
             position: 'center',
             timeout: 3000
         });
-        return; // 中止後續彈窗顯示
+        return;
     }
-    
+
+    // 顯示彈窗
     const modal = document.getElementById('additional-modal');
     modal.style.display = 'block';
 
@@ -295,6 +296,20 @@ function calculateAdditional() {
     setTimeout(() => {
         document.getElementById('additional-currency').focus();
     }, 10);
+}
+
+let toastLock = {}; // 儲存各類提示的鎖定狀態
+
+function showToastOnce(type, options) {
+    if (toastLock[type]) return; // 如果正在顯示中，略過
+
+    toastLock[type] = true; // 設為鎖定狀態
+    iziToast.warning({
+        ...options,
+        onClosed: () => {
+            toastLock[type] = false; // Toast 關閉後解除鎖定
+        }
+    });
 }
 
 function closeAdditionalModal() {
