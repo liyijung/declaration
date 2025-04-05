@@ -132,32 +132,34 @@ async function lookupExchangeRate() {
     }
 }
 
-// 解析 FILE_NO 取得報關日期
+// 取得報關日期
 function getCustomsDeclarationDate() {
-    var today = new Date();
-    var Tyear = today.getFullYear();
-    var Tmonth = String(today.getMonth() + 1).padStart(2, '0'); // getMonth() 返回 0-11
-    var Tday = String(today.getDate()).padStart(2, '0');
-    var Tymd = (Tyear - 1911) + Tmonth + Tday; // 民國年格式 YYYMMDD
-    var defaultYearPart = Tymd.substring(1, 3); // 當前年份（民國年）的第 2-3 位
-    var defaultFormattedDate = (Tyear - 1911) + '/' + Tmonth + '/' + Tday; // YYY/MM/DD 格式
+    var acceptanceDate = document.getElementById('ACCEPTANCE_DATE').value;
 
-    var fileNo = document.getElementById('FILE_NO').value;
-    if (!fileNo || fileNo.length < 7) {
-        return { Fymd: Tymd, yearPart: defaultYearPart, CustomsDeclarationDate: defaultFormattedDate };
+    if (!acceptanceDate || !/^\d{3}\/\d{2}\/\d{2}$/.test(acceptanceDate)) {
+        // 若未填寫或格式錯誤，預設使用今日日期
+        var today = new Date();
+        var Tyear = today.getFullYear() - 1911;
+        var Tmonth = String(today.getMonth() + 1).padStart(2, '0');
+        var Tday = String(today.getDate()).padStart(2, '0');
+        return {
+            Fymd: Tyear + Tmonth + Tday,
+            yearPart: String(Tyear).substring(1, 3),
+            CustomsDeclarationDate: Tyear + '/' + Tmonth + '/' + Tday
+        };
     }
 
-    var year = fileNo.substring(0, 3);  // 民國年格式前 3 位
-    var month = fileNo.substring(3, 5); // 第 4-5 位為月份
-    var day = fileNo.substring(5, 7);   // 第 6-7 位為日期
-    var yearPart = fileNo.substring(1, 3); // 第 2-3 位為年份
-    var CustomsDeclarationDate = year + '/' + month + '/' + day; // YYY/MM/DD
-
-    return { Fymd: year + month + day, yearPart: yearPart, CustomsDeclarationDate: CustomsDeclarationDate };
+    // 若填寫正確，解析民國年日期
+    var [year, month, day] = acceptanceDate.split('/');
+    return {
+        Fymd: year + month + day,
+        yearPart: year.substring(1, 3),
+        CustomsDeclarationDate: acceptanceDate
+    };
 }
 
 // 監聽事件
-document.getElementById("FILE_NO").addEventListener("blur", lookupExchangeRate);
+document.getElementById("ACCEPTANCE_DATE").addEventListener("input", lookupExchangeRate);
 document.getElementById("CURRENCY").addEventListener("input", lookupExchangeRate);
 
 // 計算運費並顯示結果
