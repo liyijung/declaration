@@ -267,6 +267,17 @@ function adjustFreightAndInsurance() {
 // 計算應加費用並顯示結果
 function calculateAdditional() {
     const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase();
+    
+    if (!termsSales) {
+        iziToast.warning({
+            title: '提示',
+            message: '請先填列貿易條件',
+            position: 'center',
+            timeout: 3000
+        });
+        return;
+    }
+    
     if (termsSales !== 'EXW') {
         iziToast.warning({
             title: '提示',
