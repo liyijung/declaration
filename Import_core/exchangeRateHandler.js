@@ -267,19 +267,19 @@ function adjustFreightAndInsurance() {
 // 計算應加費用並顯示結果
 function calculateAdditional() {
     const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase().trim();
-    const currencyRate = parseFloat(exchangeRates[currency]?.sellValue);
+    const currency = document.getElementById("CURRENCY").value.toUpperCase().trim();
+
+    if (!termsSales) {
+        alert("請先填入貿易條件");
+        return;
+    }
     
     if (termsSales !== 'EXW') {
         alert("貿易條件非 EXW");
         return;
     }
 
-    if (!termsSales) {
-        alert("請先填入貿易條件");
-        return;
-    }
-
-    if (!currencyRate) {
+    if (!currency) {
         alert(`請先填入報單幣別`);
         return;
     }
@@ -310,6 +310,7 @@ async function submitAdditional() {
     }
 
     const exchangeRates = await fetchExchangeRates();
+    const currencyRate = parseFloat(exchangeRates[currency]?.sellValue);
 
     if (!exchangeRates || !exchangeRates["USD"]) {
         alert("無法獲取美金匯率");
