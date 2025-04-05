@@ -3,10 +3,11 @@ document.addEventListener("DOMContentLoaded", function () {
     checkAccess();
 });
 
+const currentPage = window.location.pathname;
+
 function checkAccess() {
     const token = localStorage.getItem("token");
     const userRoles = JSON.parse(sessionStorage.getItem("userRoles") || localStorage.getItem("userRoles") || "[]");
-    const currentPage = window.location.pathname;
 
     if (!token || userRoles.length === 0) {
         window.location.href = "index.html";
@@ -634,21 +635,40 @@ handleTradeTerms('TERMS_SALES');
 
 function handleTradeTerms(inputId) {
     // 根據輸入的貿易條件，動態調整運費、保險費、應加費用及應減費用欄位的樣式
-    document.getElementById(inputId).addEventListener('input', function () {
-        let tradeTerm = this.value.toUpperCase().trim(); // 轉換為大寫並去除空白
-        let fieldActions = {
-            'EXW': { freight: false, insurance: false, add: true, subtract: false },
-            'FOB': { freight: false, insurance: false, add: false, subtract: false },
-            'CFR': { freight: true, insurance: false, add: false, subtract: false },
-            'C&I': { freight: false, insurance: true, add: false, subtract: false },
-            'CIF': { freight: true, insurance: true, add: false, subtract: false },
-            'default': { freight: true, insurance: true, add: true, subtract: true }
-        };
-        
+        document.getElementById(inputId).addEventListener('input', function () {
+        let tradeTerm = this.value.toUpperCase().trim(); // 轉大寫並去除空白
+
+        // 根據頁面是出口或進口來決定設定值
+        let fieldActions;
+        if (currentPage.includes("Export")) {
+            fieldActions = {
+                'EXW': { freight: false, insurance: false, add: true, subtract: false },
+                'FOB': { freight: false, insurance: false, add: false, subtract: false },
+                'CFR': { freight: true, insurance: false, add: false, subtract: false },
+                'C&I': { freight: false, insurance: true, add: false, subtract: false },
+                'CIF': { freight: true, insurance: true, add: false, subtract: false },
+                'default': { freight: true, insurance: true, add: true, subtract: true }
+            };
+        } else if (currentPage.includes("Import")) {
+            fieldActions = {
+                'EXW': { freight: true, insurance: false, add: true, subtract: false },
+                'FOB': { freight: false, insurance: false, add: false, subtract: false },
+                'CFR': { freight: true, insurance: false, add: false, subtract: false },
+                'C&I': { freight: false, insurance: true, add: false, subtract: false },
+                'CIF': { freight: true, insurance: true, add: false, subtract: false },
+                'default': { freight: true, insurance: true, add: true, subtract: true }
+            };
+        } else {
+            // 預設 fallback，避免 currentPage 未包含 Export 或 Import
+            fieldActions = {
+                'default': { freight: true, insurance: true, add: true, subtract: true }
+            };
+        }
+
         let config = fieldActions[tradeTerm] || fieldActions['default'];
-        updateFieldStyle('FRT_AMT', config.freight);  // 運費
-        updateFieldStyle('INS_AMT', config.insurance); // 保險費
-        updateFieldStyle('ADD_AMT', config.add); // 應加費用
+        updateFieldStyle('FRT_AMT', config.freight);    // 運費
+        updateFieldStyle('INS_AMT', config.insurance);  // 保險費
+        updateFieldStyle('ADD_AMT', config.add);        // 應加費用
         updateFieldStyle('SUBTRACT_AMT', config.subtract); // 應減費用
     });
 }
