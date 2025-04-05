@@ -164,6 +164,13 @@ document.getElementById("CURRENCY").addEventListener("input", lookupExchangeRate
 
 // 計算運費並顯示結果
 function calculateFreight() {
+    const exchangeRateInput = document.getElementById("exchange-rate"); // 匯率欄位
+    if (!exchangeRateInput || !exchangeRateInput.value.trim()) {
+        var { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
+        alert(`報關日期：${CustomsDeclarationDate}，無此旬匯率，無法計算！`);
+        return;
+    }
+    
     const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase();
     if (termsSales === 'EXW') {
         calculateAdditional(); // 直接跳出應加費用彈窗邏輯
@@ -209,6 +216,13 @@ function calculateFreight() {
 
 // 計算保險費並顯示結果
 function calculateInsurance() {
+    const exchangeRateInput = document.getElementById("exchange-rate"); // 匯率欄位
+    if (!exchangeRateInput || !exchangeRateInput.value.trim()) {
+        var { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
+        alert(`報關日期：${CustomsDeclarationDate}，無此旬匯率，無法計算！`);
+        return;
+    }
+
     const totalAmount = parseFloat(document.getElementById('CAL_IP_TOT_ITEM_AMT').value);
     const currency = document.getElementById('CURRENCY').value.toUpperCase();
 
@@ -266,6 +280,13 @@ function adjustFreightAndInsurance() {
 
 // 計算應加費用並顯示結果
 function calculateAdditional() {
+    const exchangeRateInput = document.getElementById("exchange-rate"); // 匯率欄位
+    if (!exchangeRateInput || !exchangeRateInput.value.trim()) {
+        var { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
+        alert(`報關日期：${CustomsDeclarationDate}，無此旬匯率，無法計算！`);
+        return;
+    }
+    
     const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase().trim();
     const currency = document.getElementById("CURRENCY").value.toUpperCase().trim();
 
