@@ -164,10 +164,12 @@ document.getElementById("CURRENCY").addEventListener("input", lookupExchangeRate
 
 // 計算運費並顯示結果
 function calculateFreight() {
+    const currency = document.getElementById('CURRENCY').value.trim().toUpperCase();
     const exchangeRateInput = document.getElementById("exchange-rate"); // 匯率欄位
-    if (!exchangeRateInput || !exchangeRateInput.value.trim()) {
-        var { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
-        alert(`報關日期：${CustomsDeclarationDate}，無此旬匯率，無法計算！`);
+
+    if (currency && (!exchangeRateInput || !exchangeRateInput.value.trim())) {
+        const { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
+        alert(`報關日期：${CustomsDeclarationDate}\n無此旬 ${currency} 匯率，無法計算！`);
         return;
     }
     
@@ -177,7 +179,6 @@ function calculateFreight() {
         return; // 不執行後續運費計算
     }
 
-    const currency = document.getElementById('CURRENCY').value.toUpperCase();
     const weight = parseFloat(document.getElementById('DCL_GW').value);
 
     fetchExchangeRates().then(exchangeRates => {
@@ -216,15 +217,16 @@ function calculateFreight() {
 
 // 計算保險費並顯示結果
 function calculateInsurance() {
+    const currency = document.getElementById('CURRENCY').value.trim().toUpperCase();
     const exchangeRateInput = document.getElementById("exchange-rate"); // 匯率欄位
-    if (!exchangeRateInput || !exchangeRateInput.value.trim()) {
-        var { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
-        alert(`報關日期：${CustomsDeclarationDate}，無此旬匯率，無法計算！`);
+
+    if (currency && (!exchangeRateInput || !exchangeRateInput.value.trim())) {
+        const { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
+        alert(`報關日期：${CustomsDeclarationDate}\n無此旬 ${currency} 匯率，無法計算！`);
         return;
     }
 
     const totalAmount = parseFloat(document.getElementById('CAL_IP_TOT_ITEM_AMT').value);
-    const currency = document.getElementById('CURRENCY').value.toUpperCase();
 
     fetchExchangeRates().then(exchangeRates => {
         if (!exchangeRates || Object.keys(exchangeRates).length === 0) {
@@ -280,15 +282,16 @@ function adjustFreightAndInsurance() {
 
 // 計算應加費用並顯示結果
 function calculateAdditional() {
+    const currency = document.getElementById('CURRENCY').value.trim().toUpperCase();
     const exchangeRateInput = document.getElementById("exchange-rate"); // 匯率欄位
-    if (!exchangeRateInput || !exchangeRateInput.value.trim()) {
-        var { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
-        alert(`報關日期：${CustomsDeclarationDate}，無此旬匯率，無法計算！`);
+
+    if (currency && (!exchangeRateInput || !exchangeRateInput.value.trim())) {
+        const { Fymd, yearPart, CustomsDeclarationDate } = getCustomsDeclarationDate();
+        alert(`報關日期：${CustomsDeclarationDate}\n無此旬 ${currency} 匯率，無法計算！`);
         return;
     }
     
     const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase().trim();
-    const currency = document.getElementById("CURRENCY").value.toUpperCase().trim();
 
     if (!termsSales) {
         alert("請先填入貿易條件");
