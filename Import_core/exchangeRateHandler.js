@@ -395,3 +395,51 @@ function clearFreight() {
 function clearInsurance() {
     document.getElementById('INS_AMT').value = '';
 }
+
+// 應加費用彈跳視窗拖曳邏輯
+function makeModalDraggable(modalId, handleId) {
+    const modal = document.getElementById(modalId);
+    const handle = document.getElementById(handleId);
+
+    let offsetX = 0, offsetY = 0, isDragging = false;
+
+    handle.onmousedown = function (e) {
+        // 取消 transform 並實際定位
+        if (modal.style.transform) {
+            const rect = modal.getBoundingClientRect();
+            modal.style.left = `${rect.left}px`;
+            modal.style.top = `${rect.top}px`;
+            modal.style.transform = '';
+        }
+
+        isDragging = true;
+        offsetX = e.clientX - modal.offsetLeft;
+        offsetY = e.clientY - modal.offsetTop;
+
+        // ✅ 禁止選取背景內容
+        document.body.style.userSelect = 'none';
+
+        document.onmousemove = dragMouseMove;
+        document.onmouseup = stopDragging;
+    };
+
+    function dragMouseMove(e) {
+        if (!isDragging) return;
+        modal.style.left = `${e.clientX - offsetX}px`;
+        modal.style.top = `${e.clientY - offsetY}px`;
+    }
+
+    function stopDragging() {
+        isDragging = false;
+        document.onmousemove = null;
+        document.onmouseup = null;
+
+        // ✅ 還原選取功能
+        document.body.style.userSelect = '';
+    }
+}
+
+// 初始化拖曳功能
+document.addEventListener('DOMContentLoaded', function () {
+    makeModalDraggable('additional-modal', 'additional-modal-header');
+});
