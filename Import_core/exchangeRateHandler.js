@@ -271,7 +271,7 @@ function calculateAdditional() {
     if (!termsSales) {
         showToastOnce('terms-empty', {
             title: '提示',
-            message: '請先填列貿易條件',
+            message: '請先填貿易條件',
             position: 'center',
             timeout: 3000
         });
@@ -281,7 +281,7 @@ function calculateAdditional() {
     if (termsSales !== 'EXW') {
         showToastOnce('terms-not-exw', {
             title: '提示',
-            message: '貿易條件非 EXW，不可使用應加費用換算',
+            message: '貿易條件非 EXW',
             position: 'center',
             timeout: 3000
         });
