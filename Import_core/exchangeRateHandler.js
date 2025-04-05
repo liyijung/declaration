@@ -337,6 +337,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // 初始化拖曳功能
+    makeModalDraggable('additional-modal', 'additional-modal-header');
 });
 
 // Tab 鍵在彈跳框內循環
@@ -438,8 +441,3 @@ function makeModalDraggable(modalId, handleId) {
         document.body.style.userSelect = '';
     }
 }
-
-// 初始化拖曳功能
-document.addEventListener('DOMContentLoaded', function () {
-    makeModalDraggable('additional-modal', 'additional-modal-header');
-});
