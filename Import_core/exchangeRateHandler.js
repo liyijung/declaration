@@ -159,7 +159,7 @@ function getCustomsDeclarationDate() {
 }
 
 // 監聽事件
-document.getElementById("ACCEPTANCE_DATE").addEventListener("input", lookupExchangeRate);
+document.getElementById("ACCEPTANCE_DATE").addEventListener("blur", lookupExchangeRate);
 document.getElementById("CURRENCY").addEventListener("input", lookupExchangeRate);
 
 // 計算運費並顯示結果
