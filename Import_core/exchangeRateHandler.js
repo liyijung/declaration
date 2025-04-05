@@ -267,24 +267,20 @@ function adjustFreightAndInsurance() {
 // 計算應加費用並顯示結果
 function calculateAdditional() {
     const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase().trim();
-
-    if (!termsSales) {
-        showToastOnce('terms-empty', {
-            title: '提示',
-            message: '請先填貿易條件',
-            position: 'center',
-            timeout: 3000
-        });
+    const currencyRate = parseFloat(exchangeRates[currency]?.sellValue);
+    
+    if (termsSales !== 'EXW') {
+        alert("貿易條件非 EXW");
         return;
     }
 
-    if (termsSales !== 'EXW') {
-        showToastOnce('terms-not-exw', {
-            title: '提示',
-            message: '貿易條件非 EXW',
-            position: 'center',
-            timeout: 3000
-        });
+    if (!termsSales) {
+        alert("請先填入貿易條件");
+        return;
+    }
+
+    if (!currencyRate) {
+        alert(`請先填入報單幣別`);
         return;
     }
 
@@ -296,20 +292,6 @@ function calculateAdditional() {
     setTimeout(() => {
         document.getElementById('additional-currency').focus();
     }, 10);
-}
-
-let toastLock = {}; // 儲存各類提示的鎖定狀態
-
-function showToastOnce(type, options) {
-    if (toastLock[type]) return; // 如果正在顯示中，略過
-
-    toastLock[type] = true; // 設為鎖定狀態
-    iziToast.warning({
-        ...options,
-        onClosed: () => {
-            toastLock[type] = false; // Toast 關閉後解除鎖定
-        }
-    });
 }
 
 function closeAdditionalModal() {
@@ -335,13 +317,8 @@ async function submitAdditional() {
     }
 
     const usdRate = parseFloat(exchangeRates["USD"].sellValue);
-    const currencyRate = parseFloat(exchangeRates[currency]?.sellValue);
     const sourceRate = parseFloat(exchangeRates[sourceCurrency]?.sellValue);
 
-    if (!currencyRate) {
-        alert(`請先填入報單幣別`);
-        return;
-    }
     if (!sourceRate) {
         alert(`無法找到 ${sourceCurrency} 的匯率`);
         return;
