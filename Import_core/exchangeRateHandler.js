@@ -187,7 +187,9 @@ function calculateFreight() {
         }
 
         if (!isNaN(weight)) {
-            const freight = (weight * 3 * usdRate) / currencyRate;
+            const roundedWeight = Math.round(weight); // 先四捨五入
+            const adjustedWeight = roundedWeight < 5 ? 5 : roundedWeight; // 若小於5則以5計
+            const freight = (adjustedWeight * 1 * usdRate) / currencyRate;
             const decimalPlaces = currency === "TWD" ? 0 : 2;
             document.getElementById('FRT_AMT').value = new Decimal(freight).toFixed(decimalPlaces);
             adjustFreightAndInsurance();
@@ -218,7 +220,9 @@ function calculateInsurance() {
 
         if (!isNaN(totalAmount)) {
             let insurance = totalAmount * 0.0011;
-            const minimumInsurance = 450 / currencyRate;
+            const usdRate = parseFloat(document.getElementById('usd-exchange-rate').value);
+            const minimumUSD = 15;
+            const minimumInsurance = (minimumUSD * usdRate) / currencyRate; // 換算成當地幣別的最低保費
             if (insurance < minimumInsurance) {
                 insurance = minimumInsurance;
             }
@@ -238,11 +242,8 @@ function adjustFreightAndInsurance() {
 
     let freight = parseFloat(document.getElementById('FRT_AMT').value);
     let insurance = parseFloat(document.getElementById('INS_AMT').value);
-
-    if (termsSales === "EXW" || termsSales === "FOB") {
-        freight = '';
-        insurance = '';
-    } else if (termsSales === "CFR" && freight > totalAmount) {
+    
+    if (termsSales === "CFR" && freight > totalAmount) {
         freight = totalAmount / 2;
     } else if (termsSales === "C&I" && insurance > totalAmount) {
         insurance = totalAmount / 2;
@@ -257,27 +258,107 @@ function adjustFreightAndInsurance() {
 
 // 計算應加費用並顯示結果
 function calculateAdditional() {
-    const currency = document.getElementById('CURRENCY').value.toUpperCase();
+    const modal = document.getElementById('additional-modal');
+    modal.style.display = 'block';
 
-    fetchExchangeRates().then(exchangeRates => {
-        if (!exchangeRates || Object.keys(exchangeRates).length === 0) {
-            document.getElementById('ADD_AMT').value = "無法獲取匯率數據";
-            return;
-        }
-
-        const currencyRate = exchangeRates[currency]?.sellValue;
-
-        if (!currencyRate) {
-            console.error(`無法找到 ${currency} 匯率`, exchangeRates);
-            document.getElementById('ADD_AMT').value = "無法獲取該幣別匯率";
-            return;
-        }
-
-        const additionalFee = 500 / currencyRate;
-        const decimalPlaces = currency === "TWD" ? 0 : 2;
-        document.getElementById('ADD_AMT').value = new Decimal(additionalFee).toFixed(decimalPlaces);
-    });
+    // 延遲一點時間聚焦，確保畫面已顯示
+    setTimeout(() => {
+        document.getElementById('additional-currency').focus();
+    }, 10);
 }
+
+function closeAdditionalModal() {
+    document.getElementById('additional-modal').style.display = 'none';
+}
+
+async function submitAdditional() {
+    const amount = parseFloat(document.getElementById('additional-amount').value);
+    const sourceCurrency = document.getElementById('additional-currency').value.toUpperCase();
+    const currency = document.getElementById('CURRENCY').value.toUpperCase(); // 目標幣別
+    const decimalPlaces = currency === "TWD" ? 0 : 2;
+
+    if (isNaN(amount)) {
+        alert("請輸入正確金額");
+        return;
+    }
+
+    const exchangeRates = await fetchExchangeRates();
+
+    if (!exchangeRates || !exchangeRates["USD"]) {
+        alert("無法獲取美金匯率");
+        return;
+    }
+
+    const usdRate = parseFloat(exchangeRates["USD"].sellValue);
+    const currencyRate = parseFloat(exchangeRates[currency]?.sellValue);
+    const sourceRate = parseFloat(exchangeRates[sourceCurrency]?.sellValue);
+
+    if (!currencyRate) {
+        alert(`請先填入報單幣別`);
+        return;
+    }
+    if (!sourceRate) {
+        alert(`無法找到 ${sourceCurrency} 的匯率`);
+        return;
+    }
+
+    // Step1: 來源幣別 ➜ USD
+    const usdAmount = (amount * sourceRate) / usdRate;
+
+    // Step2: USD ➜ 目標幣別
+    const convertedAmount = (usdAmount * usdRate) / currencyRate;
+
+    // Step3: 分配金額
+    const freight = convertedAmount * 0.7;
+    const additional = convertedAmount * 0.3;
+
+    // 寫入欄位
+    document.getElementById('FRT_AMT').value = new Decimal(freight).toFixed(decimalPlaces);
+    document.getElementById('ADD_AMT').value = new Decimal(additional).toFixed(decimalPlaces);
+
+    adjustFreightAndInsurance();
+    closeAdditionalModal();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // 幣別輸入轉大寫
+    document.getElementById('additional-currency').addEventListener('input', function () {
+        this.value = this.value.toUpperCase();
+    });
+
+    // ESC 鍵關閉彈窗
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('additional-modal');
+            if (modal.style.display === 'block') {
+                closeAdditionalModal();
+            }
+        }
+    });
+});
+
+// Tab 鍵在彈跳框內循環
+document.addEventListener('keydown', function (e) {
+    const modal = document.getElementById('additional-modal');
+    if (modal.style.display === 'block' && e.key === 'Tab') {
+        const focusableElements = modal.querySelectorAll('input, button');
+        const focusArray = Array.from(focusableElements).filter(el => !el.disabled && el.offsetParent !== null);
+
+        if (focusArray.length === 0) return;
+
+        const first = focusArray[0];
+        const last = focusArray[focusArray.length - 1];
+        const active = document.activeElement;
+
+        if (!e.shiftKey && active === last) {
+            e.preventDefault();
+            first.focus();
+        } else if (e.shiftKey && active === first) {
+            e.preventDefault();
+            last.focus();
+        }
+    }
+});
 
 // 幣別異動 => 清空 運費、保險費、應加費用
 document.getElementById('CURRENCY').addEventListener('input', function () {
