@@ -236,14 +236,33 @@
             </div>
             <div class="header-group">
                 <label for="ADD_AMT">應加費用</label>
-                <input type="number" id="ADD_AMT" name="ADD_AMT" tabindex="-1" style="flex: 1 1 0;"
+                <input type="number" id="ADD_AMT" name="ADD_AMT" tabindex="-1"
                 placeholder="(EXW 需填列應加費用)">
-                <button id="calculate-additional-button" style="flex: 1 1 0; max-width: 200px;">計算應加費用(TWD500)</button>
+                <button id="calculate-additional-button">計算應加費用</button>
             </div>
             <div class="header-group">
                 <label for="SUBTRACT_AMT">應減費用</label>
                 <input type="number" id="SUBTRACT_AMT" name="SUBTRACT_AMT" tabindex="-1"
                 placeholder="(EXW 不得填列應減費用)">
+            </div>
+        </div>
+        <!-- 應加費用彈跳視窗 -->
+        <div id="additional-modal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%,-50%);
+            background:radial-gradient(ellipse, rgb(225, 236, 254), rgb(237, 243, 254));
+            border:2px solid #ccc; padding:16px; z-index:10000; border-radius:8px; box-shadow:0 0 10px #aaa;">
+            <h3 style="margin-top: 0px;">運單查詢-運費</h3>
+            <label>幣別：
+                <input type="text" id="additional-currency"
+                style="height: 25px; font-size: 16px; width: 160px; margin-bottom: 10px;">
+            </label><br>
+            <label>金額：
+                <input type="number" id="additional-amount"
+                style="height: 25px; font-size: 16px; width: 160px;">
+            </label><br><br>
+            <h4 style="margin-top: 0px;">應加費用 30%、運費 70%</h4>
+            <div style="text-align: right;">
+                <button onclick="submitAdditional()">計算</button>
+                <button onclick="closeAdditionalModal()">取消</button>
             </div>
         </div>
 
