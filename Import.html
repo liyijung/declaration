@@ -250,7 +250,9 @@
         <div id="additional-modal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%,-50%);
             background:radial-gradient(ellipse, rgb(225, 236, 254), rgb(237, 243, 254));
             border:2px solid #ccc; padding:16px; z-index:10000; border-radius:8px; box-shadow:0 0 10px #aaa;">
-            <h3 style="margin-top: 0px;">運單查詢-運費</h3>
+            <h3 id="additional-modal-header" style="margin-top: 0px; border-bottom: 1px solid #ccc; cursor: move;">
+                運單查詢-運費
+            </h3>
             <label>幣別：
                 <input type="text" id="additional-currency"
                 style="height: 25px; font-size: 16px; width: 160px; margin-bottom: 10px;">
@@ -259,7 +261,11 @@
                 <input type="number" id="additional-amount"
                 style="height: 25px; font-size: 16px; width: 160px;">
             </label><br><br>
-            <h4 style="margin-top: 0px;">應加費用 30%、運費 70%</h4>
+            <div style="margin-top: 0px; margin-bottom: 0px; color: blue;">
+                計算後自動分配：<br>
+                30% → 應加費用<br>
+                70% → 運費
+            </div>
             <div style="text-align: right;">
                 <button onclick="submitAdditional()">計算</button>
                 <button onclick="closeAdditionalModal()">取消</button>
