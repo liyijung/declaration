@@ -157,7 +157,7 @@ function getCustomsDeclarationDate() {
 }
 
 // 監聽事件
-document.getElementById("FILE_NO").addEventListener("blur", lookupExchangeRate);
+document.getElementById("FILE_NO").addEventListener("input", lookupExchangeRate);
 document.getElementById("CURRENCY").addEventListener("input", lookupExchangeRate);
 
 // 計算運費並顯示結果
