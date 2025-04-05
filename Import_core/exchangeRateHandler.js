@@ -164,6 +164,12 @@ document.getElementById("CURRENCY").addEventListener("input", lookupExchangeRate
 
 // 計算運費並顯示結果
 function calculateFreight() {
+    const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase();
+    if (termsSales === 'EXW') {
+        calculateAdditional(); // 直接跳出應加費用彈窗邏輯
+        return; // 不執行後續運費計算
+    }
+
     const currency = document.getElementById('CURRENCY').value.toUpperCase();
     const weight = parseFloat(document.getElementById('DCL_GW').value);
 
