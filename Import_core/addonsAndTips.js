@@ -683,24 +683,3 @@ function updateCneeLabelText() {
            : "賣方英文名稱";
    }
 }
-
-$(function () {
-    $('.rocDate').each(function () {
-        $(this).datepicker({
-            dateFormat: 'yy/mm/dd',
-            changeYear: true,
-            changeMonth: true,
-            yearRange: 'c-1:c+1', // 只顯示去年、今年、明年
-            onSelect: function (dateText) {
-                const rocDate = convertToRocDate(dateText);
-                $(this).val(rocDate).focus();
-            }
-        });
-    });
-
-    function convertToRocDate(westernDate) {
-        const [year, month, day] = westernDate.split('/');
-        const rocYear = parseInt(year, 10) - 1911;
-        return `${rocYear}/${month}/${day}`;
-    }
-});
