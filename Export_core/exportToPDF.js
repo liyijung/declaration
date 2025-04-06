@@ -164,14 +164,10 @@ async function exportToPDF() {
             return value ? parseFloat(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 'NIL';
         }
 
-        // 獲取匯率數據
-        if (!currentExchangeRates || !currentExchangePeriod) {
-            await initExchangeRateData();
-        }
-
-        // 獲取 CURRENCY 的值並查找對應的匯率
+        // 幣別及匯率
         const currency = document.getElementById('CURRENCY').value.toUpperCase();
-        const exchangeRate = parseFloat(currentExchangeRates[currency]?.buyValue) || 0;
+        const exchangeRateInput = document.getElementById('exchange-rate').value.trim();
+        const exchangeRate = exchangeRateInput ? parseFloat(exchangeRateInput) : 0;
 
         // 檢查數值是否為 NIL
         const formattedFrtAmt = frtAmt !== 'NIL' ? frtAmt : 'NIL';
