@@ -7,7 +7,17 @@ function importCustomer23570158(event) {
     var file = event.target.files[0];
     var reader = new FileReader();
 
-    reader.onload = function(event) {
+    reader.onload = async function(event) {
+        // 📌 先自動填入 FILE_NO（民國年月日）
+        const fileNoElement = document.getElementById('FILE_NO');
+        if (fileNoElement) {
+            const today = new Date();
+            const rocYear = today.getFullYear() - 1911;
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            fileNoElement.value = `${rocYear}${month}${day}`;
+        }
+
         var data = new Uint8Array(event.target.result);
         var workbook = XLSX.read(data, { type: 'array' });
 
@@ -264,6 +274,7 @@ function importCustomer23570158(event) {
         document.getElementById('DCL_DOC_TYPE').value = 'G5';
         document.getElementById('TERMS_SALES').value = 'CIF';
         document.getElementById('CURRENCY').value = h20;
+        await lookupExchangeRate(); // ✅ 根據幣別查詢匯率並自動填入 exchange-rate 欄位
         document.getElementById('CAL_IP_TOT_ITEM_AMT').value = calIpTotItemAmt;
         
         // 定義 itemContainer 用來放置生成的項次
