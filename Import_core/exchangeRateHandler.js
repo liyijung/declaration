@@ -262,10 +262,15 @@ function closeAdditionalModal() {
 }
 
 async function submitAdditional() {
-    const amount = parseFloat(document.getElementById('additional-amount').value);
     const sourceCurrency = document.getElementById('additional-currency').value.toUpperCase();
+    const amount = parseFloat(document.getElementById('additional-amount').value);
     const currency = document.getElementById('CURRENCY').value.toUpperCase(); // 目標幣別
     const decimalPlaces = currency === "TWD" ? 0 : 2;
+
+    if (!sourceCurrency) {
+        alert("請輸入運單幣別");
+        return;
+    }
 
     if (isNaN(amount)) {
         alert("請輸入正確金額");
