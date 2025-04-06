@@ -208,8 +208,8 @@ function adjustFreightAndInsurance() {
         insurance = totalAmount / 4;
     }
 
-    document.getElementById('FRT_AMT').value = freight === '' ? '' : freight.toFixed(2);
-    document.getElementById('INS_AMT').value = insurance === '' ? '' : insurance.toFixed(2);
+    document.getElementById('FRT_AMT').value = (freight != null && freight !== '' && !isNaN(freight)) ? Number(freight).toFixed(2) : '';
+    document.getElementById('INS_AMT').value = (insurance != null && insurance !== '' && !isNaN(insurance)) ? Number(insurance).toFixed(2) : '';
 }
 
 // 計算應加費用並顯示結果
