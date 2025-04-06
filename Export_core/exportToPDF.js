@@ -165,15 +165,14 @@ async function exportToPDF() {
         }
 
         // 獲取匯率數據
-        const exchangeRates = await fetchExchangeRates();
-        if (!exchangeRates) {
-            throw new Error('無法獲取匯率數據');
+        if (!currentExchangeRates || !currentExchangePeriod) {
+            await initExchangeRateData();
         }
 
         // 獲取 CURRENCY 的值並查找對應的匯率
-        const currency = document.getElementById('CURRENCY').value;
-        const exchangeRate = exchangeRates[currency] ? exchangeRates[currency].buyValue : 'NIL';
-        
+        const currency = document.getElementById('CURRENCY').value.toUpperCase();
+        const exchangeRate = parseFloat(currentExchangeRates[currency]?.buyValue) || 0;
+
         // 檢查數值是否為 NIL
         const formattedFrtAmt = frtAmt !== 'NIL' ? frtAmt : 'NIL';
         const formattedInsAmt = insAmt !== 'NIL' ? insAmt : 'NIL';
@@ -238,11 +237,7 @@ async function exportToPDF() {
         doc.text(currency, 171, totalFobPriceY);
         doc.text(formattedTotalFobPrice, totalFobPriceX, totalFobPriceY);
 
-        // 當旬匯率日期區間
-        const { startDate, endDate } = await fetchDateRange();
-        console.log("匯率日期區間：", { startDate, endDate });
-        
-        if (exchangeRate && (Fymd >= startDate && Fymd <= endDate)) {
+        if (exchangeRate) {
             // 在 x: 171, y: totalFobPriceTwY 顯示 "TWD"
             doc.text("TWD", 171, totalFobPriceTwY);
             doc.text(formattedTotalFobPriceTw, totalFobPriceTwX, totalFobPriceTwY);
@@ -378,7 +373,7 @@ async function exportToPDF() {
         const itemsData = [];
         document.querySelectorAll("#item-container .item-row").forEach((item, index) => {
             const docTotP = parseFloat(item.querySelector('.DOC_TOT_P')?.value) || 0; // 取得 .DOC_TOT_P 值
-            const fobTw = docTotP * exchangeRate * (totalFobPrice / docTotPTotal); // 使用 docTotPTotal 計算 fobTw
+            const fobTw = isNaN(exchangeRate) ? 0 : docTotP * exchangeRate * (totalFobPrice / docTotPTotal); // 使用 docTotPTotal 計算 fobTw
 
             itemsData.push({
                 index: item.querySelector('.ITEM_NO')?.checked ? '*' : index + 1,  // 如果選中則顯示'*'，否則顯示編號
@@ -617,7 +612,7 @@ async function exportToPDF() {
                     }
                 }
 
-                if (exchangeRate && (Fymd >= startDate && Fymd <= endDate)) {
+                if (exchangeRate) {
                     // 顯示離岸價格(新台幣)，靠右對齊並加入千分位逗號
                     const fobTwX = 197.5;
                     const formattedFobTw = parseFloat(item.fobTw).toLocaleString('en-US'); // 將 fobTw 格式化為千分位
@@ -717,7 +712,7 @@ async function exportToPDF() {
         const separatorWidth = doc.getTextWidth(separator);
         doc.text(separator, pageWidth - separatorWidth - 6, yPosition - 3);
 
-        if (exchangeRate && (Fymd >= startDate && Fymd <= endDate)) {
+        if (exchangeRate) {
             // 顯示離岸價格(新台幣)，靠右對齊並加入千分位逗號
             let formattedTotalFobPriceTw = Math.round(totalFobPriceTw).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
             const fobTwX = 197.5;
