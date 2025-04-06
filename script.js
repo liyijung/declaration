@@ -235,6 +235,8 @@ setTimeout(() => {
     document.getElementById('announcement-box').style.bottom = '20px';
 }, 1000);
 
+/*
 document.getElementById('close-btn').addEventListener('click', () => {
     document.getElementById('announcement-box').style.bottom = '-100%';
 });
+*/
