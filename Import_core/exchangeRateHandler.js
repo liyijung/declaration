@@ -200,33 +200,34 @@ function adjustFreightAndInsurance() {
     let insurance = parseFloat(document.getElementById('INS_AMT').value);
     
     if (termsSales === "CFR" && freight > totalAmount) {
-        iziToast.warning({
-            title: '注意',
-            message: '運費金額計算後超過總金額',
-            timeout: 3000, // 自動消失
-            position: 'center',
-            backgroundColor: '#ffeb3b'
-        });
+        showIziWarningOnce("運費金額計算後超過總金額");
     } else if (termsSales === "C&I" && insurance > totalAmount) {
-        iziToast.warning({
-            title: '注意',
-            message: '保險費金額計算後超過總金額',
-            timeout: 3000, // 自動消失
-            position: 'center',
-            backgroundColor: '#ffeb3b'
-        });        
+        showIziWarningOnce("保險費金額計算後超過總金額");
     } else if (termsSales === "CIF" && (freight + insurance) > totalAmount) {
-        iziToast.warning({
-            title: '注意',
-            message: '運費和保險費金額計算後超過總金額',
-            timeout: 3000, // 自動消失
-            position: 'center',
-            backgroundColor: '#ffeb3b'
-        });              
+        showIziWarningOnce("運費和保險費金額計算後超過總金額");
     }
 
     document.getElementById('FRT_AMT').value = (freight != null && freight !== '' && !isNaN(freight)) ? Number(freight).toFixed(2) : '';
     document.getElementById('INS_AMT').value = (insurance != null && insurance !== '' && !isNaN(insurance)) ? Number(insurance).toFixed(2) : '';
+}
+
+const shownIziMessages = new Set(); // 用來記錄已顯示的提示內容
+
+function showIziWarningOnce(message) {
+    if (shownIziMessages.has(message)) return;
+
+    shownIziMessages.add(message);
+
+    iziToast.warning({
+        title: '注意',
+        message: message,
+        timeout: 3000,
+        position: 'center',
+        backgroundColor: '#ffeb3b',
+        onClosed: () => {
+            shownIziMessages.delete(message); // 關閉後移除，允許再次顯示
+        }
+    });
 }
 
 ['change', 'blur'].forEach(eventType => {
