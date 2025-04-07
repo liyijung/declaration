@@ -216,16 +216,42 @@ function adjustFreightAndInsurance() {
         insurance = '';
     } else if (termsSales === "CFR" && freight > totalAmount) {
         freight = totalAmount / 2;
+        showIziWarningOnce("運費金額計算後超過總金額，以 總金額÷2 做為運費");
     } else if (termsSales === "C&I" && insurance > totalAmount) {
         insurance = totalAmount / 2;
+        showIziWarningOnce("保險費金額計算後超過總金額，以 總金額÷2 做為保險費");
     } else if (termsSales === "CIF" && (freight + insurance) > totalAmount) {
         freight = totalAmount / 4;
         insurance = totalAmount / 4;
+        showIziWarningOnce("運費和保險費金額計算後超過總金額，以 總金額÷2 做為運保費");
     }
 
     document.getElementById('FRT_AMT').value = (freight != null && freight !== '' && !isNaN(freight)) ? Number(freight).toFixed(2) : '';
     document.getElementById('INS_AMT').value = (insurance != null && insurance !== '' && !isNaN(insurance)) ? Number(insurance).toFixed(2) : '';
 }
+
+const shownIziMessages = new Set(); // 用來記錄已顯示的提示內容
+
+function showIziWarningOnce(message) {
+    if (shownIziMessages.has(message)) return;
+
+    shownIziMessages.add(message);
+
+    iziToast.warning({
+        title: '注意',
+        message: message,
+        timeout: 5000,
+        position: 'center',
+        backgroundColor: '#ffeb3b',
+        onClosed: () => {
+            shownIziMessages.delete(message); // 關閉後移除，允許再次顯示
+        }
+    });
+}
+
+['change', 'blur'].forEach(eventType => {
+    document.getElementById('TERMS_SALES').addEventListener(eventType, adjustFreightAndInsurance);
+});
 
 // 計算應加費用並顯示結果
 async function calculateAdditional() {
