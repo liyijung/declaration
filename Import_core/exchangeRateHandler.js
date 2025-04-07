@@ -211,10 +211,6 @@ function adjustFreightAndInsurance() {
     document.getElementById('INS_AMT').value = (insurance != null && insurance !== '' && !isNaN(insurance)) ? Number(insurance).toFixed(2) : '';
 }
 
-['change', 'blur'].forEach(eventType => {
-    document.getElementById('TERMS_SALES').addEventListener(eventType, adjustFreightAndInsurance);
-});
-
 // 計算應加費用並顯示結果
 async function calculateAdditional() {
     const currency = document.getElementById('CURRENCY').value.trim().toUpperCase();
