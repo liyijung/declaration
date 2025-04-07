@@ -1,4 +1,10 @@
-// 開啟指定填列欄位資料的彈跳框
+// 開啟指定填列欄位資料的彈跳框(非表頭觸發使用)
+function openSpecifyFieldModalFromButton() {
+    document.getElementById('specify-mode').value = 'copy';  // 預設為 copy 模式
+    toggleSpecifyMode('copy'); // 顯示對應內容區塊
+    openSpecifyFieldModal();   // 開啟彈跳框
+}
+
 function openSpecifyFieldModal() {
     // 顯示彈跳框
     const specifyFieldModal = document.getElementById('specify-field-modal');
@@ -42,10 +48,6 @@ function closeSpecifyFieldModal() {
 
     // 移除 ESC 事件監聽
     document.removeEventListener('keydown', handleEscKeyForSpecifyFieldCancel);
-
-    // 重置模式為 'copy'
-    document.getElementById('specify-mode').value = 'copy';
-    toggleSpecifyMode(); // 確保 UI 恢復成 copy-content
 }
 
 // 動態生成源項次下拉選單的選項
@@ -59,15 +61,19 @@ function populateSourceItemDropdown() {
 }
 
 // 切換模式
-function toggleSpecifyMode() {
-    const specifyMode = document.getElementById('specify-mode').value;
+function toggleSpecifyMode(mode) {
+    const specifyModeInput = document.getElementById('specify-mode');
     const customContent = document.getElementById('custom-content');
     const copyContent = document.getElementById('copy-content');
     const overwriteOption = document.getElementById('overwrite-option');
     const fieldName = document.getElementById('specify-field-name').value;
     
-    const conditionOption = overwriteOption.querySelector('option[value="condition"]'); // ← 這一行必加！
+    const conditionOption = overwriteOption.querySelector('option[value="condition"]');
     const optionsToHide = overwriteOption.querySelectorAll('option[value="matchCondition"], option[value="notMatchCondition"]');
+
+    // 如果有提供 mode，則設置並使用它；否則從 DOM 取得
+    const specifyMode = mode || specifyModeInput.value;
+    specifyModeInput.value = specifyMode;
 
     if (specifyMode === 'copy') {
         customContent.style.display = 'none';
@@ -147,10 +153,6 @@ function preventEnterKey(event) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 設定一般預設模式為 'copy'
-    document.getElementById('specify-mode').value = 'copy';
-    toggleSpecifyMode(); // 觸發切換模式，確保預設顯示 copy-content
-    
     document.querySelectorAll('.item-header .form-group').forEach(header => {
         header.addEventListener('click', function () {
             // 取得 `specify-field-name` 下拉選單
@@ -178,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // 點擊表頭時，將模式切換為 'custom'
             document.getElementById('specify-mode').value = 'custom';
-            toggleSpecifyMode(); // 觸發模式切換
+            toggleSpecifyMode('custom'); // 觸發模式切換
 
             // 開啟彈跳框
             openSpecifyFieldModal();
