@@ -201,24 +201,27 @@ function adjustFreightAndInsurance() {
     
     if (termsSales === "CFR" && freight > totalAmount) {
         iziToast.warning({
-            title: '提示',
+            title: '注意',
             message: '運費金額計算後超過總金額',
             timeout: 3000, // 自動消失
-            position: 'center'
+            position: 'center',
+            backgroundColor: '#ffeb3b'
         });
     } else if (termsSales === "C&I" && insurance > totalAmount) {
         iziToast.warning({
-            title: '提示',
+            title: '注意',
             message: '保險費金額計算後超過總金額',
             timeout: 3000, // 自動消失
-            position: 'center'
+            position: 'center',
+            backgroundColor: '#ffeb3b'
         });        
     } else if (termsSales === "CIF" && (freight + insurance) > totalAmount) {
         iziToast.warning({
-            title: '提示',
+            title: '注意',
             message: '運費和保險費金額計算後超過總金額',
             timeout: 3000, // 自動消失
-            position: 'center'
+            position: 'center',
+            backgroundColor: '#ffeb3b'
         });              
     }
 
