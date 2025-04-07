@@ -119,6 +119,18 @@ document.getElementById("CURRENCY")?.addEventListener("input", lookupExchangeRat
 async function calculateFreight() {
     const currency = document.getElementById('CURRENCY').value.trim().toUpperCase();
     const exchangeRateInput = document.getElementById("exchange-rate");
+    const weight = parseFloat(document.getElementById('DCL_GW').value);
+
+    if (!currency && !weight ) {
+        alert(`請先填入 "幣別" 及 "總毛重"`);
+        return;
+    } else if (!currency) {
+        alert(`請先填入 "幣別"`);
+        return;
+    } else if (!weight) {
+        alert(`請先填入 "總毛重"`);
+        return;
+    }
 
     if (currency && (!exchangeRateInput || !exchangeRateInput.value.trim())) {
         const { CustomsDeclarationDate } = getCustomsDeclarationDate();
@@ -126,7 +138,6 @@ async function calculateFreight() {
         return;
     }
 
-    const weight = parseFloat(document.getElementById('DCL_GW').value);
     await initExchangeRateData(); // 確保資料已存在
     const exchangeRates = currentExchangeRates;
 
@@ -153,6 +164,18 @@ async function calculateFreight() {
 async function calculateInsurance() {
     const currency = document.getElementById('CURRENCY').value.trim().toUpperCase();
     const exchangeRateInput = document.getElementById("exchange-rate");
+    const totalAmount = parseFloat(document.getElementById('CAL_IP_TOT_ITEM_AMT').value);
+
+    if (!currency && !totalAmount ) {
+        alert(`請先填入 "幣別" 及 "總金額"`);
+        return;
+    } else if (!currency) {
+        alert(`請先填入 "幣別"`);
+        return;
+    } else if (!totalAmount) {
+        alert(`請先填入 "總金額"`);
+        return;
+    }
 
     if (currency && (!exchangeRateInput || !exchangeRateInput.value.trim())) {
         const { CustomsDeclarationDate } = getCustomsDeclarationDate();
@@ -160,7 +183,6 @@ async function calculateInsurance() {
         return;
     }
 
-    const totalAmount = parseFloat(document.getElementById('CAL_IP_TOT_ITEM_AMT').value);
     await initExchangeRateData();
     const exchangeRates = currentExchangeRates;
 
@@ -210,6 +232,11 @@ async function calculateAdditional() {
     const currency = document.getElementById('CURRENCY').value.trim().toUpperCase();
     const exchangeRateInput = document.getElementById("exchange-rate");
 
+    if (!currency) {
+        alert(`請先填入"幣別"`);
+        return;
+    }
+
     if (currency && (!exchangeRateInput || !exchangeRateInput.value.trim())) {
         const { CustomsDeclarationDate } = getCustomsDeclarationDate();
         alert(`報關日期：${CustomsDeclarationDate}\n無此旬 ${currency} 匯率，無法計算！`);
@@ -235,13 +262,13 @@ document.getElementById('CURRENCY').addEventListener('input', function () {
     clearFreightInsuranceAdditional();
 });
 
-// 總毛重異動 => 清空 運費
+// 總毛重異動 => 清空 運費、保險費
 document.getElementById('DCL_GW').addEventListener('input', function () {
     clearFreight();
     clearInsurance();
 });
 
-// 總金額異動 => 清空 保險費
+// 總金額異動 => 清空 運費、保險費
 document.getElementById('CAL_IP_TOT_ITEM_AMT').addEventListener('input', function () {
     clearFreight();
     clearInsurance();
