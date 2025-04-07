@@ -137,7 +137,6 @@ async function calculateFreight() {
     const exchangeRates = currentExchangeRates;
 
     if (!exchangeRates || Object.keys(exchangeRates).length === 0) {
-        document.getElementById('FRT_AMT').value = "無法獲取匯率數據";
         return;
     }
 
@@ -145,7 +144,6 @@ async function calculateFreight() {
     const currencyRate = exchangeRates[currency]?.sellValue;
 
     if (!usdRate || !currencyRate) {
-        document.getElementById('FRT_AMT').value = "無法獲取該幣別匯率";
         return;
     }
 
@@ -156,8 +154,6 @@ async function calculateFreight() {
         const decimalPlaces = currency === "TWD" ? 0 : 2;
         document.getElementById('FRT_AMT').value = new Decimal(freight).toFixed(decimalPlaces);
         adjustFreightAndInsurance();
-    } else {
-        document.getElementById('FRT_AMT').value = "輸入無效";
     }
 }
 
@@ -178,7 +174,6 @@ async function calculateInsurance() {
 
     const currencyRate = exchangeRates[currency]?.sellValue;
     if (!currencyRate) {
-        document.getElementById('INS_AMT').value = "無法獲取該幣別匯率";
         return;
     }
 
@@ -193,8 +188,6 @@ async function calculateInsurance() {
         const decimalPlaces = currency === "TWD" ? 0 : 2;
         document.getElementById('INS_AMT').value = new Decimal(insurance).toFixed(decimalPlaces);
         adjustFreightAndInsurance();
-    } else {
-        document.getElementById('INS_AMT').value = "輸入無效";
     }
 }
 
