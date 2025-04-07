@@ -262,7 +262,7 @@ async function calculateAdditional() {
     const exchangeRateInput = document.getElementById("exchange-rate");
 
     if (!currency) {
-        alert(`請先填入報單幣別`);
+        alert(`請先填入"報單幣別"`);
         return;
     }
 
@@ -275,7 +275,7 @@ async function calculateAdditional() {
     const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase().trim();
 
     if (!termsSales) {
-        alert("請先填入貿易條件");
+        alert(`請先填入"貿易條件"`);
         return;
     }
     
