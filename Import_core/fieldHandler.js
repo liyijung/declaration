@@ -345,12 +345,12 @@ function applyFieldData() {
                 const conditionType = document.getElementById('condition-type')?.value || 'equals';
                 const conditionValueInput = document.getElementById('original-field-input')?.value || '';
 
-                // 判斷是否符合條件
+                // 判斷是否符合條件（忽略大小寫）
                 let conditionPassed = true;
                 if (conditionEnabled) {
                     const conditionElem = item.querySelector(`.${conditionFieldName}`);
-                    const fieldValue = conditionElem ? conditionElem.value : '';
-                    const inputVal = conditionValueInput.trim();
+                    const fieldValue = conditionElem ? conditionElem.value.trim().toLowerCase() : '';
+                    const inputVal = conditionValueInput.trim().toLowerCase();
 
                     switch (conditionType) {
                         case 'equals':
@@ -360,10 +360,10 @@ function applyFieldData() {
                             conditionPassed = fieldValue !== inputVal;
                             break;
                         case 'greaterThan':
-                            conditionPassed = parseFloat(fieldValue) > parseFloat(inputVal);
+                            conditionPassed = parseFloat(conditionElem?.value) > parseFloat(conditionValueInput);
                             break;
                         case 'lessThan':
-                            conditionPassed = parseFloat(fieldValue) < parseFloat(inputVal);
+                            conditionPassed = parseFloat(conditionElem?.value) < parseFloat(conditionValueInput);
                             break;
                         case 'startsWith':
                             conditionPassed = fieldValue.startsWith(inputVal);
