@@ -191,7 +191,7 @@ async function calculateInsurance() {
     }
 }
 
-// 根據 TERMS_SALES 進一步判斷並調整運費和保險費
+// 根據 TERMS_SALES 進一步判斷運費和保險費計算後是否超過總金額
 function adjustFreightAndInsurance() {
     const termsSales = document.getElementById('TERMS_SALES').value.toUpperCase();
     const totalAmount = parseFloat(document.getElementById('CAL_IP_TOT_ITEM_AMT').value);
@@ -200,12 +200,11 @@ function adjustFreightAndInsurance() {
     let insurance = parseFloat(document.getElementById('INS_AMT').value);
     
     if (termsSales === "CFR" && freight > totalAmount) {
-        freight = totalAmount / 2;
+        alert("運費金額計算後超過總金額");
     } else if (termsSales === "C&I" && insurance > totalAmount) {
-        insurance = totalAmount / 2;
+        alert("保險費金額計算後超過總金額");
     } else if (termsSales === "CIF" && (freight + insurance) > totalAmount) {
-        freight = totalAmount / 4;
-        insurance = totalAmount / 4;
+        alert("運費和保險費金額計算後超過總金額");
     }
 
     document.getElementById('FRT_AMT').value = (freight != null && freight !== '' && !isNaN(freight)) ? Number(freight).toFixed(2) : '';
