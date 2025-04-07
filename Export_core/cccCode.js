@@ -17,7 +17,7 @@ function handleCCCCodeEnter(event, inputElement) {
                         title: "注意",
                         message: "請查看稅則輸出規定",
                         position: "topRight",
-                        timeout: 3000,
+                        timeout: 5000,
                         backgroundColor: '#ffeb3b',
                         onClosing: function() {
                             isWarningToastVisible = false; // 當 `iziToast` 關閉時，允許新的 `iziToast`
@@ -483,7 +483,7 @@ function handleCCCCodeInput(event, inputElement) {
                         title: "注意",
                         message: "請查看稅則輸出規定",
                         position: "topRight",
-                        timeout: 3000,
+                        timeout: 5000,
                         backgroundColor: '#ffeb3b',
                         onClosing: function() {
                             isWarningToastVisible = false; // 當 `iziToast` 關閉時，允許新的 `iziToast`
