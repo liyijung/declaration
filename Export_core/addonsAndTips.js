@@ -285,6 +285,14 @@ function validateDclDocType() {
     let hasSampleKeyword = false; // 樣品提醒標記
     const stMtdGroups = {}; // 用來儲存統計方式的連號分組
 
+    const validStMtdValues = new Set([
+        "01", "02", "03", "04", "05", "06", "07", "08", "09", "1A", "2L", "2R", "53", "78",
+        "7M", "7G", "81", "82", "83", "84", "8A", "8B", "8C", "8D", "8F", "90", "91", "92",
+        "93", "94", "95", "96", "97", "98", "99", "9A", "9B", "9C", "9D", "9E", "9F", "9G",
+        "9H", "9J", "9K", "9L", "9M", "9N", "9P", "9Q", "9R", "9S", "9T", "9U", "9V", "9W",
+        "9X", "9Y", "9Z", "YZ", "082"
+    ]);
+
     const rows = document.querySelectorAll("#item-container .item-row");
     rows.forEach(item => {
         const itemNo = item.querySelector(".item-number label")?.textContent.trim();
@@ -302,6 +310,11 @@ function validateDclDocType() {
                     sampleMatches.add(match[1]); // 只加入匹配到的關鍵字
                 }
             }
+        }
+
+        if (stMtdValue && !validStMtdValues.has(stMtdValue)) {
+            validationErrors.add(`無統計方式「${stMtdValue}」`);
+            setError(item.querySelector(".ST_MTD"), `無此統計方式`);
         }
 
         // 統計方式連號檢查（最後才處理）
