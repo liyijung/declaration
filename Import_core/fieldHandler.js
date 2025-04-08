@@ -40,7 +40,7 @@ function closeSpecifyFieldModal() {
     const specifyFieldModal = document.getElementById('specify-field-modal');
     specifyFieldModal.style.display = 'none'; // 隱藏彈跳框
 
-    // 清除原欄位輸入框的文字
+    // 清除條件值輸入框的文字
     const originalFieldInput = document.getElementById('original-field-input');
     if (originalFieldInput) {
         originalFieldInput.value = '';
@@ -69,12 +69,11 @@ function toggleSpecifyMode(mode) {
     const fieldName = document.getElementById('specify-field-name').value;
     
     const conditionOption = overwriteOption.querySelector('option[value="condition"]');
-    const optionsToHide = overwriteOption.querySelectorAll('option[value="matchCondition"], option[value="notMatchCondition"]');
 
     // 如果有提供 mode，則設置並使用它；否則從 DOM 取得
     const specifyMode = mode || specifyModeInput.value;
     specifyModeInput.value = specifyMode;
-    
+
     if (specifyMode === 'copy') {
         customContent.style.display = 'none';
         copyContent.style.display = 'block';
@@ -92,13 +91,6 @@ function toggleSpecifyMode(mode) {
 
         // ✅ 顯示條件判斷選項
         if (conditionOption) conditionOption.style.display = 'block';
-
-        if (fieldName === 'DESCRIPTION') {
-            optionsToHide.forEach(option => option.style.display = 'none');
-        } else {
-            // 顯示「條件判斷」選項
-            optionsToHide.forEach(option => option.style.display = 'block');
-        }
 
         // 設置焦點 specify-field-value (自定義填列內容-填列內容)
         setTimeout(() => {
@@ -214,11 +206,11 @@ function applyFieldData() {
     const mode = document.getElementById('specify-mode').value;
     const overwriteOption = document.getElementById('overwrite-option').value;
     
-    // 當覆蓋選項為「條件欄位」時，檢查原欄位輸入框是否有值
-    if (overwriteOption === 'matchCondition' || overwriteOption === 'notMatchCondition') {
+    // 當模式為 custom 且覆蓋選項為「條件判斷」時，檢查「條件值」是否有值
+    if (mode === 'custom' && overwriteOption === 'condition') {
         const originalField = document.getElementById('original-field-input').value.trim();
         if (originalField === '') {
-            alert('請輸入「條件：原欄位」的值');
+            alert('請輸入「條件值」');
             return; // 中止執行
         }
     }
@@ -234,12 +226,6 @@ function applyFieldData() {
         "DOC_UM", "ST_MTD", "ORG_COUNTRY", "ORG_IMP_DCL_NO", "BOND_NOTE", 
         "CERT_NO", "EXP_NO", "WIDE_UM", "LENGTH_UM"
     ];
-
-    // 讀取原欄位內容（僅在符合條件、不符合條件時使用）
-    let originalField = '';
-    if (overwriteOption === 'matchCondition' || overwriteOption === 'notMatchCondition') {
-        originalField = document.getElementById('original-field-input').value;
-    }
 
     if (mode === 'custom') {
         const itemNumbers = document.getElementById('specify-item-numbers').value.trim();
@@ -381,7 +367,7 @@ function applyFieldData() {
                             conditionPassed = true;
                     }
                 }
-                
+
                 // 判斷覆蓋條件
                 if (
                     overwriteOption === 'all' ||
@@ -467,9 +453,7 @@ function applyFieldData() {
                         if (
                             overwriteOption === 'all' ||
                             (overwriteOption === 'empty' && !targetFieldElement.value) ||
-                            (overwriteOption === 'specified' && targetFieldElement.value) ||
-                            (overwriteOption === 'matchCondition' && targetFieldElement.value.includes(originalField)) ||
-                            (overwriteOption === 'notMatchCondition' && !targetFieldElement.value.includes(originalField))
+                            (overwriteOption === 'specified' && targetFieldElement.value)
                         ) {
                             targetFieldElement.value = sourceFieldElement.value;
                         }
