@@ -122,13 +122,13 @@ async function calculateFreight() {
     const weight = parseFloat(document.getElementById('DCL_GW').value);
 
     if (!currency && !weight ) {
-        alert(`請先填入 "報單幣別" 及 "總毛重"`);
+        alert(`請先填入「報單幣別」及「總毛重」`);
         return;
     } else if (!currency) {
-        alert(`請先填入 "報單幣別"`);
+        alert(`請先填入「報單幣別」`);
         return;
     } else if (!weight) {
-        alert(`請先填入 "總毛重"`);
+        alert(`請先填入「總毛重」`);
         return;
     }
 
@@ -262,7 +262,7 @@ async function calculateAdditional() {
     const exchangeRateInput = document.getElementById("exchange-rate");
 
     if (!currency) {
-        alert(`請先填入"報單幣別"`);
+        alert(`請先填入「報單幣別」`);
         return;
     }
 
