@@ -238,11 +238,10 @@ function showIziWarningOnce(message) {
     shownIziMessages.add(message);
 
     iziToast.warning({
-        title: '注意',
+        title: '說明',
         message: message,
         timeout: 5000,
         position: 'center',
-        backgroundColor: '#ffeb3b',
         onClosed: () => {
             shownIziMessages.delete(message); // 關閉後移除，允許再次顯示
         }
