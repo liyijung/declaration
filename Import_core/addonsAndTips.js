@@ -21,12 +21,26 @@ function validateDclDocType() {
 
     const stMtdGroups = {}; // 用來儲存納稅辦法的連號分組
 
+    const validStMtdValues = new Set([
+        "31", "32", "33", "34", "35", "36", "37", "38", "39", "3A", "3B", "3E", "3F", "3K", "3L", "3M", "3R", "3V",
+        "41", "42", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5A", "5B", "5C", "5D", "5E",
+        "5F", "5G", "5H", "5J", "5K", "5L", "5M", "5N", "5P", "5Q", "5R", "5S", "5T", "5U", "5W", "5X", "5Y", "5Z",
+        "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "79",
+        "90", "91", "92", "93", "94", "95", "97", "98", "99", "9A", "9B", "9C", "9D", "9E", "9F", "9G",
+        "EF", "FB"
+    ]);
+
     const rows = document.querySelectorAll("#item-container .item-row");
     rows.forEach(item => {
         const itemNo = item.querySelector(".item-number label")?.textContent.trim();
         if (itemNo === "*") return; // 忽略 ITEM_NO 為 "*" 的項次
 
         const stMtdValue = item.querySelector(".ST_MTD")?.value.trim().toUpperCase();
+
+        if (stMtdValue && !validStMtdValues.has(stMtdValue)) {
+            validationErrors.add(`無納稅辦法「${stMtdValue}」`);
+            setError(item.querySelector(".ST_MTD"), `無此納稅辦法`);
+        }
 
         // 納稅辦法連號檢查
         if (stMtdValue) {
