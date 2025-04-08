@@ -175,13 +175,13 @@ async function calculateInsurance() {
     const totalAmount = parseFloat(document.getElementById('CAL_IP_TOT_ITEM_AMT').value);
 
     if (!currency && !totalAmount ) {
-        alert(`請先填入 "報單幣別" 及 "總金額"`);
+        alert(`請先填入「報單幣別」及「總金額」`);
         return;
     } else if (!currency) {
-        alert(`請先填入 "報單幣別"`);
+        alert(`請先填入「報單幣別」`);
         return;
     } else if (!totalAmount) {
-        alert(`請先填入 "總金額"`);
+        alert(`請先填入「總金額」`);
         return;
     }
 
