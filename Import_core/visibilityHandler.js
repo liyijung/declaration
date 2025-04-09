@@ -178,6 +178,8 @@ function initializeFieldVisibility() {
             }
         });
     }
+
+    closeToggleFieldsModal();
 }
 
 // 當頁面初始化或更新時，調用 initializeFieldVisibility 以確保同步顯示
