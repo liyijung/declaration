@@ -1180,3 +1180,15 @@ function updateCneeLabelText() {
            : "買方英文名稱";
    }
 }
+
+// 取得文件編號前7碼
+function fillTodayIfEmpty() {
+    const input = document.getElementById('FILE_NO');
+    if (!input.value.trim()) {
+        const today = new Date();
+        const rocYear = today.getFullYear() - 1911;
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        input.value = `${rocYear}${month}${day}`; // 例如 1140409
+    }
+}
