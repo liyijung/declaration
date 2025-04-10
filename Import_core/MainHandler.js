@@ -244,7 +244,7 @@ function createItemRow(data) {
             <input type="checkbox" class="ITEM_NO" tabindex="-1" ${isChecked ? 'checked' : ''}>
         </div>
         <div class="form-group fix item-number">
-            <label>${itemNumber}</label>
+            <label onclick="scrollToDescription(${itemNumber})">${itemNumber}</label>
         </div>
         ${createTextareaField('DESCRIPTION', data.DESCRIPTION.trim())}
         ${createInputField('QTY', data.QTY, true)}
@@ -305,6 +305,32 @@ function getNextItemNumber() {
     return currentItemNumber++;
 }
 
+function promptAndScroll() {
+    const input = prompt('請輸入要跳轉的項次編號：');
+    const number = parseInt(input, 10);
+    if (!isNaN(number)) {
+        scrollToDescription(number);
+    }
+}
+
+function scrollToDescription(itemNumber) {
+    const allItems = document.querySelectorAll('.item-row');
+    const targetRow = Array.from(allItems).find(row => {
+        const label = row.querySelector('.item-number label');
+        return label && label.textContent.trim() === String(itemNumber);
+    });
+
+    if (targetRow) {
+        const desc = targetRow.querySelector('textarea[name="DESCRIPTION"]');
+        if (desc) {
+            desc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            desc.focus();
+        }
+    } else {
+        alert(`找不到項次 ${itemNumber}`);
+    }
+}
+
 let textareaCounter = 0;
 let allExpanded = false; // 用於跟蹤所有文本域的展開/收合狀態
 
@@ -313,7 +339,7 @@ function createTextareaField(name, value) {
     const id = `textarea-${name}-${textareaCounter++}`;
     return `
         <div class="form-group declaration-item" style="width: 200%;">
-            <textarea id="${id}" class="${name}" rows="1" onkeydown="handleTextareaArrowKeyNavigation(event)" onfocus="highlightRow(this)" onblur="removeHighlight(this)">${value || ''}</textarea>
+            <textarea id="${id}" class="${name}" name="${name}" rows="1" onkeydown="handleTextareaArrowKeyNavigation(event)" onfocus="highlightRow(this)" onblur="removeHighlight(this)">${value || ''}</textarea>
         </div>
     `;
 }
