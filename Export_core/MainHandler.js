@@ -417,6 +417,13 @@ function scrollToDescription(itemNumber) {
     }
 }
 
+document.addEventListener('keydown', function (e) {
+    if (e.altKey && e.code === 'KeyD') {
+        e.preventDefault();
+        promptAndScroll();
+    }
+});
+
 let textareaCounter = 0;
 let allExpanded = false; // 用於跟蹤所有文本域的展開/收合狀態
 
