@@ -698,6 +698,20 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // 檢查「總毛重 / 總件數 > 70」但未勾選「一般倉」且未填報單後5碼，則中止匯出
+        const dclGwVal = parseFloat(document.getElementById('DCL_GW')?.value.trim());
+        const totCtnVal = parseFloat(document.getElementById('TOT_CTN')?.value.trim());
+        const generalWarehouseChecked = document.getElementById('general-warehouse')?.checked;
+        const docDocNoLast5Val = document.getElementById('DOC_DOC_NO_Last5')?.value || '';
+
+        if (!isNaN(dclGwVal) && !isNaN(totCtnVal) && totCtnVal > 0) {
+            const avgWeight = dclGwVal / totCtnVal;
+            if (avgWeight > 70 && (!generalWarehouseChecked || !docDocNoLast5Val.trim())) {
+                alert('單件超過70公斤，需一般倉通關，\n請勾選一般倉並填入報單號碼(後5碼)');
+                return;
+            }
+        }
+
         // 匯出XML(已完成檢查)
         const headerFields = [
             'LOT_NO', 'SHPR_BAN_ID', 'DCL_DOC_EXAM', 'SHPR_BONDED_ID', 
@@ -897,7 +911,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const fileName = document.getElementById('FILE_NO').value.trim();
         const exporterName = document.getElementById('SHPR_C_NAME').value.trim();
         const remarkElement = document.getElementById('REMARK').value.trim() || '';
-        const generalWarehouseChecked = document.getElementById('general-warehouse').checked;
 
         // 組合備註內容，"一般倉" 放最前面
         let remarks = [];
