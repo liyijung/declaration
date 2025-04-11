@@ -197,8 +197,6 @@ function updateConditionRowDisplay() {
 document.getElementById('specify-mode').addEventListener('change', updateConditionRowDisplay);
 document.getElementById('overwrite-option').addEventListener('change', updateConditionRowDisplay);
 
-
-document.getElementById('specify-field-name').addEventListener('change', toggleSpecifyMode);
 document.getElementById('specify-field-name').addEventListener('change', checkFieldDisplay);
 
 // 應用填列資料的函數
