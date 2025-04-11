@@ -231,11 +231,11 @@ function applyFieldData() {
         const fieldName = document.getElementById('specify-field-name').value;
         let fieldValue = document.getElementById('specify-field-value').value;
 
-        // 如果欄位名稱是 CCC_CODE，對填列值進行 replaceValue 處理
-        if (fieldName === 'CCC_CODE') {
-            fieldValue = replaceValue('CCC_CODE', fieldValue);
+        // 如果欄位名稱是 CCC_CODE 或 DOC_UM，對填列值進行 replaceValue 處理
+        if (['CCC_CODE', 'DOC_UM'].includes(fieldName)) {
+            fieldValue = replaceValue(fieldName, fieldValue);
         }
-        
+
         // 如果 specify-field-value 以 "=" 開頭，則複製指定欄位的值
         let copyFieldName = null;
         if (fieldValue.startsWith("=")) {
