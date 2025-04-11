@@ -306,7 +306,7 @@ function getNextItemNumber() {
 }
 
 function promptAndScroll() {
-    const input = prompt('請輸入要跳轉的項次編號：');
+    const input = prompt('請輸入要跳轉的項次：');
     const number = parseInt(input, 10);
     if (!isNaN(number)) {
         scrollToDescription(number);
