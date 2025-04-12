@@ -755,6 +755,10 @@ function startItemIntroGuide() {
                 intro: '🔗 <b>貨品歸屬稅則查詢</b><br>連結至關務署網站，可查詢貨品歸屬稅則。',
             },
             {
+                element: document.querySelector('#shortcut-help-block'),
+                intro: '⌨️ <b>快捷鍵說明</b><br>提供常用操作快捷鍵的完整列表，滑鼠移入可查看彈跳說明框，快速上手系統操作。',
+            },
+            {
                 element: document.querySelector('.item-no-header'),
                 intro: '🔆 <b>No. (編號)</b><br>點擊單一項次可反黃標示。<br>此處可切換全選／全取消。',
             },
