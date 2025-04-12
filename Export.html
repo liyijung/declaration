@@ -40,7 +40,8 @@
         <div class="header-section">
             <div class="header-group">
                 <label for="FILE_NO" onclick="fillTodayIfEmpty()">文件編號</label>
-                <input type="text" id="FILE_NO" name="FILE_NO" oninput="filterNumbers(this)">
+                <input type="text" id="FILE_NO" name="FILE_NO" oninput="filterNumbers(this)"
+                placeholder="⬅ 可點擊標題文字，自動填入前7碼，預設為當天日期">
             </div>
             <div class="header-group">
                 <label for="LOT_NO">運單號</label>
@@ -476,6 +477,9 @@ Alt + 2 指定項次">攤重</button>
                         </ul>
                     </div>
                 </div>
+                <button id="start-intro-btn" onclick="startItemIntroGuide()">
+                    🛈 功能導覽
+                </button>
             </div>
             <div class="item-row item-header">
                 <div class="form-group fix item-no item-no-header">
