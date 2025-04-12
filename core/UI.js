@@ -715,67 +715,83 @@ function startItemIntroGuide() {
     const allSteps = [
         {
             element: document.querySelector('button[onclick="openItemModal()"]'),
-            intro: '🆕 <b>新增項次</b><br>開啟新增項次視窗，可輸入新資料或從其他項次複製。<br><b>快捷鍵：</b>Alt + A'
+            intro: '🆕 <b>新增項次</b><br>開啟新增項次視窗，可輸入新資料或從其他項次複製。<br><b>快捷鍵：</b>Alt + A',
+            position: 'bottom'
         },
         {
             element: document.querySelector('button[onclick="openSpecifyFieldModalFromButton()"]'),
-            intro: '✏️ <b>指定填列欄位資料</b><br><b>從源項次複製內容：</b>可由某個項次複製多個欄位至多個指定項次。<br><b>自定義填列內容：</b>可批次指定某欄位的值，並依自訂規則與條件填入。'
+            intro: '✏️ <b>指定填列欄位資料</b><br><b>從源項次複製內容：</b>可由某個項次複製多個欄位至多個指定項次。<br><b>自定義填列內容：</b>可批次指定某欄位的值，並依自訂規則與條件填入。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('button[onclick="openAdjustOrderModal()"]'),
-            intro: '🔢 <b>調整項次順序</b><br>變更各項次在報單中的排列順序，可上下移動或重新排序。'
+            intro: '🔢 <b>調整項次順序</b><br>變更各項次在報單中的排列順序，可上下移動或重新排序。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('button[onclick="openToggleFieldsModal()"]'),
-            intro: '👁️‍🗨️ <b>顯示隱藏欄位</b><br>選擇要顯示或隱藏的欄位，讓畫面更簡潔。'
+            intro: '👁️‍🗨️ <b>顯示隱藏欄位</b><br>選擇要顯示或隱藏的欄位，讓畫面更簡潔。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('#toggle-all-btn'),
-            intro: '🔽 <b>展開全部品名</b><br>可展開所有品名輸入框，方便一次瀏覽編輯。<br><b>快捷鍵：</b>Alt + W'
+            intro: '🔽 <b>展開全部品名</b><br>可展開所有品名輸入框，方便一次瀏覽編輯。<br><b>快捷鍵：</b>Alt + W',
+            position: 'bottom'
         },
         {
             element: document.querySelector('#spread-weight-btn'),
-            intro: '⚖️ <b>攤重</b><br>可將總淨重分配到各項次，可選全部或指定項次攤分。<br><b>快捷鍵：</b><br>Alt + 1（全部）<br>Alt + 2（指定）'
+            intro: '⚖️ <b>攤重</b><br>可將總淨重分配到各項次，可選全部或指定項次攤分。<br><b>快捷鍵：</b><br>Alt + 1（全部）<br>Alt + 2（指定）',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.calc-group'),
-            intro: '🧮 <b>核算</b><br>計算所有項次數量單位、金額、重量，右側可設定金額小數位數（0~6 位）。<br><b>快捷鍵：</b>Alt + Q'
+            intro: '🧮 <b>核算</b><br>計算所有項次數量單位、金額、重量，右側可設定金額小數位數（0~6 位）。<br><b>快捷鍵：</b>Alt + Q',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.toggle-option:nth-child(1)'),
             intro: '📌 <b>固定欄位標題</b><br>勾選後可讓表頭在捲動時保持在畫面上方，方便對照資料。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.toggle-option:nth-child(2)'),
             intro: '📐 <b>固定頁面寬度</b><br>勾選後畫面展開寬度，避免欄位過多時產生擠壓。啟用後可使用快捷鍵 Alt + ←／→ 左右捲動。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.add-buttons a'),
             intro: '🔗 <b>貨品歸屬稅則查詢</b><br>連結至關務署網站，可查詢貨品歸屬稅則。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('#shortcut-help-block'),
             intro: '⌨️ <b>快捷鍵說明</b><br>提供常用操作快捷鍵的完整列表，滑鼠移入可查看彈跳說明框，快速上手系統操作。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.item-no-header'),
             intro: '🔆 <b>No. (編號)</b><br>點擊單一項次可反黃標示。<br>此處可切換全選／全取消。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.item-number'),
             intro: '🎯 <b>項次</b><br>點擊「項次」標題文字，可輸入想跳轉的項次，系統會自動捲動定位。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.ISCALC_WT'),
-            intro: '🔒 <b>鎖定淨重</b><br>點擊單一項次可選擇是否鎖定「淨重」值。<br>此處可切換全選／全取消。'
+            intro: '🔒 <b>鎖定淨重</b><br>點擊單一項次可選擇是否鎖定「淨重」值。<br>此處可切換全選／全取消。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.item-header .delete-item-btn'),
-            intro: '🗑️ <b>刪除按鈕</b><br>點擊可指定項次批次刪除，系統會自動重新編號。'
+            intro: '🗑️ <b>刪除按鈕</b><br>點擊可指定項次批次刪除，系統會自動重新編號。',
+            position: 'bottom'
         },
         {
             element: document.querySelector('.item-header'),
-            intro: '📋 <b>項次標題列</b><br>點擊標題文字可快速進入「指定填列欄位資料」的自定義模式，欄位名稱會自動帶入點擊的標題文字。'
+            intro: '📋 <b>項次標題列</b><br>點擊標題文字可快速進入「指定填列欄位資料」的自定義模式，欄位名稱會自動帶入點擊的標題文字。',
+            position: 'bottom'
         },
     ];
 
