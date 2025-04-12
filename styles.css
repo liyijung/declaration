@@ -953,3 +953,24 @@ button {
 #general-warehouse:checked + span {
     color: red;
 }
+
+#start-intro-btn {
+    background-color: #e8f0fb;
+    color: #005feec5;
+    border: 2px solid #b6d0f5;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.toggle-option,
+.calc-group {
+    display: inline-flex; /* 保持在同一排 */
+    gap: 2px;
+}
