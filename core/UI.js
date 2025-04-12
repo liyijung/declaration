@@ -728,7 +728,7 @@ function startItemIntroGuide() {
             },
             {
                 element: document.querySelector('button[onclick="openToggleFieldsModal()"]'),
-                intro: '👁️ <b>顯示隱藏欄位</b><br>選擇要顯示或隱藏的欄位，讓畫面更簡潔。'
+                intro: '👁️‍🗨️ <b>顯示隱藏欄位</b><br>選擇要顯示或隱藏的欄位，讓畫面更簡潔。'
             },
             {
                 element: document.querySelector('#toggle-all-btn'),
@@ -756,11 +756,11 @@ function startItemIntroGuide() {
             },
             {
                 element: document.querySelector('.item-no-header'),
-                intro: '📌 <b>No. (編號)</b><br>點擊單一項次可反黃標示。<br>此處可切換全選／全取消。',
+                intro: '🔆 <b>No. (編號)</b><br>點擊單一項次可反黃標示。<br>此處可切換全選／全取消。',
             },
             {
                 element: document.querySelector('.item-number'),
-                intro: '📌 <b>項次</b><br>點擊「項次」標題文字，可輸入想跳轉的項次，系統會自動捲動定位。',
+                intro: '🎯 <b>項次</b><br>點擊「項次」標題文字，可輸入想跳轉的項次，系統會自動捲動定位。',
             },
             {
                 element: document.querySelector('.ISCALC_WT'),
