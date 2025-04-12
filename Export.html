@@ -6,6 +6,10 @@
     <title>出口報單</title>
     <link rel="stylesheet" href="./styles.css">
     <link rel="icon" href="favicon_A.ico" type="image/x-icon">
+    <!-- Intro.js 樣式 -->
+    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+    <!-- Intro.js 腳本 -->
+    <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
 </head>
 <body>
     <!--固定在頁面頂部-->
@@ -431,17 +435,23 @@ Alt + 2 指定項次">攤重</button>
                     <!-- 透明遮罩 -->
                     <div id="drag-overlay"></div>
 
-                    <button id="calculate-amounts-btn" style="color: #005feec5;" onclick="calculate()" title="快捷鍵 Alt + Q">核算</button>
-                    <input type="number" id="decimal-places" placeholder="金額小數位" min="0" max="6" style="width: 60px; font-size: 12px;">
-                    <input type="text" id="calculation-status" placeholder="核算狀態" style="display: none;">
+                    <div class="calc-group">
+                        <button id="calculate-amounts-btn" style="color: #005feec5;" onclick="calculate()" title="快捷鍵 Alt + Q">核算</button>
+                        <input type="number" id="decimal-places" placeholder="金額小數位" min="0" max="6" style="width: 60px; height: 20px; margin-left: 4px; margin-top: 4px; font-size: 12px;">
+                        <input type="text" id="calculation-status" placeholder="核算狀態" style="display: none;">
+                    </div>
                 </div>
             </div>
             <div class="container">
                 <div class="add-buttons">
-                    <input type="checkbox" id="toggle-fix-top" onclick="toggleFixTop()">
-                    <label for="toggle-fix-top">固定欄位標題</label>
-                    <input type="checkbox" id="toggle-width" onclick="toggleWidth()">
-                    <label for="toggle-width">固定頁面寬度</label>
+                    <div class="toggle-option">
+                        <input type="checkbox" id="toggle-fix-top" onclick="toggleFixTop()">
+                        <label for="toggle-fix-top">固定欄位標題</label>
+                    </div>
+                    <div class="toggle-option">
+                        <input type="checkbox" id="toggle-width" onclick="toggleWidth()">
+                        <label for="toggle-width">固定頁面寬度</label>
+                    </div>
                     <a href="https://hscode.customs.gov.tw" target="_blank" rel="noopener noreferrer" 
                         style="margin-left: auto; padding-left: 10px; color: #005feec5;" tabindex="-1">
                         貨品歸屬稅則查詢
