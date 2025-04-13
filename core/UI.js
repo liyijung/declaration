@@ -762,6 +762,11 @@ function startItemIntroGuide() {
             position: 'bottom'
         },
         {
+            element: document.querySelector('.add-buttons a[href$="dataSplitter.html"]'),
+            intro: '🧮 <b>資料分欄</b><br>可將資料分割欄位，分為簡易分割方式及進階條件，方便整理與轉貼。',
+            position: 'bottom'
+        },
+        {
             element: document.querySelector('#shortcut-help-block'),
             intro: '⌨️ <b>快捷鍵說明</b><br>提供常用操作快捷鍵的完整列表，滑鼠移入可查看彈跳說明框，快速上手系統操作。',
             position: 'bottom'
