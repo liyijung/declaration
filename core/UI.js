@@ -95,16 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // 滾動到頂部
 function scrollToTop() {
     window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+        top: 0
     });
 }
 
 // 滾動到底部
 function scrollToBottom() {
     window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth'
+        top: document.body.scrollHeight
     });
 }
 
