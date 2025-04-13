@@ -763,7 +763,7 @@ function startItemIntroGuide() {
         },
         {
             element: document.querySelector('.add-buttons a[href$="dataSplitter.html"]'),
-            intro: '🧮 <b>資料分欄</b><br>可將資料分割欄位，分為簡易分割方式及進階條件，方便整理與轉貼。',
+                intro: '🧮 <b>資料分欄</b><br>可將貼上的資料依照指定規則分隔為多欄，支援簡易分隔（如空白或 Tab）與進階條件（如正則過濾、關鍵字篩選），方便整理與轉貼。',
             position: 'bottom'
         },
         {
