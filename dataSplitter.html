@@ -60,8 +60,9 @@
     <div style="margin-bottom: 25px;">
         <p>
             簡易分隔方式：
-            <label><input type="radio" name="delimiter" value="tab" checked> Tab</label>
-            <label><input type="radio" name="delimiter" value="space"> 空格（合併連續空格）</label>
+            <label><input type="radio" name="delimiter" value="tab" checked>Tab (或4空格)</label>
+            <label><input type="radio" name="delimiter" value="space">空格 (合併連續空格)</label>
+            <label><input type="radio" name="delimiter" value="none">不分隔 (使用進階條件)</label>
         </p>
 
         <button onclick="splitToTable()">🔍 剖析並分欄</button>
@@ -95,7 +96,8 @@
                 </select>
                 關鍵字處理：<select class="keywordAction" style="width: 96px;">
                     <option value=""></option>
-                    <option value="merge">資料合併</option>
+                    <option value="mergeAfter">與後欄合併</option>
+                    <option value="mergeBefore">與前欄合併</option>
                     <option value="keep">獨立一欄</option>
                 </select>
                 <button onclick="splitMatched(this)">✂️ 分割</button>
@@ -115,17 +117,17 @@
         
         //  剖析使用者貼上的資料，根據選擇的分隔方式（Tab 或空格）分欄
         function splitToTable() {
-            const raw = document.getElementById("pasteInput").value.trim();
+            const raw = document.getElementById("pasteInput").value;
             const delimiter = document.querySelector('input[name="delimiter"]:checked').value;
             const lines = raw.split(/\r?\n/); // 保留每一行原始空白
 
             currentData = lines.map(line => {
                 if (delimiter === 'tab') {
-                    // ✅ 將每一行中的「四個空白」先轉為 tab 字元（或直接當作分隔符）
-                    return line.split(/\t| {4}/); // tab 或 4 個空白都視為分隔符
+                    return line.split(/\t| {4}/); // Tab 或 4 空白分隔
+                } else if (delimiter === 'space') {
+                    return line.trim().split(/\s+/); // 合併空白分隔
                 } else {
-                    // ✅ 空格模式下，合併所有連續空白
-                    return line.trim().split(/\s+/);
+                    return [line]; // 不分隔：整行視為一欄
                 }
             });
 
@@ -249,13 +251,27 @@
                                 }
                                 if (lastIndex < val.length) parts.push(val.substring(lastIndex));
                                 newRow.push(...parts.filter(p => p.length > 0));
-                            } else if (keywordAction === 'merge') {
-                                // 保留關鍵字並合併後段
+                            } else if (keywordAction === 'mergeAfter') {
+                                // 保留關鍵字並合併後段（與後欄合併）
                                 let mergedParts = [], lastIndex = 0, match;
                                 while ((match = regex.exec(val)) !== null) {
                                     if (match.index > lastIndex) mergedParts.push(val.substring(lastIndex, match.index));
                                     let rest = val.substring(match.index);
                                     mergedParts.push(rest);
+                                    lastIndex = val.length;
+                                    break;
+                                }
+                                if (lastIndex < val.length) mergedParts.push(val.substring(lastIndex));
+                                newRow.push(...mergedParts.filter(p => p.length > 0));
+                            } else if (keywordAction === 'mergeBefore') {
+                                // 保留關鍵字並合併前段（與前欄合併）
+                                let mergedParts = [], lastIndex = 0, match;
+                                while ((match = regex.exec(val)) !== null) {
+                                    let front = val.substring(0, match.index + match[0].length);
+                                    mergedParts.push(front);
+                                    if (match.index + match[0].length < val.length) {
+                                        mergedParts.push(val.substring(match.index + match[0].length));
+                                    }
                                     lastIndex = val.length;
                                     break;
                                 }
