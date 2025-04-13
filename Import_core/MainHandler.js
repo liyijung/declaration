@@ -685,12 +685,68 @@ document.addEventListener("keydown", function(event) {
     }
 });
 
+const copy2 = document.getElementById('copy_2');
+const abcCheckboxes = ['copy_2a', 'copy_2b', 'copy_2c'].map(id => document.getElementById(id));
+const copy2a = document.getElementById('copy_2a'); // A式
+
+// 初始化：ABC disabled
+function updateABCState() {
+    const enabled = copy2.checked;
+    abcCheckboxes.forEach(cb => {
+        cb.disabled = !enabled;
+        if (!enabled) cb.checked = false;
+    });
+
+    // ✅ 如果有啟用但三個都沒勾選，預設選 A式
+    if (enabled && !abcCheckboxes.some(cb => cb.checked)) {
+        copy2a.checked = true;
+    }
+}
+
+// A/B/C 擇一（以最後勾選為準）
+abcCheckboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+        if (cb.checked) {
+            abcCheckboxes.forEach(other => {
+                if (other !== cb) other.checked = false;
+            });
+        }
+    });
+});
+
+// 第三聯 / E化退稅 互斥邏輯
+const thirdGroup = [document.getElementById('copy_3'), document.getElementById('copy_3e')];
+thirdGroup.forEach(cb => {
+    cb.addEventListener('change', () => {
+        if (cb.checked) {
+            thirdGroup.forEach(other => {
+                if (other !== cb) other.checked = false;
+            });
+        }
+    });
+});
+
+// 綁定勾選變化
+copy2.addEventListener('change', updateABCState);
+
+// 頁面載入時初始化一次
+window.addEventListener('DOMContentLoaded', updateABCState);
+
 // 更新DOC_OTR_DESC的值，勾選時加入描述，取消勾選時移除描述
+function escapeRegExpWithNewline(str) {
+    return str
+        .replace(/\n/g, '\\n') // 用正則表達式匹配換行符號
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // 處理特殊符號
+}
+
 function updateDocOtrDesc() {
     let copyDescMap = {
-        'copy_2': '申請報單副本第二聯（進口證明用聯）',
-        'copy_3': '申請報單副本第三聯（沖退原料稅用聯）\n附外銷品使用原料及其供應商資料清表',
-        'copy_5': '申請報單副本第五聯（其他聯）'
+        'copy_2a': '申請進口A式證明用聯',
+        'copy_2b': '申請進口B式證明用聯',
+        'copy_2c': '申請進口C式證明用聯',
+        'copy_3': '申請沖退原料稅用聯',
+        'copy_3e': '申請沖退原料稅(E化退稅)',
+        'copy_5': '申請其他聯'
     };
 
     const docOtrDescElement = document.getElementById('DOC_OTR_DESC');
@@ -698,7 +754,7 @@ function updateDocOtrDesc() {
 
     // 先移除所有與申請相關的描述
     for (let key in copyDescMap) {
-        const regex = new RegExp(copyDescMap[key].replace(/\n/g, '\\n'), 'g'); // 用正則表達式匹配換行符號
+        const regex = new RegExp(escapeRegExpWithNewline(copyDescMap[key]), 'g');
         currentDesc = currentDesc.replace(regex, '').trim();  // 移除相關的描述並修整空白
     }
 
@@ -723,14 +779,23 @@ function updateDocOtrDesc() {
 // 更新REMARK1的值
 function updateRemark1() {
     let additionalDesc = '';
-    if (document.getElementById('copy_2').checked) {
-        additionalDesc += (additionalDesc ? '\n' : '') + '申請報單副本第二聯（進口證明用聯）';
+    if (document.getElementById('copy_2a').checked) {
+        additionalDesc += (additionalDesc ? '\n' : '') + '申請進口A式證明用聯';
+    }
+    if (document.getElementById('copy_2b').checked) {
+        additionalDesc += (additionalDesc ? '\n' : '') + '申請進口B式證明用聯';
+    }
+    if (document.getElementById('copy_2c').checked) {
+        additionalDesc += (additionalDesc ? '\n' : '') + '申請進口C式證明用聯';
     }
     if (document.getElementById('copy_3').checked) {
-        additionalDesc += (additionalDesc ? '\n' : '') + '申請報單副本第三聯（沖退原料稅用聯）';
+        additionalDesc += (additionalDesc ? '\n' : '') + '申請沖退原料稅用聯';
+    }
+    if (document.getElementById('copy_3e').checked) {
+        additionalDesc += (additionalDesc ? '\n' : '') + '申請沖退原料稅(E化退稅)';
     }
     if (document.getElementById('copy_5').checked) {
-        additionalDesc += (additionalDesc ? '\n' : '') + '申請報單副本第五聯（其他聯）';
+        additionalDesc += (additionalDesc ? '\n' : '') + '申請其他聯';
     }
 
     const remark1Element = document.getElementById('REMARK1');
@@ -743,9 +808,25 @@ function updateRemark1FromImport() {
     const remark1Element = document.getElementById('REMARK1');
     const remark1Value = remark1Element.value;
 
-    document.getElementById('copy_2').checked = remark1Value.includes('申請報單副本第二聯（進口證明用聯）');
-    document.getElementById('copy_3').checked = remark1Value.includes('申請報單副本第三聯（沖退原料稅用聯）');
-    document.getElementById('copy_5').checked = remark1Value.includes('申請報單副本第五聯（其他聯）');
+    const copy2aChecked = remark1Value.includes('申請進口A式證明用聯');
+    const copy2bChecked = remark1Value.includes('申請進口B式證明用聯');
+    const copy2cChecked = remark1Value.includes('申請進口C式證明用聯');
+
+    document.getElementById('copy_2a').checked = copy2aChecked;
+    document.getElementById('copy_2b').checked = copy2bChecked;
+    document.getElementById('copy_2c').checked = copy2cChecked;
+    document.getElementById('copy_3').checked = remark1Value.includes('申請沖退原料稅用聯');
+    document.getElementById('copy_3e').checked = remark1Value.includes('申請沖退原料稅(E化退稅)');
+    document.getElementById('copy_5').checked = remark1Value.includes('申請其他聯');
+
+    // ✅ 若 A/B/C 任一被勾選，copy_2 也要勾選
+    const hasABC = copy2aChecked || copy2bChecked || copy2cChecked;
+    document.getElementById('copy_2').checked = hasABC;
+
+    // ✅ 更新ABC狀態（啟用或停用）
+    if (typeof updateABCState === 'function') {
+        updateABCState();
+    }
 
     updateRemark1(); // 確保REMARK1欄位值與checkbox狀態同步
 }
@@ -860,8 +941,11 @@ function clearExistingData() {
     }
 
     // 清空申請報單副本欄位
-    document.getElementById('copy_2').checked = false;
+    document.getElementById('copy_2a').checked = false;
+    document.getElementById('copy_2b').checked = false;
+    document.getElementById('copy_2c').checked = false;
     document.getElementById('copy_3').checked = false;
+    document.getElementById('copy_3e').checked = false;
     document.getElementById('copy_5').checked = false;
 }
 
