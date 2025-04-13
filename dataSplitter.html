@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <link rel="icon" href="favicon_A.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <title>資料分欄</title>
+    <style>
+        body {
+            font-size: 16px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .rule-block {
+            border: 1px dashed #aaa;
+            padding: 10px;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"] {
+            font-size: 16px;
+        }
+        select {
+            height: 23px; /* 統一高度 */
+        }        
+    </style>
+</head>
+
+<body>
+    <h3>📋 請貼上資料：</h3>
+    <textarea id="pasteInput" placeholder="請貼上資料，例如來自PDF、TXT..."></textarea>
+
+    <div style="margin-bottom: 25px;">
+        <p>
+            簡易分隔方式：
+            <label><input type="radio" name="delimiter" value="tab" checked> Tab</label>
+            <label><input type="radio" name="delimiter" value="space"> 空格（合併連續空格）</label>
+        </p>
+
+        <button onclick="splitToTable()">🔍 剖析並分欄</button>
+        <button onclick="clearAll()">🧹 清除</button>
+    </div>
+
+    <div id="regexRules" style="background-color: #cee1fd;">
+        <div class="rule-block">
+            <p>
+                正則條件：<select class="conditionType" style="width: 96px;">
+                    <option value="matches">符合</option>
+                    <option value="notMatches">不符合</option>
+                </select>                
+                <select class="regexTemplate" style="width: 92px;"
+                        onchange="this.parentElement.querySelector('.conditionValue').value = this.value">
+                    <option value="^\s*\d+\s">數字開頭</option>
+                    <option value="^[0-9]">數字</option>
+                    <option value="">關鍵字</option>
+                </select>
+                <input type="text" class="conditionValue" value="^\s*\d+\s">
+            </p>
+            <p>
+                限定欄位：<input type="number" class="columnScope" min="1" style="width: 89px;">
+                　移至欄位：<input type="number" class="targetColumn" min="1" value="2" style="width: 89px;">
+                <button onclick="moveMatched(this)">🔄 移動</button>
+            </p>
+            <p>
+                分割方式：<select class="splitMode" style="width: 96px;">
+                    <option value="space">空格</option>
+                    <option value="regex">關鍵字</option>
+                </select>
+                關鍵字處理：<select class="keywordAction" style="width: 96px;">
+                    <option value=""></option>
+                    <option value="merge">資料合併</option>
+                    <option value="keep">獨立一欄</option>
+                </select>
+                <button onclick="splitMatched(this)">✂️ 分割</button>
+            </p>
+        </div>
+    </div>
+
+    <h3>🧾 分欄結果：
+        <button onclick="copyResult()" style="margin-left: 50px;">📋 複製結果</button>
+    </h3>
+    <div id="tableOutput"></div>
+
+    <script>
+        // 儲存目前分欄後的資料內容
+        let currentData = [];
+
+        
+        //  剖析使用者貼上的資料，根據選擇的分隔方式（Tab 或空格）分欄
+        function splitToTable() {
+            const raw = document.getElementById("pasteInput").value.trim();
+            const delimiter = document.querySelector('input[name="delimiter"]:checked').value;
+            const lines = raw.split(/\r?\n/); // 保留每一行原始空白
+
+            currentData = lines.map(line => {
+                if (delimiter === 'tab') {
+                    // ✅ 將每一行中的「四個空白」先轉為 tab 字元（或直接當作分隔符）
+                    return line.split(/\t| {4}/); // tab 或 4 個空白都視為分隔符
+                } else {
+                    // ✅ 空格模式下，合併所有連續空白
+                    return line.trim().split(/\s+/);
+                }
+            });
+
+            renderTable(currentData);
+        }
+
+        // 將資料渲染成 HTML 表格
+        function renderTable(rows) {
+            const maxCols = Math.max(...rows.map(r => r.length)); // 取得最多欄位數
+            let html = '<table><thead><tr>';
+            for (let i = 0; i < maxCols; i++) html += `<th>欄位${i + 1}</th>`; // 表頭
+            html += '</tr></thead><tbody>';
+            rows.forEach((r, idx) => {
+                html += `<tr id="row-${idx}">`;
+                for (let i = 0; i < maxCols; i++)
+                    html += `<td class="cell-${idx} cell-${idx}-${i}">${r[i] || ''}</td>`; // 每格資料
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById("tableOutput").innerHTML = html;
+        }
+
+        // 清除所有資料與表格
+        function clearAll() {
+            document.getElementById("pasteInput").value = '';
+            document.getElementById("tableOutput").innerHTML = '';
+            currentData = [];
+        }
+
+        // 將結果表格複製為文字（Tab 分隔格式）
+        function copyResult() {
+            const table = document.querySelector('#tableOutput table');
+            if (!table) return;
+            let text = '';
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let rowText = [];
+                for (let i = 0; i < cells.length; i++) rowText.push(cells[i].innerText);
+                text += rowText.join('\t') + '\n'; // 每列以 tab 分隔
+            });
+            navigator.clipboard.writeText(text.trim()).then(() => alert("已複製！"));
+        }
+
+        // 將符合正則條件的欄位移動到指定位置
+        function moveMatched(btn) {
+            const block = btn.closest('.rule-block');
+            const pattern = block.querySelector('.conditionValue').value.trim(); // 正則條件
+            const type = block.querySelector('.conditionType').value; // 符合 / 不符合
+            const colScope = block.querySelector('.columnScope').value; // 限定欄位
+            const target = parseInt(block.querySelector('.targetColumn').value) - 1; // 目標欄位 index
+            if (!pattern || isNaN(target)) return;
+            const regex = new RegExp(pattern);
+
+            currentData = currentData.map(row => {
+                let matchIndex = -1;
+                const scopeStart = colScope ? parseInt(colScope) - 1 : 0;
+                const scopeEnd = colScope ? scopeStart + 1 : row.length;
+                // 找出符合條件的欄位
+                for (let i = scopeStart; i < scopeEnd; i++) {
+                    const val = row[i] ? row[i].trim() : '';
+                    const matched = type === 'matches' ? regex.test(val) : !regex.test(val);
+                    if (matched) {
+                        matchIndex = i;
+                        break;
+                    }
+                }
+                // 若有符合條件欄位，則移動到目標欄位
+                if (matchIndex !== -1 && matchIndex !== target) {
+                    const value = row.splice(matchIndex, 1)[0]; // 移除原欄位
+                    while (row.length < target) row.push('');   // 補足欄位長度
+                    row.splice(target, 0, value);               // 插入至指定欄位
+                }
+                return row;
+            });
+            renderTable(currentData);
+        }
+
+        // 對符合條件的資料進行分割處理
+        function splitMatched(btn) {
+            const block = btn.closest('.rule-block');
+            const pattern = block.querySelector('.conditionValue').value;
+            const type = block.querySelector('.conditionType').value;
+            const splitMode = block.querySelector('.splitMode').value;
+            const keywordAction = block.querySelector('.keywordAction').value;
+            const colScope = block.querySelector('.columnScope').value;
+            if (!pattern && splitMode === 'regex') return;
+
+            const regex = new RegExp(pattern || '', 'g');
+
+            currentData = currentData.map(row => {
+                let newRow = [];
+                row.forEach((val, idx) => {
+                    const inScope = !colScope || parseInt(colScope) - 1 === idx;
+                    val = val ? val.trim() : '';
+
+                    // 如果不在指定欄位範圍內，直接保留
+                    if (!inScope) return newRow.push(val);
+
+                    const isMatch = type === 'matches' ? regex.test(val) : !regex.test(val);
+                    regex.lastIndex = 0;
+
+                    // 符合條件就進行分割
+                    if (isMatch) {
+                        if (splitMode === 'space') {
+                            // 以空白分割
+                            newRow.push(...val.split(/\s+/));
+                        } else if (splitMode === 'tab') {
+                            // 以 Tab 分割
+                            newRow.push(...val.split('\t'));
+                        } else if (splitMode === 'regex') {
+                            // 根據關鍵字處理方式進行分割
+                            if (keywordAction === 'keep') {
+                                // 保留關鍵字並分段
+                                let parts = [], lastIndex = 0, match;
+                                while ((match = regex.exec(val)) !== null) {
+                                    if (match.index > lastIndex) parts.push(val.substring(lastIndex, match.index));
+                                    parts.push(match[0]); // 保留關鍵字
+                                    lastIndex = regex.lastIndex;
+                                    if (match.index === regex.lastIndex) regex.lastIndex++;
+                                }
+                                if (lastIndex < val.length) parts.push(val.substring(lastIndex));
+                                newRow.push(...parts.filter(p => p.length > 0));
+                            } else if (keywordAction === 'merge') {
+                                // 保留關鍵字並合併後段
+                                let mergedParts = [], lastIndex = 0, match;
+                                while ((match = regex.exec(val)) !== null) {
+                                    if (match.index > lastIndex) mergedParts.push(val.substring(lastIndex, match.index));
+                                    let rest = val.substring(match.index);
+                                    mergedParts.push(rest);
+                                    lastIndex = val.length;
+                                    break;
+                                }
+                                if (lastIndex < val.length) mergedParts.push(val.substring(lastIndex));
+                                newRow.push(...mergedParts.filter(p => p.length > 0));
+                            }
+                        }
+                    } else {
+                        newRow.push(val); // 不符合條件則保留原值
+                    }
+                });
+                return newRow;
+            });
+
+            renderTable(currentData); // 重新渲染表格
+        }
+
+        // 分割方式與關鍵字處理的互動邏輯
+        document.querySelectorAll('.rule-block').forEach(block => {
+            const splitModeSelect = block.querySelector('.splitMode');
+            const keywordActionSelect = block.querySelector('.keywordAction');
+
+            // 分割方式改變
+            splitModeSelect.addEventListener('change', function () {
+                if (this.value === 'space') {
+                    keywordActionSelect.selectedIndex = 0; // 清空關鍵字處理
+                } else if (this.value === 'regex' && !keywordActionSelect.value) {
+                    keywordActionSelect.value = 'merge'; // 預設保留關鍵字(合併)
+                }
+            });
+
+            // 關鍵字處理改變
+            keywordActionSelect.addEventListener('change', function () {
+                if (!this.value) {
+                    splitModeSelect.value = 'space'; // 清空時自動設為空格
+                } else {
+                    splitModeSelect.value = 'regex'; // 有選擇則強制設為關鍵字
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                window.location.href = "https://liyijung.github.io/declaration/";
+            } else {
+                console.log("✅ 已登入，允許使用");
+            }
+        });
+    </script>
+
+</body>
+
+</html>
