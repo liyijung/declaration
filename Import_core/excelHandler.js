@@ -336,19 +336,35 @@ function removeThousandsSeparator(value) {
 // 根據REMARKS欄位的值來勾選對應選項
 function checkRemarkOptions(remarks) {
     const options = {
-        '申請報單副本第二聯（進口證明用聯）': 'copy_2',
-        '申請報單副本第三聯（沖退原料稅用聯）': 'copy_3',
-        '申請報單副本第五聯（其他聯）': 'copy_5'
+        '申請進口A式證明用聯': 'copy_2a',
+        '申請進口B式證明用聯': 'copy_2b',
+        '申請進口C式證明用聯': 'copy_2c',
+        '申請沖退原料稅用聯': 'copy_3',
+        '申請沖退原料稅(E化退稅)': 'copy_3e',
+        '申請其他聯': 'copy_5'
     };
+
+    let hasABC = false;
 
     Object.keys(options).forEach(key => {
         const checkbox = document.getElementById(options[key]);
-        if (remarks.includes(key)) {
-            checkbox.checked = true;
-        } else {
-            checkbox.checked = false;
+        const isChecked = remarks.includes(key);
+        checkbox.checked = isChecked;
+
+        // 若是 A/B/C 任一有出現
+        if (['copy_2a', 'copy_2b', 'copy_2c'].includes(options[key]) && isChecked) {
+            hasABC = true;
         }
     });
+
+    // 如果有 A/B/C 任一，勾選 copy_2
+    const copy2 = document.getElementById('copy_2');
+    copy2.checked = hasABC;
+
+    // 確保 copy_2 勾選後觸發 checkbox 狀態更新（例如啟用ABC）
+    if (typeof updateABCState === 'function') {
+        updateABCState();
+    }
 }
 
 // 匯出Excel的功能
