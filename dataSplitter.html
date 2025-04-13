@@ -90,7 +90,7 @@
                 <button onclick="moveMatched(this)">🔄 移動</button>
             </p>
             <p>
-                分割方式：<select class="splitMode" style="width: 96px;">
+                分隔方式：<select class="splitMode" style="width: 96px;">
                     <option value="space">空格</option>
                     <option value="regex">關鍵字</option>
                 </select>
@@ -100,7 +100,7 @@
                     <option value="mergeBefore">與前欄合併</option>
                     <option value="keep">獨立一欄</option>
                 </select>
-                <button onclick="splitMatched(this)">✂️ 分割</button>
+                <button onclick="splitMatched(this)">✂️ 分隔</button>
             </p>
         </div>
     </div>
@@ -206,7 +206,7 @@
             renderTable(currentData);
         }
 
-        // 對符合條件的資料進行分割處理
+        // 對符合條件的資料進行分隔處理
         function splitMatched(btn) {
             const block = btn.closest('.rule-block');
             const pattern = block.querySelector('.conditionValue').value;
@@ -230,16 +230,16 @@
                     const isMatch = type === 'matches' ? regex.test(val) : !regex.test(val);
                     regex.lastIndex = 0;
 
-                    // 符合條件就進行分割
+                    // 符合條件就進行分隔
                     if (isMatch) {
                         if (splitMode === 'space') {
-                            // 以空白分割
+                            // 以空白分隔
                             newRow.push(...val.split(/\s+/));
                         } else if (splitMode === 'tab') {
-                            // 以 Tab 分割
+                            // 以 Tab 分隔
                             newRow.push(...val.split('\t'));
                         } else if (splitMode === 'regex') {
-                            // 根據關鍵字處理方式進行分割
+                            // 根據關鍵字處理方式進行分隔
                             if (keywordAction === 'keep') {
                                 // 保留關鍵字並分段
                                 let parts = [], lastIndex = 0, match;
@@ -289,12 +289,12 @@
             renderTable(currentData); // 重新渲染表格
         }
 
-        // 分割方式與關鍵字處理的互動邏輯
+        // 分隔方式與關鍵字處理的互動邏輯
         document.querySelectorAll('.rule-block').forEach(block => {
             const splitModeSelect = block.querySelector('.splitMode');
             const keywordActionSelect = block.querySelector('.keywordAction');
 
-            // 分割方式改變
+            // 分隔方式改變
             splitModeSelect.addEventListener('change', function () {
                 if (this.value === 'space') {
                     keywordActionSelect.selectedIndex = 0; // 清空關鍵字處理
