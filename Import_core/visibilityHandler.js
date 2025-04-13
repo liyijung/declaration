@@ -153,7 +153,7 @@ function initializeFieldVisibility() {
         document.querySelectorAll(`.item-header .${field}, #item-container .${field}`).forEach(fieldElement => {
             const formGroup = fieldElement.closest('.form-group');
             if (formGroup) {
-                if (shouldShowSizeFields) {
+                if (selectedOptions.includes(field) || shouldShowSizeFields) {
                     formGroup.classList.remove('hidden');
                 } else {
                     formGroup.classList.add('hidden');
