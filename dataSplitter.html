@@ -80,6 +80,7 @@
                         onchange="this.parentElement.querySelector('.conditionValue').value = this.value">
                     <option value="">關鍵字</option>
                     <option value="^\s*\d+\s">數字開頭</option>
+                    <option value="\s\d+(,\d+)*(.\d+)?$">數字結尾</option>
                     <option value="^[0-9]">數字</option>
                 </select>
                 <input type="text" class="conditionValue">
