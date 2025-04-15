@@ -293,7 +293,8 @@
             const colScope = block.querySelector('.columnScope').value;
             if (!pattern && splitMode === 'regex') return;
 
-            const regex = new RegExp(pattern || '', 'g');
+            const testRegex = new RegExp(pattern);           // 不加 'g'：專門給 test() 用
+            const execRegexGlobal = () => new RegExp(pattern, 'g'); // 用 function 每筆建立新的
 
             currentData = currentData.map(row => {
                 let newRow = [];
@@ -304,8 +305,7 @@
                     // 如果不在指定欄位範圍內，直接保留
                     if (!inScope) return newRow.push(val);
 
-                    const isMatch = type === 'matches' ? regex.test(val) : !regex.test(val);
-                    regex.lastIndex = 0;
+                    const isMatch = type === 'matches' ? testRegex.test(val) : !testRegex.test(val);
 
                     // 符合條件就進行分隔
                     if (isMatch) {
@@ -320,40 +320,39 @@
                             if (keywordAction === 'keep') {
                                 // 保留關鍵字並分段
                                 let parts = [], lastIndex = 0, match;
+                                const regex = execRegexGlobal(); // 每筆都用新的 regex
                                 while ((match = regex.exec(val)) !== null) {
                                     if (match.index > lastIndex) parts.push(val.substring(lastIndex, match.index));
                                     parts.push(match[0]); // 保留關鍵字
                                     lastIndex = regex.lastIndex;
-                                    if (match.index === regex.lastIndex) regex.lastIndex++;
                                 }
                                 if (lastIndex < val.length) parts.push(val.substring(lastIndex));
                                 newRow.push(...parts.filter(p => p.length > 0));
                             } else if (keywordAction === 'mergeAfter') {
                                 // 保留關鍵字並合併後段（與後欄合併）
-                                let mergedParts = [], lastIndex = 0, match;
+                                let merged = [], lastIndex = 0, match;
+                                const regex = execRegexGlobal(); // 每筆都用新的 regex
                                 while ((match = regex.exec(val)) !== null) {
-                                    if (match.index > lastIndex) mergedParts.push(val.substring(lastIndex, match.index));
-                                    let rest = val.substring(match.index);
-                                    mergedParts.push(rest);
+                                    if (match.index > lastIndex) merged.push(val.substring(lastIndex, match.index));
+                                    merged.push(val.substring(match.index)); // 含關鍵字後段
                                     lastIndex = val.length;
                                     break;
                                 }
-                                if (lastIndex < val.length) mergedParts.push(val.substring(lastIndex));
-                                newRow.push(...mergedParts.filter(p => p.length > 0));
+                                if (lastIndex < val.length) merged.push(val.substring(lastIndex));
+                                newRow.push(...merged.filter(p => p.length > 0));
                             } else if (keywordAction === 'mergeBefore') {
                                 // 保留關鍵字並合併前段（與前欄合併）
-                                let mergedParts = [], lastIndex = 0, match;
+                                let merged = [], match;
+                                const regex = execRegexGlobal(); // 每筆都用新的 regex
                                 while ((match = regex.exec(val)) !== null) {
                                     let front = val.substring(0, match.index + match[0].length);
-                                    mergedParts.push(front);
+                                    merged.push(front);
                                     if (match.index + match[0].length < val.length) {
-                                        mergedParts.push(val.substring(match.index + match[0].length));
+                                        merged.push(val.substring(match.index + match[0].length));
                                     }
-                                    lastIndex = val.length;
                                     break;
                                 }
-                                if (lastIndex < val.length) mergedParts.push(val.substring(lastIndex));
-                                newRow.push(...mergedParts.filter(p => p.length > 0));
+                                newRow.push(...merged.filter(p => p.length > 0));
                             }
                         }
                     } else {
