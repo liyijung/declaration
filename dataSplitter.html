@@ -170,9 +170,8 @@
                 <select class="regexTemplate" style="width: 92px;"
                         onchange="this.parentElement.querySelector('.conditionValue').value = this.value">
                     <option value="">關鍵字</option>
-                    <option value="^\s*\d+\s">數字開頭</option>
+                    <option value="^\s*\d+(,\d+)?(\.\d+)?">數字開頭</option>
                     <option value="\d+(,\d+)?(\.\d+)?\s*$">數字結尾</option>
-                    <option value="^[0-9]">數字</option>
                     <option value="\d{4}\.\d{2}\.\d{2}\.\d{2}-\d">稅則</option>
                 </select>
                 <input type="text" class="conditionValue">
