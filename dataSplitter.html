@@ -49,7 +49,38 @@
         }
         select {
             height: 23px; /* 統一高度 */
-        }        
+        }
+        .regex-help-block {
+            position: relative;
+            cursor: pointer;
+            display: inline-block; 
+            margin-left: 5px; 
+            vertical-align: top;
+        }
+
+        .regex-help-modal {
+            display: none;
+            position: absolute;
+            top: -20px;
+            left: 100%;
+            margin-left: 12px;
+            z-index: 10;
+            background-color: #f9f9f9;
+            background-clip: padding-box;
+            border: 1px solid #ccc;
+            padding: 12px;
+            width: 360px;
+            font-size: 13px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .regex-help-modal table th,
+        .regex-help-modal table td {
+            padding: 4px;
+            font-size: 13px;
+            vertical-align: top;
+            word-break: break-word;
+        }
     </style>
 </head>
 
@@ -72,6 +103,45 @@
         <a href="dataSplitter.mp4" target="_blank" style="text-decoration: none;">
             <button style="margin-left: 50px;">🎬 進階條件示範影片</button>
         </a>
+
+        <!-- 正則表示式對照表按鈕與內容 -->
+        <div id="regex-help-block" class="regex-help-block" style="display: inline-block; vertical-align: top;">
+            <span id="regex-toggle-btn" style="cursor: pointer;">📘 正則表示式對照</span>
+            <div id="regex-help-modal" class="regex-help-modal">
+                <h3 style="font-size: 15px; margin-top: 0;">常用正則表示式對照表</h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr>
+                            <th style="border-bottom: 1px solid #ccc;">表示式</th>
+                            <th style="border-bottom: 1px solid #ccc;">說明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>.</code></td><td>任意單一字元（不含換行）</td></tr>
+                        <tr><td><code>\d</code></td><td>數字（0-9）</td></tr>
+                        <tr><td><code>\D</code></td><td>非數字</td></tr>
+                        <tr><td><code>\w</code></td><td>英文字母、數字或底線</td></tr>
+                        <tr><td><code>\W</code></td><td>非英數字與底線</td></tr>
+                        <tr><td><code>\s</code></td><td>空白字元（空格、Tab、換行）</td></tr>
+                        <tr><td><code>^</code></td><td>字串起始位置</td></tr>
+                        <tr><td><code>$</code></td><td>字串結尾位置</td></tr>
+                        <tr><td><code>*</code></td><td>前一字元出現 0 次或多次</td></tr>
+                        <tr><td><code>+</code></td><td>前一字元出現 1 次或多次</td></tr>
+                        <tr><td><code>?</code></td><td>前一字元出現 0 或 1 次</td></tr>
+                        <tr><td><code>{n}</code></td><td>恰好 n 次</td></tr>
+                        <tr><td><code>{n,}</code></td><td>至少 n 次</td></tr>
+                        <tr><td><code>{n,m}</code></td><td>n 到 m 次</td></tr>
+                        <tr><td><code>[abc]</code></td><td>a 或 b 或 c</td></tr>
+                        <tr><td><code>[^abc]</code></td><td>非 a、b、c</td></tr>
+                        <tr><td><code>[a-z]</code></td><td>任一小寫英文字母</td></tr>
+                        <tr><td><code>(...)</code></td><td>群組（可重複引用）</td></tr>
+                        <tr><td><code>a&#124;b</code></td><td>a 或 b</td></tr>
+                        <tr><td><code>\b</code></td><td>字邊界（單字開頭／結尾）</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <div id="regexRules" style="background-color: #cee1fd;">
@@ -87,6 +157,7 @@
                     <option value="^\s*\d+\s">數字開頭</option>
                     <option value="\s\d+(,\d+)*(.\d+)?$">數字結尾</option>
                     <option value="^[0-9]">數字</option>
+                    <option value="\d{4}\.\d{2}\.\d{2}\.\d{2}-\d">稅則</option>
                 </select>
                 <input type="text" class="conditionValue">
             </p>
@@ -317,6 +388,22 @@
                     splitModeSelect.value = 'regex'; // 有選擇則強制設為關鍵字
                 }
             });
+        });
+
+        // 「📘 正則表示式對照」來開啟／關閉表格式說明內容
+        document.getElementById("regex-toggle-btn").addEventListener("click", function (e) {
+            e.stopPropagation(); // 避免點擊到外層直接關閉
+            const modal = document.getElementById("regex-help-modal");
+            modal.style.display = (modal.style.display === "block") ? "none" : "block";
+        });
+
+        // 點擊其他區域關閉
+        document.addEventListener("click", function (e) {
+            const modal = document.getElementById("regex-help-modal");
+            const trigger = document.getElementById("regex-help-block");
+            if (!trigger.contains(e.target)) {
+                modal.style.display = "none";
+            }
         });
 
         document.addEventListener("DOMContentLoaded", () => {
