@@ -214,6 +214,12 @@
 
         //  剖析使用者貼上的資料，根據選擇的分隔方式（Tab 或空格）分欄
         function splitToTable() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "index.html";
+                return;
+            }
+
             const raw = document.getElementById("pasteInput").value;
             const delimiter = document.querySelector('input[name="delimiter"]:checked').value;
             const lines = raw.split(/\r?\n/); // 保留每一行原始空白
@@ -546,11 +552,12 @@
             const token = localStorage.getItem("token");
 
             if (!token) {
-                window.location.href = "https://liyijung.github.io/declaration/";
+                window.location.href = "index.html";
             } else {
                 console.log("✅ 已登入，允許使用");
             }
         });
+        
     </script>
 
 </body>
