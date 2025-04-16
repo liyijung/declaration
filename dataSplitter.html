@@ -177,8 +177,8 @@
                 <input type="text" class="conditionValue">
             </p>
             <p>
-                限定欄位：<input type="number" class="columnScope" min="1" style="width: 89px;">
-                　移至欄位：<input type="number" class="targetColumn" min="1" style="width: 89px;">
+                限定欄位：<input type="number" class="columnScope" min="1" style="width: 111px;">
+                移至欄位：<input type="number" class="targetColumn" min="1" style="width: 111px;">
                 <button onclick="moveMatched(this)">🔄 移動</button>
             </p>
             <p>
@@ -193,6 +193,13 @@
                     <option value="keep">獨立一欄</option>
                 </select>
                 <button onclick="splitMatched(this)">✂️ 分隔</button>
+            </p>
+
+            <p style="margin-top: 10px;">
+                合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 63px;">
+                到 <input type="number" class="mergeTo" min="1" style="width: 63px;">
+                插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 65px;">
+                <button onclick="mergeColumns(this)">🧬 合併</button>
             </p>
 
             <p style="margin-top: 10px;">
@@ -558,6 +565,42 @@
             }
         });
         
+        // 欄位合併
+        function mergeColumns(btn) {
+            const block = btn.closest('.rule-block');
+            const fromIndex = parseInt(block.querySelector('.mergeFrom')?.value) - 1;
+            const toIndex = parseInt(block.querySelector('.mergeTo')?.value) - 1;
+            const targetIndex = parseInt(block.querySelector('.mergeTarget')?.value) - 1;
+
+            if (isNaN(fromIndex) || isNaN(toIndex) || isNaN(targetIndex)) {
+                alert('請填寫有效的合併欄位範圍與目標欄位');
+                return;
+            }
+
+            currentData = currentData.map(row => {
+                const start = Math.max(0, Math.min(fromIndex, toIndex));
+                const end = Math.max(0, Math.max(fromIndex, toIndex));
+                const merged = row.slice(start, end + 1).join(' ').trim();
+
+                // 移除原來合併欄位
+                row.splice(start, end - start + 1);
+
+                // 插入合併後的欄位
+                const insertAt = Math.min(targetIndex, row.length);
+                row.splice(insertAt, 0, merged);
+
+                return row;
+            });
+
+            renderTable(currentData);
+
+            // 若預覽有開啟，即時更新
+            const previewBox = block.querySelector('.preview-box');
+            if (previewBox && previewBox.style.display !== 'none') {
+                updatePreview(block);
+            }
+        }
+
     </script>
 
 </body>
