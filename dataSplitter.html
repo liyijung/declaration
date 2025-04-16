@@ -120,11 +120,11 @@
             <button style="margin-left: 50px;">🎬 進階條件示範影片</button>
         </a>
 
-        <!-- 正規表示式對照表按鈕與內容 -->
+        <!-- 正則表示式對照表按鈕與內容 -->
         <div id="regex-help-block" class="regex-help-block" style="display: inline-block; vertical-align: top;">
-            <span id="regex-toggle-btn" style="cursor: pointer;">📘 正規表示式對照</span>
+            <span id="regex-toggle-btn" style="cursor: pointer;">📘 正則表示式對照</span>
             <div id="regex-help-modal" class="regex-help-modal">
-                <h3 style="font-size: 15px; margin-top: 0;">常用正規表示式對照表</h3>
+                <h3 style="font-size: 15px; margin-top: 0;">常用正則表示式對照表</h3>
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                     <thead>
                         <tr>
@@ -472,7 +472,7 @@
             });
         });
 
-        // 「📘 正規表示式對照」來開啟／關閉表格式說明內容
+        // 「📘 正則表示式對照」來開啟／關閉表格式說明內容
         document.getElementById("regex-toggle-btn").addEventListener("click", function (e) {
             e.stopPropagation(); // 避免點擊到外層直接關閉
             const modal = document.getElementById("regex-help-modal");
@@ -519,7 +519,7 @@
             try {
                 regex = new RegExp(pattern, 'g');
             } catch (err) {
-                errorMsg = `<div style="color:red; margin-bottom: 6px;">⚠️ 無效的正規表示式：${err.message}</div>`;
+                errorMsg = `<div style="color:red; margin-bottom: 6px;">⚠️ 無效的正則表示式：${err.message}</div>`;
             }
 
             const maxCols = Math.max(...currentData.map(row => row.length));
