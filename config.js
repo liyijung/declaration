@@ -2,7 +2,7 @@ export const CONFIG = {
     API_URL: "", // 稍後由 detectAPI() 動態設定
     TOKEN_CHECK_INTERVAL: 43200000, // 12 小時 (毫秒)
     PING_INTERVAL: 600000,         // 10 分鐘 (毫秒)
-    ACTIVE_HOURS: { start: 8, end: 20 }, // 活躍時段 08:00 - 20:00
+    ACTIVE_HOURS: { start: 0, end: 24 }, // 活躍時段 00:00 - 23:59
 };
 
 // ✅ 主機與備援網址
