@@ -511,29 +511,33 @@
             const conditionType = block.querySelector('.conditionType').value;
             const previewBox = block.querySelector('.preview-box');
 
-            if (!previewBox) return; // 沒預覽框就跳出
-            const hasPattern = pattern.trim() !== ''; // 判斷是否有設定關鍵字
+            if (!previewBox) return;
+            const hasPattern = pattern.trim() !== '';
 
-            const regex = new RegExp(pattern, 'g'); // 用於高亮
+            let errorMsg = '';
+            let regex = null;
+            try {
+                regex = new RegExp(pattern, 'g');
+            } catch (err) {
+                errorMsg = `<div style="color:red; margin-bottom: 6px;">⚠️ 無效的正則表達式：${err.message}</div>`;
+            }
+
             const maxCols = Math.max(...currentData.map(row => row.length));
-
             let html = '<table style="border-collapse: collapse; font-size: 14px;">';
 
-            // 🔹 加入表頭：欄位1、欄位2...
             html += '<thead><tr>';
             for (let i = 0; i < maxCols; i++) {
                 html += `<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">欄位${i + 1}</th>`;
             }
             html += '</tr></thead><tbody>';
 
-            // 🔹 加入資料列
             currentData.forEach((row, rowIndex) => {
                 html += '<tr>';
                 for (let i = 0; i < maxCols; i++) {
                     let val = String(row[i] || '');
                     const inScope = !colScope || parseInt(colScope) - 1 === i;
 
-                    if (inScope) {
+                    if (inScope && regex) {
                         const hasMatch = regex.test(val);
                         regex.lastIndex = 0;
 
@@ -552,7 +556,8 @@
             });
 
             html += '</tbody></table>';
-            previewBox.innerHTML = html;
+
+            previewBox.innerHTML = errorMsg + html;
         }
 
         document.addEventListener("DOMContentLoaded", () => {
