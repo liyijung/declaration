@@ -55,6 +55,7 @@
         .container {
             margin-top: 150px;
             flex: 1; /* 讓主內容填滿 */
+            padding-bottom: 105px; /* 🟡 底部預留空間 */
         }
 
         .card {
@@ -122,6 +123,20 @@
             font-size: 14px;
             margin-top: auto;
         }
+
+        .subtle-yellow-btn {
+            background-color: #ffe8a1; /* Bootstrap 的 bg-warning-subtle 顏色 */
+            color: #212529;             /* text-dark */
+            border: 1px solid #ffc107;  /* 接近 warning 的邊框色 */
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .subtle-yellow-btn:hover {
+            background-color: #ffdb71; /* hover 顏色稍亮 */
+            border-color: #ffca2c;
+            color: #212529;
+        }
+
     </style>
 </head>
 
@@ -191,6 +206,21 @@
                         <a id="import-link" href="#" class="btn btn-success btn-lg w-100"
                             onclick="checkLogin(event, 'Import.html')">【建置中】</a>
                             <!-- 若加 disabled 可避免使用者誤點 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 資料分欄工具 -->
+            <div class="col-md-5">
+                <div class="card border-warning bg-white h-100 shadow">
+                    <div class="card-body pt-3">
+                        <h3 class="card-title text-dark">📋 資料分欄</h3>
+                        <p class="card-text text-dark">
+                            可將貼上的資料依照指定規則分隔為多欄。
+                        </p>
+                        <a href="#" onclick="checkLogin(event, 'dataSplitter.html')" class="btn subtle-yellow-btn btn-lg w-100">
+                            開啟工具
+                        </a>
                     </div>
                 </div>
             </div>
