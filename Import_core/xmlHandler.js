@@ -601,7 +601,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 匯出XML(已完成檢查)
         const headerFields = [
-            'LOT_NO', 'SHPR_BAN_ID', 'DCL_DOC_EXAM', 'SHPR_BONDED_ID', 
+            'FILE_NO', 'LOT_NO', 'SHPR_BAN_ID', 'DCL_DOC_EXAM', 'SHPR_BONDED_ID', 
             'SHPR_C_NAME', 'SHPR_E_NAME', 'SHPR_C_ADDR', 'SHPR_E_ADDR', 'SHPR_TEL', 
             'CNEE_C_NAME', 'CNEE_E_NAME', 'CNEE_E_ADDR', 
             'CNEE_COUNTRY_CODE', 'CNEE_BAN_ID',
@@ -656,6 +656,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
+                // 對 FILE_NO 欄位進行處理
+                if (id === 'FILE_NO') {
+                    // 改節點名稱為 DOC_HEAD_DOC_NO
+                    let tagName = 'DOC_HEAD_DOC_NO';
+
+                    // 取出原始值並去除空白
+                    let fileNo = value.trim();
+
+                    // 若為11碼且第8碼為0，則改為前7碼 + 後3碼
+                    if (fileNo.length === 11 && fileNo.charAt(7) === '0') {
+                        fileNo = fileNo.substring(0, 7) + fileNo.substring(8, 11);
+                    }
+
+                    // 將處理後的值加到 XML
+                    xmlContent += `  <fields>\n    <field_name>${tagName}</field_name>\n    <field_value>${fileNo}</field_value>\n  </fields>\n`;
+                    return; // 已處理完 FILE_NO，不再走通用流程
+                }
+                
                 // 對 LOT_NO 欄位進行處理
                 if (id === 'LOT_NO') {
                     // 全形轉半形
