@@ -280,13 +280,18 @@
             const table = document.querySelector('#tableOutput table');
             if (!table) return;
             let text = '';
-            const rows = table.querySelectorAll('tbody tr');
+        
+            const rows = currentData; // 使用 currentData 可直接掌握欄位
+            const maxCols = Math.max(...rows.map(r => r.length)); // 確保欄位一致
+        
             rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                let rowText = [];
-                for (let i = 0; i < cells.length; i++) rowText.push(cells[i].innerText);
-                text += rowText.join('\t') + '\n'; // 每列以 tab 分隔
+                const filledRow = [...row];
+                while (filledRow.length < maxCols) {
+                    filledRow.push(''); // 補空欄
+                }
+                text += filledRow.join('\t') + '\n'; // 每列以 tab 分隔
             });
+        
             navigator.clipboard.writeText(text.trim()).then(() => alert("已複製！"));
         }
 
