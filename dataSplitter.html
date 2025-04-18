@@ -205,6 +205,11 @@
             </p>
 
             <p style="margin-top: 10px;">
+                <button onclick="insertBlankBeforeMatched(this)">➕ 符合條件欄前插入空欄</button>
+                <button onclick="removeBlankBeforeMatched(this)">➖ 符合條件欄前刪除空欄</button>
+            </p>
+            
+            <p style="margin-top: 10px;">
                 <button onclick="togglePreview(this)">🔎 預覽符合內容</button>
             </p>
             <div class="preview-box" style="display: none; border: 1px dashed #aaa; background: #fffde7; padding: 8px; margin-top: 10px; font-size: 14px;"></div>
@@ -613,6 +618,94 @@
             }
         }
 
+        // 符合條件欄前插入空欄
+        function insertBlankBeforeMatched(btn) {
+            const block = btn.closest('.rule-block');
+            const pattern = block.querySelector('.conditionValue').value.trim();
+            const type = block.querySelector('.conditionType').value;
+            const colScope = block.querySelector('.columnScope').value;
+            if (!pattern) return;
+
+            let regex;
+            try {
+                regex = new RegExp(pattern);
+            } catch (err) {
+                alert(`無效的正則表示式：${err.message}`);
+                return;
+            }
+
+            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
+
+            currentData = currentData.map(row => {
+                let newRow = [...row];
+                let insertIndex = -1;
+
+                newRow.forEach((val, idx) => {
+                    const inScope = scopeIndex === null || idx === scopeIndex;
+                    const matched = inScope && regex.test(String(val || '').trim());
+                    if (matched && insertIndex === -1) {
+                        insertIndex = idx;
+                    }
+                });
+
+                if (insertIndex !== -1) {
+                    newRow.splice(insertIndex, 0, ''); // 插入空欄
+                }
+
+                return newRow;
+            });
+
+            renderTable(currentData);
+
+            // 若預覽有開啟，即時更新
+            const previewBox = block.querySelector('.preview-box');
+            if (previewBox && previewBox.style.display !== 'none') {
+                updatePreview(block);
+            }
+        }
+
+        // 符合條件欄前刪除空欄
+        function removeBlankBeforeMatched(btn) {
+            const block = btn.closest('.rule-block');
+            const pattern = block.querySelector('.conditionValue').value.trim();
+            const type = block.querySelector('.conditionType').value;
+            const colScope = block.querySelector('.columnScope').value;
+            if (!pattern) return;
+
+            let regex;
+            try {
+                regex = new RegExp(pattern);
+            } catch (err) {
+                alert(`無效的正則表示式：${err.message}`);
+                return;
+            }
+
+            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
+
+            currentData = currentData.map(row => {
+                let newRow = [...row];
+
+                newRow.forEach((val, idx) => {
+                    const inScope = scopeIndex === null || idx === scopeIndex;
+                    const matched = inScope && regex.test(String(val || '').trim());
+
+                    if (matched && idx > 0 && newRow[idx - 1] === '') {
+                        newRow.splice(idx - 1, 1); // 刪除前一欄空白
+                    }
+                });
+
+                return newRow;
+            });
+
+            renderTable(currentData);
+
+            // 若預覽有開啟，即時更新
+            const previewBox = block.querySelector('.preview-box');
+            if (previewBox && previewBox.style.display !== 'none') {
+                updatePreview(block);
+            }
+        }
+        
     </script>
 
 </body>
