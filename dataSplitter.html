@@ -330,6 +330,9 @@
             document.getElementById("tableOutput").innerHTML = '';
             currentData = [];
         
+            // 重設簡易分隔方式為 Tab（或4空格）
+            document.querySelector('input[name="delimiter"][value="tab"]').checked = true;
+
             // 關閉所有預覽框，並重設按鈕文字
             document.querySelectorAll('.rule-block').forEach(block => {
                 const previewBox = block.querySelector('.preview-box');
@@ -344,7 +347,7 @@
                 }
             });
             
-            // 確保按完「清除」後，分欄結果區仍能再次顯示
+            // 顯示主結果表格區
             document.getElementById("tableOutput").style.display = 'block';
         }
 
