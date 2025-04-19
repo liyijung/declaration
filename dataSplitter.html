@@ -693,7 +693,10 @@
 
                 newRow.forEach((val, idx) => {
                     const inScope = scopeIndex === null || idx === scopeIndex;
-                    const matched = inScope && regex.test(String(val || '').trim());
+                    const matched = inScope && (
+                        (type === 'matches' && regex.test(String(val || '').trim())) ||
+                        (type === 'notMatches' && !regex.test(String(val || '').trim()))
+                    );
 
                     if (matched && idx > 0 && newRow[idx - 1] === '') {
                         newRow.splice(idx - 1, 1); // 刪除前一欄空白
