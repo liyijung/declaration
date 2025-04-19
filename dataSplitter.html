@@ -318,11 +318,25 @@
             document.getElementById("tableOutput").innerHTML = html;
         }
 
-        // 清除所有資料與表格
         function clearAll() {
+            // 清除輸入與結果表格
             document.getElementById("pasteInput").value = '';
             document.getElementById("tableOutput").innerHTML = '';
             currentData = [];
+        
+            // 關閉所有預覽框，並重設按鈕文字
+            document.querySelectorAll('.rule-block').forEach(block => {
+                const previewBox = block.querySelector('.preview-box');
+                if (previewBox) {
+                    previewBox.style.display = 'none';
+                    previewBox.innerHTML = '';
+                }
+        
+                const toggleBtn = block.querySelector('button[onclick="togglePreview(this)"]');
+                if (toggleBtn) {
+                    toggleBtn.innerText = '🔎 預覽符合內容';
+                }
+            });
         }
 
         // 將結果表格複製為文字（Tab 分隔格式）
