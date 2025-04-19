@@ -292,6 +292,7 @@
             });
 
             renderTable(currentData);
+            document.getElementById("tableOutput").style.display = 'block'; // 顯示結果表格
 
             // 更新所有開啟中的預覽區塊
             document.querySelectorAll('.rule-block').forEach(block => {
@@ -337,6 +338,9 @@
                     toggleBtn.innerText = '🔎 預覽符合內容';
                 }
             });
+            
+            // 確保按完「清除」後，分欄結果區仍能再次顯示
+            document.getElementById("tableOutput").style.display = 'block';
         }
 
         // 將結果表格複製為文字（Tab 分隔格式）
