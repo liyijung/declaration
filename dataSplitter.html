@@ -877,45 +877,23 @@
         function resetCondition(btn) {
             const block = btn.closest('.rule-block');
         
-            // 正則條件類型
             block.querySelector('.conditionType').value = 'matches';
-        
-            // 範本與條件值
             block.querySelector('.regexTemplate').selectedIndex = 0;
             block.querySelector('.conditionValue').value = '';
-        
-            // 限定欄位與移至欄位
             block.querySelector('.columnScope').value = '';
             block.querySelector('.targetColumn').value = '';
-        
-            // 分隔與關鍵字處理
             block.querySelector('.splitMode').value = 'space';
             block.querySelector('.keywordAction').value = '';
-        
-            // 合併欄位設定
             block.querySelector('.mergeFrom').value = '';
             block.querySelector('.mergeTo').value = '';
             block.querySelector('.mergeTarget').value = '';
-        
-            // 插入／刪除空欄的選單：預設符合欄前
             block.querySelector('.blankInsertAction').value = 'insertBefore';
             block.querySelector('.blankRemoveAction').value = 'removeBefore';
-            
-            // 關閉預覽區塊並顯示主表格
-            const previewBox = block.querySelector('.preview-box');
-            const tableOutput = document.getElementById('tableOutput');
-            if (previewBox) {
-                previewBox.style.display = 'none';
-                previewBox.innerHTML = '';
-            }
-            if (tableOutput) {
-                tableOutput.style.display = 'block';
-            }
         
-            // 將預覽按鈕文字重設（若已展開）
-            const toggleBtn = block.querySelector('button[onclick="togglePreview(this)"]');
-            if (toggleBtn) {
-                toggleBtn.innerText = '🔎 預覽符合內容';
+            // 如果預覽區有開啟，就即時更新，不關閉
+            const previewBox = block.querySelector('.preview-box');
+            if (previewBox && previewBox.style.display !== 'none') {
+                updatePreview(block);
             }
         }
         
