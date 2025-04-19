@@ -292,9 +292,14 @@
             });
 
             renderTable(currentData);
-            document.getElementById("tableOutput").style.display = 'block'; // 顯示結果表格
 
-            // 更新所有開啟中的預覽區塊
+            // 根據是否有預覽開啟，決定是否顯示分欄結果
+            const anyPreviewOpened = Array.from(document.querySelectorAll('.preview-box'))
+                .some(box => box.style.display !== 'none');
+
+            document.getElementById("tableOutput").style.display = anyPreviewOpened ? 'none' : 'block';
+            
+            // 同步更新所有預覽（如果有開）
             document.querySelectorAll('.rule-block').forEach(block => {
                 const previewBox = block.querySelector('.preview-box');
                 if (previewBox && previewBox.style.display !== 'none') {
