@@ -42,6 +42,10 @@
             font-size: 16px;
         }
 
+        .rule-block p {
+            margin: 6px 0;
+        }
+
         select,
         input[type="text"],
         input[type="number"] {
@@ -197,19 +201,28 @@
                 <button onclick="splitMatched(this)">✂️ 分隔</button>
             </p>
 
-            <p style="margin-top: 10px;">
-                合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 63px;">
-                到 <input type="number" class="mergeTo" min="1" style="width: 63px;">
-                插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 65px;">
+            <p>
+                合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 61px;">
+                到 <input type="number" class="mergeTo" min="1" style="width: 61px;">
+                插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 69px;">
                 <button onclick="mergeColumns(this)">🧬 合併</button>
             </p>
 
-            <p style="margin-top: 10px;">
-                <button onclick="removeBlankBeforeMatched(this)">➖ 符合條件欄前刪除空欄</button>
-                <button onclick="insertBlankBeforeMatched(this)">➕ 符合條件欄前插入空欄</button>
+            <p>
+                刪除空欄：<select class="blankRemoveAction" style="width: 102px;">
+                    <option value="removeBefore">符合欄前</option>
+                    <option value="removeAfter">符合欄後</option>
+                </select>
+                <button onclick="performBlankRemove(this)">刪除</button>
+
+                插入空欄：<select class="blankInsertAction" style="width: 102px;">
+                    <option value="insertBefore">符合欄前</option>
+                    <option value="insertAfter">符合欄後</option>
+                </select>
+                <button onclick="performBlankInsert(this)">插入</button>
             </p>
             
-            <p style="margin-top: 10px;">
+            <p>
                 <button onclick="togglePreview(this)">🔎 預覽符合內容</button>
             </p>
             <div class="preview-box" style="display: none; border: 1px dashed #aaa; background: #fffde7; padding: 8px; margin-top: 10px; font-size: 14px;"></div>
@@ -572,16 +585,6 @@
             previewBox.innerHTML = errorMsg + html;
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const token = localStorage.getItem("token");
-
-            if (!token) {
-                window.location.href = "index.html";
-            } else {
-                console.log("✅ 已登入，允許使用");
-            }
-        });
-        
         // 欄位合併
         function mergeColumns(btn) {
             const block = btn.closest('.rule-block');
@@ -618,7 +621,56 @@
             }
         }
 
-        // 符合條件欄前刪除空欄
+        // 符合欄前刪除
+        function insertBlankBeforeMatched(btn) {
+            const block = btn.closest('.rule-block');
+            const pattern = block.querySelector('.conditionValue').value.trim();
+            const type = block.querySelector('.conditionType').value;
+            const colScope = block.querySelector('.columnScope').value;
+            if (!pattern) return;
+
+            let regex;
+            try {
+                regex = new RegExp(pattern);
+            } catch (err) {
+                alert(`無效的正則表示式：${err.message}`);
+                return;
+            }
+
+            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
+
+            currentData = currentData.map(row => {
+                let newRow = [...row];
+                let insertIndex = -1;
+
+                newRow.forEach((val, idx) => {
+                    const inScope = scopeIndex === null || idx === scopeIndex;
+                    const matched = inScope && (
+                        (type === 'matches' && regex.test(val)) ||
+                        (type === 'notMatches' && !regex.test(val))
+                    );
+                    if (matched && insertIndex === -1) {
+                        insertIndex = idx;
+                    }
+                });
+
+                if (insertIndex !== -1) {
+                    newRow.splice(insertIndex, 0, ''); // 插入空欄
+                }
+
+                return newRow;
+            });
+
+            renderTable(currentData);
+
+            // 若預覽有開啟，即時更新
+            const previewBox = block.querySelector('.preview-box');
+            if (previewBox && previewBox.style.display !== 'none') {
+                updatePreview(block);
+            }
+        }
+
+        // 符合欄前插入
         function removeBlankBeforeMatched(btn) {
             const block = btn.closest('.rule-block');
             const pattern = block.querySelector('.conditionValue').value.trim();
@@ -660,8 +712,8 @@
             }
         }
         
-        // 符合條件欄前插入空欄
-        function insertBlankBeforeMatched(btn) {
+        // 符合欄後刪除
+        function removeBlankAfterMatched(btn) {
             const block = btn.closest('.rule-block');
             const pattern = block.querySelector('.conditionValue').value.trim();
             const type = block.querySelector('.conditionType').value;
@@ -680,31 +732,123 @@
 
             currentData = currentData.map(row => {
                 let newRow = [...row];
-                let insertIndex = -1;
 
                 newRow.forEach((val, idx) => {
                     const inScope = scopeIndex === null || idx === scopeIndex;
-                    const matched = inScope && regex.test(String(val || '').trim());
-                    if (matched && insertIndex === -1) {
-                        insertIndex = idx;
+                    const matched = inScope && (
+                        (type === 'matches' && regex.test(val)) ||
+                        (type === 'notMatches' && !regex.test(val))
+                    );
+
+                    if (matched && newRow[idx + 1] === '') {
+                        newRow.splice(idx + 1, 1); // 刪除後方空欄
                     }
                 });
-
-                if (insertIndex !== -1) {
-                    newRow.splice(insertIndex, 0, ''); // 插入空欄
-                }
 
                 return newRow;
             });
 
             renderTable(currentData);
+            const previewBox = block.querySelector('.preview-box');
+            if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+        }
 
-            // 若預覽有開啟，即時更新
+        // 符合欄後插入
+        function insertBlankAfterMatched(btn) {
+            const block = btn.closest('.rule-block');
+            const pattern = block.querySelector('.conditionValue').value.trim();
+            const type = block.querySelector('.conditionType').value;
+            const colScope = block.querySelector('.columnScope').value;
+            if (!pattern) return;
+
+            let regex;
+            try {
+                regex = new RegExp(pattern);
+            } catch (err) {
+                alert(`無效的正則表示式：${err.message}`);
+                return;
+            }
+
+            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
+
+            currentData = currentData.map(row => {
+                let newRow = [...row];
+
+                newRow.forEach((val, idx) => {
+                    const inScope = scopeIndex === null || idx === scopeIndex;
+                    const matched = inScope && (
+                        (type === 'matches' && regex.test(val)) ||
+                        (type === 'notMatches' && !regex.test(val))
+                    );
+
+                    if (matched) {
+                        newRow.splice(idx + 1, 0, ''); // 在後方插入空欄
+                    }
+                });
+
+                return newRow;
+            });
+
+            renderTable(currentData);
+            const previewBox = block.querySelector('.preview-box');
+            if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+        }
+
+        function performBlankInsert(btn) {
+            const block = btn.closest('.rule-block');
+            const action = block.querySelector('.blankInsertAction')?.value;
+
+            switch (action) {
+                case 'insertBefore':
+                    insertBlankBeforeMatched(btn);
+                    break;
+                case 'insertAfter':
+                    insertBlankAfterMatched(btn);
+                    break;
+                default:
+                    alert("請選擇插入的空欄位置");
+                    return;
+            }
+
+            // 即時更新預覽
             const previewBox = block.querySelector('.preview-box');
             if (previewBox && previewBox.style.display !== 'none') {
                 updatePreview(block);
             }
         }
+
+        function performBlankRemove(btn) {
+            const block = btn.closest('.rule-block');
+            const action = block.querySelector('.blankRemoveAction')?.value;
+
+            switch (action) {
+                case 'removeBefore':
+                    removeBlankBeforeMatched(btn);
+                    break;
+                case 'removeAfter':
+                    removeBlankAfterMatched(btn);
+                    break;
+                default:
+                    alert("請選擇要刪除的空欄位置");
+                    return;
+            }
+
+            // 即時更新預覽
+            const previewBox = block.querySelector('.preview-box');
+            if (previewBox && previewBox.style.display !== 'none') {
+                updatePreview(block);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                window.location.href = "index.html";
+            } else {
+                console.log("✅ 已登入，允許使用");
+            }
+        });
 
     </script>
 
