@@ -236,8 +236,9 @@
                 </select>
                 <button onclick="performBlankInsert(this)">➕ 插入</button>
 
-                移動欄位：<input type="number" id="shift-col" min="1" style="width: 91px;">
-                位移格數：<input type="number" id="shift-rows" style="width: 91px;">
+                移動欄位：<input type="number" id="shift-col" min="1" style="width: 88px;">
+                位移格數：<input type="number" id="shift-rows" style="width: 88px;" min="0" max="9999" oninput="checkShiftLimit()">
+                <span id="shift-limit-tip" style="color: red; font-size: 13px; margin-left: 6px;"></span>
                 <button onclick="shiftColumn('up')">⬆️ 上移</button>
                 <button onclick="shiftColumn('down')">⬇️ 下移</button>
             </p>
@@ -695,14 +696,21 @@
             const rowInput = document.getElementById('shift-rows');
 
             const colIndex = parseInt(colInput.value) - 1;
-            const offset = parseInt(rowInput.value);
+            let offset = parseInt(rowInput.value);
+
+            const rowCount = currentData.length;
 
             if (isNaN(colIndex) || isNaN(offset) || colIndex < 0 || offset < 0) {
                 alert('請輸入有效的欄位與位移格數');
                 return;
             }
 
-            const rowCount = currentData.length;
+            // ✅ 限制 offset 不得超過行數
+            if (offset > rowCount) {
+                offset = rowCount;
+                rowInput.value = offset; // 自動修正輸入框的值
+            }
+
             const newData = JSON.parse(JSON.stringify(currentData)); // 深拷貝
 
             for (let i = 0; i < rowCount; i++) {
@@ -716,7 +724,7 @@
             currentData = newData;
             renderTable(currentData);
 
-            // ✅ 即時更新所有開啟中的預覽框
+            // 即時更新所有預覽區塊
             document.querySelectorAll('.rule-block').forEach(block => {
                 const previewBox = block.querySelector('.preview-box');
                 if (previewBox && previewBox.style.display !== 'none') {
@@ -724,6 +732,24 @@
                 }
             });
         }
+
+        function checkShiftLimit() {
+            const rowInput = document.getElementById('shift-rows');
+            const tip = document.getElementById('shift-limit-tip');
+            const max = parseInt(rowInput.getAttribute('max')) || 0;
+            let val = parseInt(rowInput.value);
+
+            if (!isNaN(val) && val > max) {
+                rowInput.value = max;
+                tip.textContent = `⚠ 最多只能輸入 ${max}`;
+            } else {
+                tip.textContent = '';
+            }
+        }
+
+        // 設定位移格數最大值限制
+        document.getElementById('shift-rows').setAttribute('max', currentData.length);
+        document.getElementById('shift-limit-tip').textContent = '';
 
         // 符合欄前刪除
         function insertBlankBeforeMatched(btn) {
