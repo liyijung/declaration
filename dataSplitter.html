@@ -215,6 +215,7 @@
                     <option value="mergeAfter">與後欄合併</option>
                     <option value="mergeBefore">與前欄合併</option>
                     <option value="keep">獨立一欄</option>
+                    <option value="splitOnly">不保留</option>
                 </select>
                 <button onclick="splitMatched(this)">✂️ 分隔</button>
             </p>
@@ -481,6 +482,16 @@
                                     break;
                                 }
                                 newRow.push(...merged.filter(p => p.length > 0));
+                            } else if (keywordAction === 'splitOnly') {
+                                // 根據關鍵字分隔，但不保留關鍵字本身
+                                let parts = [], lastIndex = 0, match;
+                                const regex = execRegexGlobal(); // 每筆都用新的 regex
+                                while ((match = regex.exec(val)) !== null) {
+                                    if (match.index > lastIndex) parts.push(val.substring(lastIndex, match.index));
+                                    lastIndex = regex.lastIndex;
+                                }
+                                if (lastIndex < val.length) parts.push(val.substring(lastIndex));
+                                newRow.push(...parts.filter(p => p.length > 0));
                             }
                         }
                     } else {
