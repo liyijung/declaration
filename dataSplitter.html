@@ -963,7 +963,11 @@
             block.querySelector('.mergeTarget').value = '';
             block.querySelector('.blankInsertAction').value = 'insertBefore';
             block.querySelector('.blankRemoveAction').value = 'removeBefore';
-        
+
+            // 清空「移動欄位」與「位移格數」
+            document.getElementById('shift-col').value = '';
+            document.getElementById('shift-rows').value = '';
+
             // 如果預覽區有開啟，就即時更新，不關閉
             const previewBox = block.querySelector('.preview-box');
             if (previewBox && previewBox.style.display !== 'none') {
