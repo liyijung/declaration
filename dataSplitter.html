@@ -280,7 +280,12 @@
                 return;
             }
 
-            const raw = document.getElementById("pasteInput").value;
+            const raw = document.getElementById("pasteInput").value.trim();
+            if (!raw) {
+                alert("請先貼上資料再執行分欄！");
+                return;
+            }
+
             const delimiter = document.querySelector('input[name="delimiter"]:checked').value;
             const lines = raw.split(/\r?\n/); // 保留每一行原始空白
 
@@ -295,6 +300,17 @@
             });
 
             renderTable(currentData);
+
+            // ✅ 加入這段：設定「位移格數」最大值與提示
+            const rowCount = currentData.length;
+            document.getElementById('shift-rows').setAttribute('max', rowCount);
+
+            const tip = document.getElementById('shift-limit-tip');
+            if (rowCount > 0) {
+                tip.textContent = '';
+            } else {
+                tip.textContent = '⚠️ 最多只能輸入 0';
+            }
 
             // 根據是否有預覽開啟，決定是否顯示分欄結果
             const anyPreviewOpened = Array.from(document.querySelectorAll('.preview-box'))
@@ -694,37 +710,82 @@
         function shiftColumn(direction) {
             const colInput = document.getElementById('shift-col');
             const rowInput = document.getElementById('shift-rows');
+            const tip = document.getElementById('shift-limit-tip');
 
             const colIndex = parseInt(colInput.value) - 1;
-            let offset = parseInt(rowInput.value);
-
+            const offset = parseInt(rowInput.value);
             const rowCount = currentData.length;
 
-            if (isNaN(colIndex) || isNaN(offset) || colIndex < 0 || offset < 0) {
+            if (isNaN(colIndex) || isNaN(offset) || colIndex < 0 || offset <= 0) {
                 alert('請輸入有效的欄位與位移格數');
                 return;
             }
 
-            // ✅ 限制 offset 不得超過行數
-            if (offset > rowCount) {
-                offset = rowCount;
-                rowInput.value = offset; // 自動修正輸入框的值
+            if (direction === 'up') {
+                // ✅ 上移前檢查空格
+                for (let i = 0; i < rowCount; i++) {
+                    const currentVal = currentData[i]?.[colIndex];
+                    if (!currentVal || currentVal.trim() === '') continue;
+
+                    for (let j = 1; j <= offset; j++) {
+                        const aboveRow = i - j;
+                        if (aboveRow < 0 || (currentData[aboveRow]?.[colIndex] || '').trim() !== '') {
+                            tip.textContent = `⚠️ 第 ${i + 1} 行上方不足 ${offset} 行空白，無法上移`;
+                            return;
+                        }
+                    }
+                }
+
+                // ✅ 上移：從上往下搬
+                for (let i = 0; i < rowCount; i++) {
+                    const targetRow = i - offset;
+                    if (targetRow >= 0) {
+                        currentData[targetRow] = currentData[targetRow] || [];
+                        currentData[targetRow][colIndex] = currentData[i]?.[colIndex] || '';
+                    }
+                }
+                // 清空原位
+                for (let i = rowCount - offset; i < rowCount; i++) {
+                    currentData[i] = currentData[i] || [];
+                    currentData[i][colIndex] = '';
+                }
+
+                tip.textContent = '';
+            } else if (direction === 'down') {
+                // ✅ 下移前檢查空格
+                for (let i = rowCount - 1; i >= 0; i--) {
+                    const currentVal = currentData[i]?.[colIndex];
+                    if (!currentVal || currentVal.trim() === '') continue;
+
+                    for (let j = 1; j <= offset; j++) {
+                        const belowRow = i + j;
+                        if (belowRow >= rowCount || (currentData[belowRow]?.[colIndex] || '').trim() !== '') {
+                            tip.textContent = `⚠️ 第 ${i + 1} 行下方不足 ${offset} 行空白，無法下移`;
+                            return;
+                        }
+                    }
+                }
+
+                // ✅ 下移：從下往上搬
+                for (let i = rowCount - 1; i >= 0; i--) {
+                    const targetRow = i + offset;
+                    if (targetRow < rowCount) {
+                        currentData[targetRow] = currentData[targetRow] || [];
+                        currentData[targetRow][colIndex] = currentData[i]?.[colIndex] || '';
+                    }
+                }
+                // 清空原位
+                for (let i = 0; i < offset; i++) {
+                    currentData[i] = currentData[i] || [];
+                    currentData[i][colIndex] = '';
+                }
+
+                tip.textContent = '';
             }
 
-            const newData = JSON.parse(JSON.stringify(currentData)); // 深拷貝
-
-            for (let i = 0; i < rowCount; i++) {
-                const sourceIndex = (direction === 'up') ? i + offset : i - offset;
-                const value = (sourceIndex >= 0 && sourceIndex < rowCount) ? currentData[sourceIndex]?.[colIndex] : '';
-
-                if (!newData[i]) newData[i] = [];
-                newData[i][colIndex] = value;
-            }
-
-            currentData = newData;
             renderTable(currentData);
 
-            // 即時更新所有預覽區塊
+            // 更新所有預覽區塊
             document.querySelectorAll('.rule-block').forEach(block => {
                 const previewBox = block.querySelector('.preview-box');
                 if (previewBox && previewBox.style.display !== 'none') {
