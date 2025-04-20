@@ -368,6 +368,11 @@
             
             // 顯示主結果表格區
             document.getElementById("tableOutput").style.display = 'block';
+
+            // 重置條件
+            document.querySelectorAll('.rule-block').forEach(block => {
+                resetCondition(block);
+            });
         }
 
         // 將結果表格複製為文字（Tab 分隔格式）
@@ -1035,8 +1040,9 @@
         }
 
         // 重置條件
-        function resetCondition(btn) {
-            const block = btn.closest('.rule-block');
+        function resetCondition(input) {
+            const block = input.closest ? input.closest('.rule-block') : input;
+            if (!block) return;
         
             block.querySelector('.conditionType').value = 'matches';
             block.querySelector('.regexTemplate').selectedIndex = 0;
