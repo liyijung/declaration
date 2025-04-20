@@ -185,11 +185,11 @@
     <div id="regexRules" style="background-color: #cee1fd;">
         <div class="rule-block">
             <p>
-                正則條件：<select class="conditionType" style="width: 96px;">
+                正則條件：<select class="conditionType" style="width: 97px;">
                     <option value="matches">符合</option>
                     <option value="notMatches">不符合</option>
                 </select>                
-                <select class="regexTemplate" style="width: 92px;"
+                <select class="regexTemplate" style="width: 120px;"
                         onchange="this.parentElement.querySelector('.conditionValue').value = this.value">
                     <option value="">關鍵字</option>
                     <option value="^\s*\d+(,\d+)?(\.\d+)?">數字開頭</option>
@@ -198,19 +198,19 @@
                     <option value="[A-Za-z]\s*$">英文結尾</option>                    
                     <option value="\d{4}\.\d{2}\.\d{2}\.\d{2}-\d">稅則</option>
                 </select>
-                <input type="text" class="conditionValue">
+                <input type="text" class="conditionValue" style="width: 213px;">
             </p>
             <p>
-                限定欄位：<input type="number" class="columnScope" min="1" style="width: 111px;">
-                移至欄位：<input type="number" class="targetColumn" min="1" style="width: 111px;">
+                限定欄位：<input type="number" class="columnScope" min="1" style="width: 134px;">
+                移至欄位：<input type="number" class="targetColumn" min="1" style="width: 134px;">
                 <button onclick="moveMatched(this)">🔄 移動</button>
             </p>
             <p>
-                分隔方式：<select class="splitMode" style="width: 102px;">
+                分隔方式：<select class="splitMode" style="width: 125px;">
                     <option value="space">空格</option>
                     <option value="regex">關鍵字</option>
                 </select>
-                關鍵字處理：<select class="keywordAction" style="width: 118px;">
+                關鍵字處理：<select class="keywordAction" style="width: 142px;">
                     <option value=""></option>
                     <option value="mergeAfter">與後欄合併</option>
                     <option value="mergeBefore">與前欄合併</option>
@@ -221,24 +221,24 @@
             </p>
 
             <p>
-                合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 61px;">
-                到 <input type="number" class="mergeTo" min="1" style="width: 61px;">
-                插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 69px;">
+                合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 72px;">
+                到 <input type="number" class="mergeTo" min="1" style="width: 73px;">
+                插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 91px;">
                 <button onclick="mergeColumns(this)">🧬 合併</button>
             </p>
 
             <p>
-                刪除空欄：<select class="blankRemoveAction" style="width: 102px;">
+                刪除空欄：<select class="blankRemoveAction" style="width: 98px;">
                     <option value="removeBefore">符合欄前</option>
                     <option value="removeAfter">符合欄後</option>
                 </select>
-                <button onclick="performBlankRemove(this)">刪除</button>
+                <button onclick="performBlankRemove(this)">➖ 刪除</button>
 
-                插入空欄：<select class="blankInsertAction" style="width: 102px;">
+                插入空欄：<select class="blankInsertAction" style="width: 98px;">
                     <option value="insertBefore">符合欄前</option>
                     <option value="insertAfter">符合欄後</option>
                 </select>
-                <button onclick="performBlankInsert(this)">插入</button>
+                <button onclick="performBlankInsert(this)">➕ 插入</button>
             </p>
             
             <p>
