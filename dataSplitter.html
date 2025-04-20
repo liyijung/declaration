@@ -102,7 +102,7 @@
         }
 
         .preview-box {
-            max-height: 400px;
+            max-height: 500px;
             overflow: auto;
         }
 
@@ -198,9 +198,7 @@
                     <option value="[A-Za-z]\s*$">英文結尾</option>                    
                     <option value="\d{4}\.\d{2}\.\d{2}\.\d{2}-\d">稅則</option>
                 </select>
-                <input type="text" class="conditionValue" style="width: 213px;">
-            </p>
-            <p>
+                <input type="text" class="conditionValue" style="width: 213px; margin-right: 8px;">
                 限定欄位：<input type="number" class="columnScope" min="1" style="width: 134px;">
                 移至欄位：<input type="number" class="targetColumn" min="1" style="width: 134px;">
                 <button onclick="moveMatched(this)">🔄 移動</button>
@@ -218,9 +216,7 @@
                     <option value="splitOnly">不保留</option>
                 </select>
                 <button onclick="splitMatched(this)">✂️ 分隔</button>
-            </p>
 
-            <p>
                 合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 72px;">
                 到 <input type="number" class="mergeTo" min="1" style="width: 73px;">
                 插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 91px;">
@@ -234,13 +230,18 @@
                 </select>
                 <button onclick="performBlankRemove(this)">➖ 刪除</button>
 
-                插入空欄：<select class="blankInsertAction" style="width: 98px;">
+                插入空欄：<select class="blankInsertAction" style="width: 99px;">
                     <option value="insertBefore">符合欄前</option>
                     <option value="insertAfter">符合欄後</option>
                 </select>
                 <button onclick="performBlankInsert(this)">➕ 插入</button>
+
+                移動欄位：<input type="number" id="shift-col" min="1" style="width: 91px;">
+                位移格數：<input type="number" id="shift-rows" style="width: 91px;">
+                <button onclick="shiftColumn('up')">⬆️ 上移</button>
+                <button onclick="shiftColumn('down')">⬇️ 下移</button>
             </p>
-            
+
             <p>
                 <button onclick="togglePreview(this)">🔎 預覽符合內容</button>
                 <button onclick="resetCondition(this)">♻️ 重置條件</button>
@@ -686,6 +687,42 @@
             if (previewBox && previewBox.style.display !== 'none') {
                 updatePreview(block);
             }
+        }
+
+        // 移動欄位
+        function shiftColumn(direction) {
+            const colInput = document.getElementById('shift-col');
+            const rowInput = document.getElementById('shift-rows');
+
+            const colIndex = parseInt(colInput.value) - 1;
+            const offset = parseInt(rowInput.value);
+
+            if (isNaN(colIndex) || isNaN(offset) || colIndex < 0 || offset < 0) {
+                alert('請輸入有效的欄位與位移格數');
+                return;
+            }
+
+            const rowCount = currentData.length;
+            const newData = JSON.parse(JSON.stringify(currentData)); // 深拷貝
+
+            for (let i = 0; i < rowCount; i++) {
+                const sourceIndex = (direction === 'up') ? i + offset : i - offset;
+                const value = (sourceIndex >= 0 && sourceIndex < rowCount) ? currentData[sourceIndex]?.[colIndex] : '';
+
+                if (!newData[i]) newData[i] = [];
+                newData[i][colIndex] = value;
+            }
+
+            currentData = newData;
+            renderTable(currentData);
+
+            // ✅ 即時更新所有開啟中的預覽框
+            document.querySelectorAll('.rule-block').forEach(block => {
+                const previewBox = block.querySelector('.preview-box');
+                if (previewBox && previewBox.style.display !== 'none') {
+                    updatePreview(block);
+                }
+            });
         }
 
         // 符合欄前刪除
