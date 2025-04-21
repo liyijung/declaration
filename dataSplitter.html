@@ -364,7 +364,7 @@
         
                 const toggleBtn = block.querySelector('button[onclick="togglePreview(this)"]');
                 if (toggleBtn) {
-                    toggleBtn.innerText = '<i class="fas fa-search"></i> 預覽符合內容';
+                    toggleBtn.innerHTML = '<i class="fas fa-search"></i> 預覽符合內容';
                 }
             });
             
@@ -613,11 +613,11 @@
             if (previewBox.style.display === 'none') {
                 updatePreview(block);
                 previewBox.style.display = 'block';
-                btn.innerText = '<i class="fas fa-times"></i> 關閉預覽';
+                btn.innerHTML = '<i class="fas fa-times"></i> 關閉預覽';
                 if (tableOutput) tableOutput.style.display = 'none'; // 隱藏分欄結果
             } else {
                 previewBox.style.display = 'none';
-                btn.innerText = '<i class="fas fa-search"></i> 預覽符合內容';
+                btn.innerHTML = '<i class="fas fa-search"></i> 預覽符合內容';
                 if (tableOutput) tableOutput.style.display = 'block'; // 顯示分欄結果
             }
         }
