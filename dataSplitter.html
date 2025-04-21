@@ -354,35 +354,7 @@
         }
 
         function clearAll() {
-            // 清除輸入與結果表格
-            document.getElementById("pasteInput").value = '';
-            document.getElementById("tableOutput").innerHTML = '';
-            currentData = [];
-        
-            // 重設簡易分隔方式為 Tab（或4空格）
-            document.querySelector('input[name="delimiter"][value="tab"]').checked = true;
-
-            // 關閉所有預覽框，並重設按鈕文字
-            document.querySelectorAll('.rule-block').forEach(block => {
-                const previewBox = block.querySelector('.preview-box');
-                if (previewBox) {
-                    previewBox.style.display = 'none';
-                    previewBox.innerHTML = '';
-                }
-        
-                const toggleBtn = block.querySelector('button[onclick="togglePreview(this)"]');
-                if (toggleBtn) {
-                    toggleBtn.innerHTML = '<i class="fas fa-search"></i> 預覽符合內容';
-                }
-            });
-            
-            // 顯示主結果表格區
-            document.getElementById("tableOutput").style.display = 'block';
-
-            // 重置條件
-            document.querySelectorAll('.rule-block').forEach(block => {
-                resetCondition(block);
-            });
+            location.reload(); // 等同於按下 F5
         }
 
         // 將結果表格複製為文字（Tab 分隔格式）
