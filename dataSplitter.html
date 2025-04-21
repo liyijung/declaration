@@ -3,6 +3,8 @@
 
 <head>
     <link rel="icon" href="favicon_A.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <meta charset="UTF-8">
     <title>資料分欄</title>
     <style>
@@ -134,17 +136,17 @@
             <label><input type="radio" name="delimiter" value="none">不分隔 (使用進階條件)</label>
         </p>
 
-        <button onclick="splitToTable()">🔍 剖析並分欄</button>
-        <button onclick="clearAll()">🧹 清除</button>
+        <button onclick="splitToTable()"><i class="fas fa-search"></i> 剖析並分欄</button>
+        <button onclick="clearAll()"><i class="fas fa-broom"></i> 清除</button>
 
         <!-- 示範影片區塊 -->
         <a href="dataSplitterVideo.html" target="_blank" style="text-decoration: none;">
-            <button style="margin-left: 50px;">🎬 進階條件示範影片</button>
+            <button style="margin-left: 50px;"><i class="fas fa-video"></i> 進階條件示範影片</button>
         </a>
 
         <!-- 正則表示式對照表按鈕與內容 -->
         <div id="regex-help-block" class="regex-help-block" style="display: inline-block; vertical-align: top;">
-            <span id="regex-toggle-btn" style="cursor: pointer;">📘 正則表示式對照</span>
+            <span id="regex-toggle-btn" style="cursor: pointer;"><i class="fas fa-book"></i> 正則表示式對照</span>
             <div id="regex-help-modal" class="regex-help-modal">
                 <h3 style="font-size: 15px; margin-top: 0;">常用正則表示式對照表</h3>
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
@@ -201,51 +203,51 @@
                 <input type="text" class="conditionValue" style="width: 213px; margin-right: 8px;">
                 限定欄位：<input type="number" class="columnScope" min="1" style="width: 134px;">
                 移至欄位：<input type="number" class="targetColumn" min="1" style="width: 134px;">
-                <button onclick="moveMatched(this)">🔄 移動</button>
+                <button onclick="moveMatched(this)"><i class="fas fa-retweet"></i> 移動</button>
             </p>
             <p>
-                分隔方式：<select class="splitMode" style="width: 125px;">
+                分隔方式：<select class="splitMode" style="width: 130px;">
                     <option value="space">空格</option>
                     <option value="regex">關鍵字</option>
                 </select>
-                關鍵字處理：<select class="keywordAction" style="width: 142px;">
+                關鍵字處理：<select class="keywordAction" style="width: 143px;">
                     <option value=""></option>
                     <option value="mergeAfter">與後欄合併</option>
                     <option value="mergeBefore">與前欄合併</option>
                     <option value="keep">獨立一欄</option>
                     <option value="splitOnly">不保留</option>
                 </select>
-                <button onclick="splitMatched(this)">✂️ 分隔</button>
+                <button onclick="splitMatched(this)"><i class="fas fa-scissors"></i> 分隔</button>
 
-                合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 72px;">
+                合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 73px;">
                 到 <input type="number" class="mergeTo" min="1" style="width: 73px;">
                 插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 91px;">
-                <button onclick="mergeColumns(this)">🧬 合併</button>
+                <button onclick="mergeColumns(this)"><i class="fas fa-code-branch"></i> 合併</button>
             </p>
 
             <p>
-                刪除空欄：<select class="blankRemoveAction" style="width: 98px;">
+                刪除空欄：<select class="blankRemoveAction" style="width: 107px;">
                     <option value="removeBefore">符合欄前</option>
                     <option value="removeAfter">符合欄後</option>
                 </select>
-                <button onclick="performBlankRemove(this)">➖ 刪除</button>
+                <button onclick="performBlankRemove(this)"><i class="fas fa-minus"></i> 刪除</button>
 
-                插入空欄：<select class="blankInsertAction" style="width: 99px;">
+                插入空欄：<select class="blankInsertAction" style="width: 106px;">
                     <option value="insertBefore">符合欄前</option>
                     <option value="insertAfter">符合欄後</option>
                 </select>
-                <button onclick="performBlankInsert(this)">➕ 插入</button>
+                <button onclick="performBlankInsert(this)"><i class="fas fa-plus"></i> 插入</button>
 
-                移動欄位：<input type="number" id="shift-col" min="1" style="width: 88px;">
-                位移格數：<input type="number" id="shift-rows" style="width: 88px;" min="0" max="9999" oninput="checkShiftLimit()">
+                移動欄位：<input type="number" id="shift-col" min="1" style="width: 94px;">
+                位移格數：<input type="number" id="shift-rows" style="width: 93px;" min="0" max="9999" oninput="checkShiftLimit()">
                 <span id="shift-limit-tip" style="color: red; font-size: 13px; margin-left: 6px;"></span>
-                <button onclick="shiftColumn('up')">⬆️ 上移</button>
-                <button onclick="shiftColumn('down')">⬇️ 下移</button>
+                <button onclick="shiftColumn('up')"><i class="fas fa-arrow-up"></i> 上移</button>
+                <button onclick="shiftColumn('down')"><i class="fas fa-arrow-down"></i> 下移</button>
             </p>
 
             <p>
-                <button onclick="togglePreview(this)">🔎 預覽符合內容</button>
-                <button onclick="resetCondition(this)">♻️ 重置條件</button>
+                <button onclick="togglePreview(this)"><i class="fas fa-search"></i> 預覽符合內容</button>
+                <button onclick="resetCondition(this)"><i class="fas fa-sync-alt"></i> 重置條件</button>
             </p>
 
             <div class="preview-box" style="display: none; border: 1px dashed #aaa; background: #fffde7; padding: 8px; margin-top: 10px; font-size: 14px;"></div>
@@ -254,7 +256,7 @@
     </div>
 
     <h3>🧾 分欄結果：
-        <button onclick="copyResult()" style="margin-left: 32px;">📋 複製結果</button>
+        <button onclick="copyResult()" style="margin-left: 32px;"><i class="fas fa-clipboard"></i> 複製結果</button>
     </h3>
     <div id="tableOutput" style="margin-bottom: 60px;"></div>
 
