@@ -290,7 +290,7 @@
                 return;
             }
 
-            const raw = document.getElementById("pasteInput").value.trim();
+            const raw = document.getElementById("pasteInput").value.replace(/\u200B/g, '').trim();
             if (!raw) {
                 alert("請先貼上資料再執行分欄！");
                 return;
