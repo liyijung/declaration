@@ -862,6 +862,22 @@
             const pattern = block.querySelector('.conditionValue').value.trim();
             const type = block.querySelector('.conditionType').value;
             const colScope = block.querySelector('.columnScope').value;
+            const previewBox = block.querySelector('.preview-box');
+
+            const moveEntireColumn = pattern === '';
+            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
+
+            if (moveEntireColumn && scopeIndex !== null) {
+                currentData = currentData.map(row => {
+                    const newRow = [...row];
+                    newRow.splice(scopeIndex, 0, '');
+                    return newRow;
+                });
+                renderTable(currentData);
+                if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+                return;
+            }
+
             if (!pattern) return;
 
             let regex;
@@ -871,8 +887,6 @@
                 alert(`無效的正則表示式：${err.message}`);
                 return;
             }
-
-            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
 
             currentData = currentData.map(row => {
                 let newRow = [...row];
@@ -884,25 +898,18 @@
                         (type === 'matches' && regex.test(val)) ||
                         (type === 'notMatches' && !regex.test(val))
                     );
-                    if (matched && insertIndex === -1) {
-                        insertIndex = idx;
-                    }
+                    if (matched && insertIndex === -1) insertIndex = idx;
                 });
 
                 if (insertIndex !== -1) {
-                    newRow.splice(insertIndex, 0, ''); // 插入空欄
+                    newRow.splice(insertIndex, 0, '');
                 }
 
                 return newRow;
             });
 
             renderTable(currentData);
-
-            // 若預覽有開啟，即時更新
-            const previewBox = block.querySelector('.preview-box');
-            if (previewBox && previewBox.style.display !== 'none') {
-                updatePreview(block);
-            }
+            if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
         }
 
         // 符合欄前插入
@@ -911,6 +918,24 @@
             const pattern = block.querySelector('.conditionValue').value.trim();
             const type = block.querySelector('.conditionType').value;
             const colScope = block.querySelector('.columnScope').value;
+            const previewBox = block.querySelector('.preview-box');
+
+            const moveEntireColumn = pattern === '';
+            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
+
+            if (moveEntireColumn && scopeIndex !== null) {
+                currentData = currentData.map(row => {
+                    const newRow = [...row];
+                    if (scopeIndex > 0 && newRow[scopeIndex - 1] === '') {
+                        newRow.splice(scopeIndex - 1, 1);
+                    }
+                    return newRow;
+                });
+                renderTable(currentData);
+                if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+                return;
+            }
+
             if (!pattern) return;
 
             let regex;
@@ -920,8 +945,6 @@
                 alert(`無效的正則表示式：${err.message}`);
                 return;
             }
-
-            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
 
             currentData = currentData.map(row => {
                 let newRow = [...row];
@@ -934,7 +957,7 @@
                     );
 
                     if (matched && idx > 0 && newRow[idx - 1] === '') {
-                        newRow.splice(idx - 1, 1); // 刪除前一欄空白
+                        newRow.splice(idx - 1, 1);
                     }
                 });
 
@@ -942,20 +965,33 @@
             });
 
             renderTable(currentData);
-
-            // 若預覽有開啟，即時更新
-            const previewBox = block.querySelector('.preview-box');
-            if (previewBox && previewBox.style.display !== 'none') {
-                updatePreview(block);
-            }
+            if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
         }
-        
+
         // 符合欄後刪除
         function removeBlankAfterMatched(btn) {
             const block = btn.closest('.rule-block');
             const pattern = block.querySelector('.conditionValue').value.trim();
             const type = block.querySelector('.conditionType').value;
             const colScope = block.querySelector('.columnScope').value;
+            const previewBox = block.querySelector('.preview-box');
+
+            const moveEntireColumn = pattern === '';
+            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
+
+            if (moveEntireColumn && scopeIndex !== null) {
+                currentData = currentData.map(row => {
+                    const newRow = [...row];
+                    if (newRow[scopeIndex + 1] === '') {
+                        newRow.splice(scopeIndex + 1, 1);
+                    }
+                    return newRow;
+                });
+                renderTable(currentData);
+                if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+                return;
+            }
+
             if (!pattern) return;
 
             let regex;
@@ -965,8 +1001,6 @@
                 alert(`無效的正則表示式：${err.message}`);
                 return;
             }
-
-            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
 
             currentData = currentData.map(row => {
                 let newRow = [...row];
@@ -979,7 +1013,7 @@
                     );
 
                     if (matched && newRow[idx + 1] === '') {
-                        newRow.splice(idx + 1, 1); // 刪除後方空欄
+                        newRow.splice(idx + 1, 1);
                     }
                 });
 
@@ -987,7 +1021,6 @@
             });
 
             renderTable(currentData);
-            const previewBox = block.querySelector('.preview-box');
             if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
         }
 
@@ -997,6 +1030,22 @@
             const pattern = block.querySelector('.conditionValue').value.trim();
             const type = block.querySelector('.conditionType').value;
             const colScope = block.querySelector('.columnScope').value;
+            const previewBox = block.querySelector('.preview-box');
+
+            const moveEntireColumn = pattern === '';
+            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
+
+            if (moveEntireColumn && scopeIndex !== null) {
+                currentData = currentData.map(row => {
+                    const newRow = [...row];
+                    newRow.splice(scopeIndex + 1, 0, '');
+                    return newRow;
+                });
+                renderTable(currentData);
+                if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+                return;
+            }
+
             if (!pattern) return;
 
             let regex;
@@ -1006,8 +1055,6 @@
                 alert(`無效的正則表示式：${err.message}`);
                 return;
             }
-
-            const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
 
             currentData = currentData.map(row => {
                 let newRow = [...row];
@@ -1020,7 +1067,7 @@
                     );
 
                     if (matched) {
-                        newRow.splice(idx + 1, 0, ''); // 在後方插入空欄
+                        newRow.splice(idx + 1, 0, '');
                     }
                 });
 
@@ -1028,9 +1075,9 @@
             });
 
             renderTable(currentData);
-            const previewBox = block.querySelector('.preview-box');
             if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
         }
+
 
         function performBlankInsert(btn) {
             const block = btn.closest('.rule-block');
