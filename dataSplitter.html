@@ -439,6 +439,12 @@
             const colScope = block.querySelector('.columnScope').value;
             if (!pattern && splitMode === 'regex') return;
 
+            // 防止 .* 等過度寬鬆的正則造成無限迴圈
+            if ((pattern === '.*' || pattern === '^.*$') && splitMode === 'regex') {
+                alert('⚠️ 請勿使用過於寬鬆的正則，例如 .* 或 ^.*$ 可能造成當機！');
+                return;
+            }
+            
             const testRegex = new RegExp(pattern);           // 不加 'g'：專門給 test() 用
             const execRegexGlobal = () => new RegExp(pattern, 'g'); // 用 function 每筆建立新的
 
@@ -468,6 +474,7 @@
                                 let parts = [], lastIndex = 0, match;
                                 const regex = execRegexGlobal(); // 每筆都用新的 regex
                                 while ((match = regex.exec(val)) !== null) {
+                                    if (match[0] === '') break; // 防止 .* 造成無限循環
                                     if (match.index > lastIndex) parts.push(val.substring(lastIndex, match.index));
                                     parts.push(match[0]); // 保留關鍵字
                                     lastIndex = regex.lastIndex;
@@ -479,6 +486,7 @@
                                 let merged = [], lastIndex = 0, match;
                                 const regex = execRegexGlobal(); // 每筆都用新的 regex
                                 while ((match = regex.exec(val)) !== null) {
+                                    if (match[0] === '') break; // 防止 .* 造成無限循環
                                     if (match.index > lastIndex) merged.push(val.substring(lastIndex, match.index));
                                     merged.push(val.substring(match.index)); // 含關鍵字後段
                                     lastIndex = val.length;
@@ -491,6 +499,7 @@
                                 let merged = [], match;
                                 const regex = execRegexGlobal(); // 每筆都用新的 regex
                                 while ((match = regex.exec(val)) !== null) {
+                                    if (match[0] === '') break; // 防止 .* 造成無限循環
                                     let front = val.substring(0, match.index + match[0].length);
                                     merged.push(front);
                                     if (match.index + match[0].length < val.length) {
@@ -504,6 +513,7 @@
                                 let parts = [], lastIndex = 0, match;
                                 const regex = execRegexGlobal(); // 每筆都用新的 regex
                                 while ((match = regex.exec(val)) !== null) {
+                                    if (match[0] === '') break; // 防止 .* 造成無限循環
                                     if (match.index > lastIndex) parts.push(val.substring(lastIndex, match.index));
                                     lastIndex = regex.lastIndex;
                                 }
