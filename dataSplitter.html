@@ -351,7 +351,7 @@
 
             rows.forEach((r, idx) => {
                 html += `<tr id="row-${idx}">`;
-                html += `<td style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2; text-align: right; font-weight: bold;">${idx + 1}</td>`; // 行號
+                html += `<td style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2; text-align: center; font-weight: bold;">${idx + 1}</td>`; // 行號
                 for (let i = 0; i < maxCols; i++)
                     html += `<td class="cell-${idx} cell-${idx}-${i}">${r[i] || ''}</td>`;
                 html += '</tr>';
@@ -643,7 +643,7 @@
 
             currentData.forEach((row, rowIndex) => {
                 html += '<tr>';
-                html += `<td style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2; text-align: right; font-weight: bold;">${rowIndex + 1}</td>`; // 行號欄
+                html += `<td style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2; text-align: center; font-weight: bold;">${rowIndex + 1}</td>`; // 行號欄
                 for (let i = 0; i < maxCols; i++) {
                     let val = String(row[i] || '');
                     const inScope = !colScope || parseInt(colScope) - 1 === i;
