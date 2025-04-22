@@ -903,7 +903,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (className === 'ISCALC_WT') {
                     value = item.querySelector(`.${className}`).checked ? 'Y' : '';
                 } else {
-                    value = escapeXml(item.querySelector(`.${className}`).value);
+                    value = item.querySelector(`.${className}`).value || '';
+                    value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '').trim();
+                    value = escapeXml(value);
                     
                     // 替換單位及稅則
                     value = replaceValue(className, value);
