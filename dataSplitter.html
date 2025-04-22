@@ -426,10 +426,27 @@
             const type = block.querySelector('.conditionType').value; // 符合 / 不符合
             const colScope = block.querySelector('.columnScope').value; // 限定欄位
             const target = parseInt(block.querySelector('.targetColumn').value) - 1; // 目標欄位 index
-            if (!pattern || isNaN(target)) return;
+            if (isNaN(target)) return;
+            const moveEntireColumn = pattern === ''; // ⬅️ 新增：若沒填寫正則，表示整欄移動
             const regex = new RegExp(pattern);
 
             currentData = currentData.map(row => {
+                const newRow = [...row];
+
+                if (moveEntireColumn) {
+                    // ⬅️ 移動整欄
+                    if (colScope) {
+                        const from = parseInt(colScope) - 1;
+                        if (from !== target && from >= 0 && from < newRow.length) {
+                            const value = newRow.splice(from, 1)[0];
+                            while (newRow.length < target) newRow.push('');
+                            newRow.splice(target, 0, value);
+                        }
+                    }
+                    return newRow;
+                }
+
+                // 以下根據關鍵字判斷是否移動
                 let matchIndex = -1;
                 const scopeStart = colScope ? parseInt(colScope) - 1 : 0;
                 const scopeEnd = colScope ? scopeStart + 1 : row.length;
