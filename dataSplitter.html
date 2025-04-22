@@ -128,6 +128,7 @@
             gap: 45px; /* 控制左右間距 */
             margin-bottom: 10px;
         }
+
     </style>
 </head>
 
@@ -257,7 +258,7 @@
                 <button onclick="resetCondition(this)"><i class="fas fa-sync-alt"></i> 重置條件</button>
             </p>
 
-            <div class="preview-box" style="display: none; border: 1px dashed #aaa; background: #fffde7; padding: 8px; margin-top: 10px; font-size: 14px;"></div>
+            <div class="preview-box" style="display: none; border: 1px dashed #aaa; background: #fffde7; padding: 0px; margin-top: 10px; font-size: 14px;"></div>
             
         </div>
     </div>
@@ -344,14 +345,18 @@
         function renderTable(rows) {
             const maxCols = Math.max(...rows.map(r => r.length)); // 取得最多欄位數
             let html = '<table><thead><tr>';
-            for (let i = 0; i < maxCols; i++) html += `<th>欄位${i + 1}</th>`; // 表頭
+            html += '<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">#</th>'; // 加入行號欄
+            for (let i = 0; i < maxCols; i++) html += `<th>欄位${i + 1}</th>`;
             html += '</tr></thead><tbody>';
+
             rows.forEach((r, idx) => {
                 html += `<tr id="row-${idx}">`;
+                html += `<td style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2; text-align: right; font-weight: bold;">${idx + 1}</td>`; // 行號
                 for (let i = 0; i < maxCols; i++)
-                    html += `<td class="cell-${idx} cell-${idx}-${i}">${r[i] || ''}</td>`; // 每格資料
+                    html += `<td class="cell-${idx} cell-${idx}-${i}">${r[i] || ''}</td>`;
                 html += '</tr>';
             });
+
             html += '</tbody></table>';
             document.getElementById("tableOutput").innerHTML = html;
         }
@@ -629,14 +634,16 @@
             const maxCols = Math.max(...currentData.map(row => row.length));
             let html = '<table style="border-collapse: collapse; font-size: 14px;">';
 
-            html += '<thead><tr>';
-            for (let i = 0; i < maxCols; i++) {
-                html += `<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">欄位${i + 1}</th>`;
-            }
-            html += '</tr></thead><tbody>';
+                html += '<thead><tr>';
+                html += `<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">#</th>`; // 行號欄
+                for (let i = 0; i < maxCols; i++) {
+                    html += `<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">欄位${i + 1}</th>`;
+                }
+                html += '</tr></thead><tbody>';
 
             currentData.forEach((row, rowIndex) => {
                 html += '<tr>';
+                html += `<td style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2; text-align: right; font-weight: bold;">${rowIndex + 1}</td>`; // 行號欄
                 for (let i = 0; i < maxCols; i++) {
                     let val = String(row[i] || '');
                     const inScope = !colScope || parseInt(colScope) - 1 === i;
