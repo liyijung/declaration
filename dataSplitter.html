@@ -236,13 +236,13 @@
 
             <p>
                 刪除空欄：<select class="blankRemoveAction" style="width: 107px;">
-                    <option value="removeBefore" selected>符合欄前</option>
+                    <option value="removeBefore">符合欄前</option>
                     <option value="removeAfter">符合欄後</option>
                 </select>
                 <button onclick="performBlankRemove(this)"><i class="fas fa-minus"></i> 刪除</button>
 
                 插入空欄：<select class="blankInsertAction" style="width: 106px;">
-                    <option value="insertBefore" selected>符合欄前</option>
+                    <option value="insertBefore">符合欄前</option>
                     <option value="insertAfter">符合欄後</option>
                 </select>
                 <button onclick="performBlankInsert(this)"><i class="fas fa-plus"></i> 插入</button>
@@ -1141,7 +1141,7 @@
             block.querySelector('.mergeTo').value = '';
             block.querySelector('.mergeTarget').value = '';
             block.querySelector('.blankInsertAction').value = 'insertBefore';
-            block.querySelector('.blankRemoveAction').value = 'removeAfter';
+            block.querySelector('.blankRemoveAction').value = 'removeBefore';
 
             // 清空「移動欄位」與「位移格數」
             document.getElementById('shift-col').value = '';
