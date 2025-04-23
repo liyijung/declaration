@@ -756,15 +756,7 @@
                         }
                     }
 
-                    html += `<td 
-                        class="cell-${rowIndex}-${i}" 
-                        data-row="${rowIndex}" 
-                        data-col="${i}" 
-                        tabindex="0"
-                        onclick="this.focus(); highlightFocusedCell(this)"
-                        onkeydown="handleCellKey(event)" 
-                        style="border: 1px solid #ccc; padding: 4px;"
-                    >${val}</td>`;
+                    html += `<td style="border: 1px solid #ccc; padding: 4px;">${val}</td>`;
                 }
                 html += '</tr>';
             });
