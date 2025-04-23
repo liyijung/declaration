@@ -361,9 +361,18 @@
 
         // 將資料渲染成 HTML 表格
         function renderTable(rows) {
-            const maxCols = Math.max(...rows.map(r => r.length)); // 取得最多欄位數
+            // 先記錄目前的焦點格（如有）
+            let focusedRow = null;
+            let focusedCol = null;
+            const active = document.activeElement;
+            if (active && active.dataset && active.dataset.row && active.dataset.col) {
+                focusedRow = parseInt(active.dataset.row);
+                focusedCol = parseInt(active.dataset.col);
+            }
+
+            const maxCols = Math.max(...rows.map(r => r.length));
             let html = '<table><thead><tr>';
-            html += '<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">#</th>'; // 行號欄
+            html += '<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">#</th>';
             for (let i = 0; i < maxCols; i++) {
                 html += `<th>欄位${i + 1}</th>`;
             }
@@ -387,6 +396,15 @@
 
             html += '</tbody></table>';
             document.getElementById("tableOutput").innerHTML = html;
+
+            // 還原原本的焦點與藍框
+            if (focusedRow !== null && focusedCol !== null) {
+                const cell = document.querySelector(`.cell-${focusedRow}-${focusedCol}`);
+                if (cell) {
+                    cell.focus();
+                    cell.classList.add('cell-focus');
+                }
+            }
 
             // 即時更新所有開啟中的預覽區
             document.querySelectorAll('.rule-block').forEach(block => {
