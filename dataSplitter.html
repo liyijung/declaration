@@ -267,6 +267,9 @@
     <div class="title-row">
         <h3><i class="fas fa-file-invoice"></i> 分欄結果：</h3>
         <button onclick="copyResult()"><i class="fas fa-clipboard"></i> 複製結果</button>
+        <span style="font-size: 16px; color: #555;">
+            （可選取單格 ↑ ↓ ← → 移動、Insert 插入右移、Delete 刪除空欄左移）
+        </span>    
     </div>
     <div id="tableOutput" style="margin-bottom: 60px;"></div>
 
@@ -346,15 +349,25 @@
         function renderTable(rows) {
             const maxCols = Math.max(...rows.map(r => r.length)); // 取得最多欄位數
             let html = '<table><thead><tr>';
-            html += '<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">#</th>'; // 加入行號欄
-            for (let i = 0; i < maxCols; i++) html += `<th>欄位${i + 1}</th>`;
+            html += '<th style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2;">#</th>'; // 行號欄
+            for (let i = 0; i < maxCols; i++) {
+                html += `<th>欄位${i + 1}</th>`;
+            }
             html += '</tr></thead><tbody>';
 
             rows.forEach((r, idx) => {
                 html += `<tr id="row-${idx}">`;
-                html += `<td style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2; text-align: center; font-weight: bold;">${idx + 1}</td>`; // 行號
-                for (let i = 0; i < maxCols; i++)
-                    html += `<td class="cell-${idx} cell-${idx}-${i}">${r[i] || ''}</td>`;
+                html += `<td style="border: 1px solid #ccc; padding: 4px; background-color: #f2f2f2; text-align: center; font-weight: bold;">${idx + 1}</td>`;
+                for (let i = 0; i < maxCols; i++) {
+                    html += `<td 
+                        class="cell-${idx} cell-${idx}-${i}" 
+                        data-row="${idx}" 
+                        data-col="${i}" 
+                        tabindex="0" 
+                        onkeydown="handleCellKey(event)" 
+                        onclick="this.focus()"
+                    >${r[i] || ''}</td>`;
+                }
                 html += '</tr>';
             });
 
@@ -1156,7 +1169,64 @@
                 updatePreview(block);
             }
         }
-        
+
+        function handleCellKey(e) {
+            const td = e.target;
+            const row = parseInt(td.dataset.row);
+            const col = parseInt(td.dataset.col);
+            const currentVal = currentData[row][col] || '';
+
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (row > 0) {
+                        [currentData[row][col], currentData[row - 1][col]] = [currentData[row - 1][col], currentVal];
+                        renderTable(currentData);
+                        focusCell(row - 1, col);
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (row < currentData.length - 1) {
+                        [currentData[row][col], currentData[row + 1][col]] = [currentData[row + 1][col], currentVal];
+                        renderTable(currentData);
+                        focusCell(row + 1, col);
+                    }
+                    break;
+                case 'ArrowLeft':
+                    if (col > 0) {
+                        [currentData[row][col], currentData[row][col - 1]] = [currentData[row][col - 1], currentVal];
+                        renderTable(currentData);
+                        focusCell(row, col - 1);
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (col < currentData[row].length - 1) {
+                        [currentData[row][col], currentData[row][col + 1]] = [currentData[row][col + 1], currentVal];
+                        renderTable(currentData);
+                        focusCell(row, col + 1);
+                    }
+                    break;
+                case 'Delete':
+                    if (!currentVal || currentVal.trim() === '') {
+                        currentData[row].splice(col, 1); // 同列往左推
+                        renderTable(currentData);
+                        focusCell(row, col);
+                    }
+                    break;
+                case 'Insert':
+                    currentData[row].splice(col, 0, ''); // 插入空欄
+                    renderTable(currentData);
+                    focusCell(row, col);
+                    break;
+            }
+        }
+
+        function focusCell(row, col) {
+            setTimeout(() => {
+                const cell = document.querySelector(`.cell-${row}-${col}`);
+                if (cell) cell.focus();
+            }, 10);
+        }
+
     </script>
 
 </body>
