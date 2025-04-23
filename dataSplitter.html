@@ -387,6 +387,14 @@
 
             html += '</tbody></table>';
             document.getElementById("tableOutput").innerHTML = html;
+
+            // 即時更新所有開啟中的預覽區
+            document.querySelectorAll('.rule-block').forEach(block => {
+                const previewBox = block.querySelector('.preview-box');
+                if (previewBox && previewBox.style.display !== 'none') {
+                    updatePreview(block);
+                }
+            });
         }
 
         function clearAll() {
@@ -748,7 +756,15 @@
                         }
                     }
 
-                    html += `<td style="border: 1px solid #ccc; padding: 4px;">${val}</td>`;
+                    html += `<td 
+                        class="cell-${rowIndex}-${i}" 
+                        data-row="${rowIndex}" 
+                        data-col="${i}" 
+                        tabindex="0"
+                        onclick="this.focus(); highlightFocusedCell(this)"
+                        onkeydown="handleCellKey(event)" 
+                        style="border: 1px solid #ccc; padding: 4px;"
+                    >${val}</td>`;
                 }
                 html += '</tr>';
             });
@@ -1193,6 +1209,7 @@
             switch (e.key) {
                 case 'ArrowUp':
                     if (row > 0) {
+                        ensureCellExists(row - 1, col);
                         [currentData[row][col], currentData[row - 1][col]] = [currentData[row - 1][col], currentVal];
                         renderTable(currentData);
                         focusCell(row - 1, col);
@@ -1200,6 +1217,7 @@
                     break;
                 case 'ArrowDown':
                     if (row < currentData.length - 1) {
+                        ensureCellExists(row + 1, col);
                         [currentData[row][col], currentData[row + 1][col]] = [currentData[row + 1][col], currentVal];
                         renderTable(currentData);
                         focusCell(row + 1, col);
@@ -1207,17 +1225,17 @@
                     break;
                 case 'ArrowLeft':
                     if (col > 0) {
+                        ensureCellExists(row, col - 1);
                         [currentData[row][col], currentData[row][col - 1]] = [currentData[row][col - 1], currentVal];
                         renderTable(currentData);
                         focusCell(row, col - 1);
                     }
                     break;
                 case 'ArrowRight':
-                    if (col < currentData[row].length - 1) {
-                        [currentData[row][col], currentData[row][col + 1]] = [currentData[row][col + 1], currentVal];
-                        renderTable(currentData);
-                        focusCell(row, col + 1);
-                    }
+                    ensureCellExists(row, col + 1);
+                    [currentData[row][col], currentData[row][col + 1]] = [currentData[row][col + 1], currentData[row][col]];
+                    renderTable(currentData);
+                    focusCell(row, col + 1);
                     break;
                 case 'Delete':
                     if (!currentVal || currentVal.trim() === '') {
@@ -1231,6 +1249,13 @@
                     renderTable(currentData);
                     focusCell(row, col);
                     break;
+            }
+        }
+        
+        function ensureCellExists(row, col) {
+            if (!currentData[row]) currentData[row] = [];
+            while (currentData[row].length <= col) {
+                currentData[row].push('');
             }
         }
 
