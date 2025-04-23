@@ -115,18 +115,24 @@
             z-index: 2;
         }
         
-        #tableOutput table thead th {
+        .title-row {
             position: sticky;
-            top: 0;
-            background-color: #f2f2f2;
-            z-index: 2;
+            top: 0; /* 頂部吸附 */
+            z-index: 20; /* 比 table header 小 */
+            background-color: #fff;
+            padding: 10px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #ccc;
+            width: 100%; /* ⬅️ 加這行，讓背景撐滿整個可視寬度 */
         }
 
-        .title-row {
-            display: flex;
-            align-items: center;
-            gap: 45px; /* 控制左右間距 */
-            margin-bottom: 10px;
+        #tableOutput table thead th {
+            position: sticky;
+            top: 40px; /* 根據 .title-row 高度微調 */
+            background-color: #f2f2f2;
+            z-index: 30;
         }
 
         td.cell-focus {
@@ -270,12 +276,15 @@
     </div>
 
     <div class="title-row">
-        <h3><i class="fas fa-file-invoice"></i> 分欄結果：</h3>
-        <button onclick="copyResult()"><i class="fas fa-clipboard"></i> 複製結果</button>
+        <span style="font-size: 18px; font-weight: bold;">
+            <i class="fas fa-file-invoice"></i> 分欄結果：
+        </span>
+        <button onclick="copyResult()" style="margin-left: 25px;"><i class="fas fa-clipboard"></i> 複製結果</button>
         <span style="font-size: 16px; color: #555;">
             （可選取單格 ↑ ↓ ← → 移動、Insert 插入右移、Delete 刪除空欄左移）
-        </span>    
+        </span>
     </div>
+
     <div id="tableOutput" style="margin-bottom: 60px;"></div>
 
     <script>
