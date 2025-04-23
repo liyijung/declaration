@@ -1424,6 +1424,19 @@
             td.classList.add('cell-focus');
         }
 
+        // 捲動滑鼠滾輪時，取消藍框並移除瀏覽器焦點
+        document.addEventListener('wheel', () => {
+            // 移除藍框樣式
+            document.querySelectorAll('td.cell-focus').forEach(cell => {
+                cell.classList.remove('cell-focus');
+            });
+
+            // 取消目前的 focus 狀態（如有）
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+            }
+        }, { passive: true });
+        
     </script>
 
 </body>
