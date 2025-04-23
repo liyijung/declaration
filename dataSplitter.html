@@ -129,6 +129,11 @@
             margin-bottom: 10px;
         }
 
+        td.cell-focus {
+            outline: 2px solid #007bff; /* 或其他顏色，例如 #00bcd4 */
+            outline-offset: -1px;
+        }
+
     </style>
 </head>
 
@@ -365,7 +370,7 @@
                         data-col="${i}" 
                         tabindex="0" 
                         onkeydown="handleCellKey(event)" 
-                        onclick="this.focus()"
+                        onclick="this.focus(); highlightFocusedCell(this)"
                     >${r[i] || ''}</td>`;
                 }
                 html += '</tr>';
@@ -1222,9 +1227,27 @@
 
         function focusCell(row, col) {
             setTimeout(() => {
+                // 移除所有 cell 的 focus 樣式
+                document.querySelectorAll('td.cell-focus').forEach(cell => {
+                    cell.classList.remove('cell-focus');
+                });
+
+                // 將焦點加到指定 cell 並加上樣式
                 const cell = document.querySelector(`.cell-${row}-${col}`);
-                if (cell) cell.focus();
+                if (cell) {
+                    cell.focus();
+                    cell.classList.add('cell-focus');
+                }
             }, 10);
+        }
+
+        function highlightFocusedCell(td) {
+            // 先清除所有焦點樣式
+            document.querySelectorAll('td.cell-focus').forEach(cell => {
+                cell.classList.remove('cell-focus');
+            });
+
+            td.classList.add('cell-focus');
         }
 
     </script>
