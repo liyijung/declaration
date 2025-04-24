@@ -315,7 +315,7 @@
             }
 
             const raw = document.getElementById("pasteInput").value
-            .replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u00A0\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF\u003F\uFFFD]/g, '')
+            .replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u00A0\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
             .trim();
             
             if (!raw) {
