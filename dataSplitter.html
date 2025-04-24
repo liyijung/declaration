@@ -423,7 +423,7 @@
                 text += filledRow.map(val => {
                     const v = String(val || '');
                     const isNumeric = /^[+-]?(?:\d+|\d{1,3}(,\d{3})*)(\.\d+)?([eE][+-]?\d+)?$/.test(v);
-                    return isNumeric ? `'${v}` : v;
+                    return isNumeric ? `\u2060${v}` : v;
                 }).join('\t') + '\n';
             });
         
