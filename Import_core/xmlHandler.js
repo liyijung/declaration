@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 let value = escapeXml(element.value);
 
                 // 過濾非可見字符、控制代碼及無效字符
-                value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '').trim();
+                value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u00A0\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '').trim();
 
                 // 對 CURRENCY 欄位進行特殊處理
                 if (id === 'CURRENCY') {
@@ -767,7 +767,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     value = item.querySelector(`.${className}`).checked ? 'Y' : '';
                 } else {
                     value = item.querySelector(`.${className}`).value || '';
-                    value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '').trim();
+                    value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u00A0\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '').trim();
                     value = escapeXml(value);
                     
                     // 替換單位及稅則
