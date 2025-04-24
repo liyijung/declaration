@@ -250,16 +250,16 @@
                 刪除空欄：<select class="blankRemoveAction" style="width: 107px;">
                     <option value="removeBefore">符合欄前</option>
                     <option value="removeAfter">符合欄後</option>
-                    <option value="removeAbove">符合欄上【條件+限定欄位】</option>
-                    <option value="removeBelow">符合欄下【條件+限定欄位】</option>
+                    <option value="removeAbove">符合欄上</option>
+                    <option value="removeBelow">符合欄下</option>
                 </select>
                 <button onclick="performBlankRemove(this)"><i class="fas fa-minus"></i> 刪除</button>
 
                 插入空欄：<select class="blankInsertAction" style="width: 106px;">
                     <option value="insertBefore">符合欄前</option>
                     <option value="insertAfter">符合欄後</option>
-                    <option value="insertAbove">符合欄上【條件+限定欄位】</option>
-                    <option value="insertBelow">符合欄下【條件+限定欄位】</option>
+                    <option value="insertAbove">符合欄上</option>
+                    <option value="insertBelow">符合欄下</option>
                 </select>
                 <button onclick="performBlankInsert(this)"><i class="fas fa-plus"></i> 插入</button>
 
@@ -1020,7 +1020,19 @@
             const previewBox = block.querySelector('.preview-box');
             const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
 
-            if (!pattern || scopeIndex === null) return;
+            if (pattern === '' && scopeIndex !== null) {
+                for (let i = 1; i < currentData.length; i++) {
+                    const val = currentData[i][scopeIndex];
+                    const aboveRow = currentData[i - 1];
+                    if (val && String(val).trim() !== '' && aboveRow.every(v => !v || String(v).trim() === '')) {
+                        currentData.splice(i - 1, 1);
+                        i--;
+                    }
+                }
+                renderTable(currentData);
+                if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+                return;
+            }
 
             let regex;
             try {
@@ -1054,7 +1066,19 @@
             const previewBox = block.querySelector('.preview-box');
             const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
 
-            if (!pattern || scopeIndex === null) return;
+            if (pattern === '' && scopeIndex !== null) {
+                for (let i = 0; i < currentData.length - 1; i++) {
+                    const val = currentData[i][scopeIndex];
+                    const belowRow = currentData[i + 1];
+                    if (val && String(val).trim() !== '' && belowRow.every(v => !v || String(v).trim() === '')) {
+                        currentData.splice(i + 1, 1);
+                        i--;
+                    }
+                }
+                renderTable(currentData);
+                if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+                return;
+            }
 
             let regex;
             try {
@@ -1198,7 +1222,18 @@
             const previewBox = block.querySelector('.preview-box');
             const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
 
-            if (!pattern || scopeIndex === null) return;
+            if (pattern === '' && scopeIndex !== null) {
+                for (let i = currentData.length - 1; i >= 0; i--) {
+                    const val = currentData[i][scopeIndex];
+                    if (val && String(val).trim() !== '') {
+                        const newRow = Array(Math.max(...currentData.map(r => r.length))).fill('');
+                        currentData.splice(i, 0, newRow);
+                    }
+                }
+                renderTable(currentData);
+                if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+                return;
+            }
 
             let regex;
             try {
@@ -1230,7 +1265,18 @@
             const previewBox = block.querySelector('.preview-box');
             const scopeIndex = colScope ? parseInt(colScope) - 1 : null;
 
-            if (!pattern || scopeIndex === null) return;
+            if (pattern === '' && scopeIndex !== null) {
+                for (let i = currentData.length - 1; i >= 0; i--) {
+                    const val = currentData[i][scopeIndex];
+                    if (val && String(val).trim() !== '') {
+                        const newRow = Array(Math.max(...currentData.map(r => r.length))).fill('');
+                        currentData.splice(i + 1, 0, newRow);
+                    }
+                }
+                renderTable(currentData);
+                if (previewBox && previewBox.style.display !== 'none') updatePreview(block);
+                return;
+            }
 
             let regex;
             try {
