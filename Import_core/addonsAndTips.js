@@ -613,7 +613,7 @@ function checkTotalAmount() {
                     進口金額限制美金兩萬以下，且通關必驗，<br>
                     若金額超過美金兩萬需檢附輸入許可證才可進口）`,
                     position: 'center',
-                    timeout: 5000,
+                    timeout: false,
                     backgroundColor: '#ffeb3b',
                     onClosed: function() {
                         isWarningShown = false; // 當提示關閉後重置旗標
