@@ -1094,7 +1094,7 @@ function checkTotalAmount() {
                     出口金額限制美金兩萬以下，且通關必驗，<br>
                     若金額超過美金兩萬需檢附輸出許可證才可出口）`,
                     position: 'center',
-                    timeout: 5000,
+                    timeout: false,
                     backgroundColor: '#ffeb3b',
                     onClosed: function() {
                         isWarningShown = false; // 當提示關閉後重置旗標
@@ -1192,3 +1192,15 @@ function fillTodayIfEmpty() {
         input.value = `${rocYear}${month}${day}`; // 例如 1140409
     }
 }
+
+document.getElementById('TO_CODE').addEventListener('blur', function () {
+    const toCode = this.value.trim().toUpperCase();
+    if (toCode.startsWith('US')) {
+        iziToast.info({
+            title: '提醒',
+            message: '自114年5月7日起：<br>輸往美國之TW產製貨品，應檢附『輸美國貨品原產地聲明書』',
+            position: 'center',
+            timeout: false,
+        });
+    }
+});
