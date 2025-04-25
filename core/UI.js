@@ -612,6 +612,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             title: "注意",
                             message: "單件超過70公斤，需一般倉通關",
                             position: "center",
+                            timeout: false,
                             backgroundColor: '#ffeb3b',
                             onClosing: function() {
                                 isWeightWarningVisible = false; // `iziToast` 關閉時解除鎖定
