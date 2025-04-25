@@ -243,7 +243,7 @@ function showIziWarningOnce(message) {
     iziToast.warning({
         title: '注意',
         message: message,
-        timeout: 5000,
+        timeout: false,
         position: 'center',
         backgroundColor: '#ffeb3b',
         onClosed: () => {
