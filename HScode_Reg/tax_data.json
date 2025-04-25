@@ -56442,8 +56442,8 @@
         "統計數量單位": "",
         "統計重量單位": "KGM",
         "稽徵規定": "",
-        "輸入規定": "",
-        "輸出規定": ""
+        "輸入規定": "522 ",
+        "輸出規定": "522 "
     },
     {
         "貨品分類號列": "29329300007",
@@ -56628,6 +56628,32 @@
         "輸出規定": "522 "
     },
     {
+        "貨品分類號列": "29329900751",
+        "中文貨名": "四氫大麻己酚、六氫大麻己酚、六氫大麻酚，及其異構物、酯類、醚類及鹽類",
+        "英文貨名": "Parahexyl, Hexahydrocannabihexol(HHCH), Hexahydrocannabinol(HHC), and their isomers, esters, ethers and salts",
+        "第一欄稅率": "5%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,CN,NZ,SG)",
+        "第三欄稅率": "7.5%",
+        "統計數量單位": "",
+        "統計重量單位": "KGM",
+        "稽徵規定": "",
+        "輸入規定": "522 ",
+        "輸出規定": "522 "
+    },
+    {
+        "貨品分類號列": "29329900760",
+        "中文貨名": "１－（１，３－苯並二噁茂－５－基）－２－丙酮之異構物、酯類、醚類及鹽類",
+        "英文貨名": "Isomer, esters,ethers and salts, of 1-(1,3-Benzodioxol-5-yl) Propan-2-one",
+        "第一欄稅率": "5%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,CN,NZ,SG)",
+        "第三欄稅率": "7.5%",
+        "統計數量單位": "",
+        "統計重量單位": "KGM",
+        "稽徵規定": "",
+        "輸入規定": "522 ",
+        "輸出規定": "522 "
+    },
+    {
         "貨品分類號列": "29329900902",
         "中文貨名": "其他僅具有氧雜原子之雜環化合物",
         "英文貨名": "Other heterocyclic compound with oxygen hetero-atom(s) only",
@@ -56693,7 +56719,20 @@
         "輸出規定": ""
     },
     {
-        "貨品分類號列": "29332900005",
+        "貨品分類號列": "29332900112",
+        "中文貨名": "依托咪酯、美托咪酯、異丙帕酯，及其異構物、酯類、醚類及鹽類",
+        "英文貨名": "Etomidate, Metomidate, Isopropyl 1-(1-phenylethyl)-1H-imidazole-5-carboxylate, and their isomers, esters, ethers, salts",
+        "第一欄稅率": "3.5%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,NZ,SG)",
+        "第三欄稅率": "7.5%",
+        "統計數量單位": "",
+        "統計重量單位": "KGM",
+        "稽徵規定": "",
+        "輸入規定": "522 ",
+        "輸出規定": "522 "
+    },
+    {
+        "貨品分類號列": "29332900997",
         "中文貨名": "其他之結構中含有一未稠合之咪唑環（不論是否氫化）之化合物",
         "英文貨名": "Other compounds containing an unfused imidazole ring (whether or not hydrogened) in the structure",
         "第一欄稅率": "3.5%",
@@ -61309,8 +61348,8 @@
     },
     {
         "貨品分類號列": "30049010303",
-        "中文貨名": "醫藥製劑，含有丙泊酚及其異構物、酯類、醚類及鹽類者",
-        "英文貨名": "Medicaments, containing Propofol , and its isomer, esters, ethers, salts",
+        "中文貨名": "醫藥製劑，含有丙泊酚、依托咪酯，及其異構物、酯類、醚類及鹽類者",
+        "英文貨名": "Medicaments, containing Propofol , Etomidate, and their isomer, esters, ethers, salts",
         "第一欄稅率": "0%",
         "第二欄稅率": "0% (PA,GT,NI,SV,HN,NZ,SG,MH)",
         "第三欄稅率": "0%",
