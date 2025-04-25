@@ -240,7 +240,7 @@ function showIziWarningOnce(message) {
     iziToast.warning({
         title: '說明',
         message: message,
-        timeout: 5000,
+        timeout: 10000,
         position: 'center',
         onClosed: () => {
             shownIziMessages.delete(message); // 關閉後移除，允許再次顯示
