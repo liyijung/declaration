@@ -45,7 +45,7 @@
         }
 
         .rule-block p {
-            margin: 6px 0;
+            margin: 4px 0;
         }
 
         select,
@@ -141,6 +141,20 @@
             outline-offset: -1px;
         }
 
+        .group {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px; /* 大螢幕正常 gap */
+        }
+
+        @media (max-width: 768px) {
+            .group {
+                margin-top: 2px;
+            }
+            .rule-block p {
+                margin: 0px;
+            }
+        }
     </style>
 </head>
 
@@ -207,67 +221,79 @@
     <div id="regexRules" style="background-color: #cee1fd;">
         <div class="rule-block">
             <p>
-                正則條件：<select class="conditionType" style="width: 97px;">
-                    <option value="matches">符合</option>
-                    <option value="notMatches">不符合</option>
-                </select>                
-                <select class="regexTemplate" style="width: 120px;"
-                        onchange="this.parentElement.querySelector('.conditionValue').value = this.value">
-                    <option value="">關鍵字</option>
-                    <option value="^\s*\d+(,\d+)?(\.\d+)?">數字開頭</option>
-                    <option value="\d+(,\d+)?(\.\d+)?\s*$">數字結尾</option>
-                    <option value="^\s*[A-Za-z]">英文開頭</option>
-                    <option value="[A-Za-z]\s*$">英文結尾</option>                    
-                    <option value="\d{4}\.\d{2}\.\d{2}\.\d{2}-\d">稅則</option>
-                </select>
-                <input type="text" class="conditionValue" style="width: 213px; margin-right: 8px;">
-                限定欄位：<input type="number" class="columnScope" min="1" style="width: 95px;">
-                <button onclick="deleteColumn(this)" style="margin-left: 4px;" tabindex="-1"><i class="fas fa-trash"></i> 刪除</button>
-                移至欄位：<input type="number" class="targetColumn" min="1" style="width: 91px;">
-                <button onclick="moveMatched(this)"><i class="fas fa-retweet"></i> 移動</button>
+                <span class="group">
+                    正則條件：<select class="conditionType" style="width: 97px;">
+                        <option value="matches">符合</option>
+                        <option value="notMatches">不符合</option>
+                    </select>                
+                    <select class="regexTemplate" style="width: 120px;"
+                            onchange="this.parentElement.querySelector('.conditionValue').value = this.value">
+                        <option value="">關鍵字</option>
+                        <option value="^\s*\d+(,\d+)?(\.\d+)?">數字開頭</option>
+                        <option value="\d+(,\d+)?(\.\d+)?\s*$">數字結尾</option>
+                        <option value="^\s*[A-Za-z]">英文開頭</option>
+                        <option value="[A-Za-z]\s*$">英文結尾</option>                    
+                        <option value="\d{4}\.\d{2}\.\d{2}\.\d{2}-\d">稅則</option>
+                    </select>
+                    <input type="text" class="conditionValue" style="width: 217px; margin-right: 8px;">
+                </span>
+                <span class="group">
+                    限定欄位：<input type="number" class="columnScope" min="1" style="width: 96px;">
+                    <button onclick="deleteColumn(this)" style="margin-left: 4px;" tabindex="-1"><i class="fas fa-trash"></i> 刪除</button>
+                    移至欄位：<input type="number" class="targetColumn" min="1" style="width: 96px;">
+                    <button onclick="moveMatched(this)"><i class="fas fa-retweet"></i> 移動</button>
+                </span>
             </p>
             <p>
-                分隔方式：<select class="splitMode" style="width: 130px;">
-                    <option value="space">空格</option>
-                    <option value="regex">關鍵字</option>
-                </select>
-                關鍵字處理：<select class="keywordAction" style="width: 143px;">
-                    <option value=""></option>
-                    <option value="mergeAfter">與後欄合併</option>
-                    <option value="mergeBefore">與前欄合併</option>
-                    <option value="keep">獨立一欄</option>
-                    <option value="splitOnly">不保留</option>
-                </select>
-                <button onclick="splitMatched(this)"><i class="fas fa-scissors"></i> 分隔</button>
+                <span class="group">
+                    分隔方式：<select class="splitMode" style="width: 130px;">
+                        <option value="space">空格</option>
+                        <option value="regex">關鍵字</option>
+                    </select>
+                    關鍵字處理：<select class="keywordAction" style="width: 143px;">
+                        <option value=""></option>
+                        <option value="mergeAfter">與後欄合併</option>
+                        <option value="mergeBefore">與前欄合併</option>
+                        <option value="keep">獨立一欄</option>
+                        <option value="splitOnly">不保留</option>
+                    </select>
+                    <button onclick="splitMatched(this)"><i class="fas fa-scissors"></i> 分隔</button>
+                </span>
 
-                合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 73px;">
-                到 <input type="number" class="mergeTo" min="1" style="width: 73px;">
-                插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 91px;">
-                <button onclick="mergeColumns(this)"><i class="fas fa-code-branch"></i> 合併</button>
+                <span class="group">
+                    合併欄位：<input type="number" class="mergeFrom" min="1" style="width: 73px;">
+                    到 <input type="number" class="mergeTo" min="1" style="width: 73px;">
+                    插入欄位：<input type="number" class="mergeTarget" min="1" style="width: 98px;">
+                    <button onclick="mergeColumns(this)"><i class="fas fa-code-branch"></i> 合併</button>
+                </span>
             </p>
 
             <p>
-                刪除空欄：<select class="blankRemoveAction" style="width: 107px;">
-                    <option value="removeBefore">符合欄前</option>
-                    <option value="removeAfter">符合欄後</option>
-                    <option value="removeAbove">符合欄上</option>
-                    <option value="removeBelow">符合欄下</option>
-                </select>
-                <button onclick="performBlankRemove(this)"><i class="fas fa-minus"></i> 刪除</button>
+                <span class="group">
+                    刪除空欄：<select class="blankRemoveAction" style="width: 107px;">
+                        <option value="removeBefore">符合欄前</option>
+                        <option value="removeAfter">符合欄後</option>
+                        <option value="removeAbove">符合欄上</option>
+                        <option value="removeBelow">符合欄下</option>
+                    </select>
+                    <button onclick="performBlankRemove(this)"><i class="fas fa-minus"></i> 刪除</button>
 
-                插入空欄：<select class="blankInsertAction" style="width: 106px;">
-                    <option value="insertBefore">符合欄前</option>
-                    <option value="insertAfter">符合欄後</option>
-                    <option value="insertAbove">符合欄上</option>
-                    <option value="insertBelow">符合欄下</option>
-                </select>
-                <button onclick="performBlankInsert(this)"><i class="fas fa-plus"></i> 插入</button>
-
-                移動欄位：<input type="number" id="shift-col" min="1" style="width: 97px;">
-                位移格數：<input type="number" id="shift-rows" style="width: 96px;" min="0" max="9999" oninput="checkShiftLimit()">
-                <button onclick="shiftColumn('up')"><i class="fas fa-arrow-up"></i> 上移</button>
-                <button onclick="shiftColumn('down')"><i class="fas fa-arrow-down"></i> 下移</button>
-                <span id="shift-limit-tip" style="color: red; font-size: 14px; margin-left: 6px;"></span>
+                    插入空欄：<select class="blankInsertAction" style="width: 106px;">
+                        <option value="insertBefore">符合欄前</option>
+                        <option value="insertAfter">符合欄後</option>
+                        <option value="insertAbove">符合欄上</option>
+                        <option value="insertBelow">符合欄下</option>
+                    </select>
+                    <button onclick="performBlankInsert(this)"><i class="fas fa-plus"></i> 插入</button>
+                </span>
+                
+                <span class="group">
+                    移動欄位：<input type="number" id="shift-col" min="1" style="width: 100px;">
+                    位移格數：<input type="number" id="shift-rows" style="width: 100px;" min="0" max="9999" oninput="checkShiftLimit()">
+                    <button onclick="shiftColumn('up')"><i class="fas fa-arrow-up"></i> 上移</button>
+                    <button onclick="shiftColumn('down')"><i class="fas fa-arrow-down"></i> 下移</button>
+                    <span id="shift-limit-tip" style="color: red; font-size: 14px; margin-left: 6px;"></span>
+                </span>
             </p>
 
             <p>
@@ -284,8 +310,8 @@
         <span style="font-size: 18px; font-weight: bold;">
             <i class="fas fa-file-invoice"></i> 分欄結果：
         </span>
-        <button onclick="copyResult()" style="margin-left: 25px;"><i class="fas fa-clipboard"></i> 複製結果</button>
-        <span style="font-size: 16px; color: #555;">
+        <button onclick="copyResult()" style="margin-left: 15px;"><i class="fas fa-clipboard"></i> 複製結果</button>
+        <span style="font-size: 15px; color: #555;">
             （可選取單格 ↑ ↓ ← → 移動、Insert 插入右移、Delete 刪除空欄左移）
         </span>
     </div>
