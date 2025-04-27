@@ -292,13 +292,13 @@
                     位移格數：<input type="number" id="shift-rows" style="width: 100px;" min="0" max="9999" oninput="checkShiftLimit()">
                     <button onclick="shiftColumn('up')"><i class="fas fa-arrow-up"></i> 上移</button>
                     <button onclick="shiftColumn('down')"><i class="fas fa-arrow-down"></i> 下移</button>
-                    <span id="shift-limit-tip" style="color: red; font-size: 14px; margin-left: 6px;"></span>
                 </span>
             </p>
 
             <p>
                 <button onclick="togglePreview(this)"><i class="fas fa-search"></i> 預覽符合內容</button>
                 <button onclick="resetCondition(this)"><i class="fas fa-sync-alt"></i> 重置條件</button>
+                <span id="shift-limit-tip" style="color: red; font-size: 15px; margin-left: 15px;"></span>
             </p>
 
             <div class="preview-box" style="display: none; border: 1px dashed #aaa; background: #fffde7; padding: 0px; margin-top: 10px; font-size: 14px;"></div>
