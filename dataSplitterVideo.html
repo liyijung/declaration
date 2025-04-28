@@ -25,6 +25,16 @@
     <video id="tutorialVideo" src="dataSplitter.mp4" controls autoplay></video>
 
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                window.location.href = "index.html";
+            } else {
+                console.log("✅ 已登入");
+            }
+        });
+        
         const video = document.getElementById('tutorialVideo');
 
         // 使用者互動後才允許進入全螢幕
