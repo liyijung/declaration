@@ -951,6 +951,25 @@ document.addEventListener('DOMContentLoaded', function () {
             fullFileName += `【${remarks.join('，')}】`; // 以 "，" 分隔多個備註
         }
 
+        // 🔍 如果 TO_CODE 為 US 開頭，且任一 ORG_COUNTRY 為空或 TW（排除 ITEM_NO 為 *）
+        const toCode = document.getElementById('TO_CODE')?.value.trim().toUpperCase();
+        if (toCode && toCode.startsWith('US')) {
+            let needsDeclaration = false;
+            document.querySelectorAll("#item-container .item-row").forEach(row => {
+                const isStarItem = row.querySelector(".ITEM_NO")?.checked;
+                if (isStarItem) return; // 忽略 ITEM_NO 為 *
+
+                const orgCountry = row.querySelector(".ORG_COUNTRY")?.value.trim().toUpperCase();
+                if (!orgCountry || orgCountry === "TW") {
+                    needsDeclaration = true;
+                }
+            });
+
+            if (needsDeclaration) {
+                fullFileName += "『應檢附輸美國貨品原產地聲明書』";
+            }
+        }
+
         // 加上副檔名
         fullFileName += ".xml";
 
