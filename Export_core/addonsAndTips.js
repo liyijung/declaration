@@ -225,7 +225,10 @@ function summarizeOrgCountry() {
 
         // 處理邏輯...
         let stMtdName = stMtdMapping[stMtdValue]?.value || stMtdValue;
-        if (['81', '82', '9M'].includes(stMtdValue)) {
+        const hasOrgImport = itemRow.querySelector('.ORG_IMP_DCL_NO')?.value.trim();
+        const hasOrgDclNo = itemRow.querySelector('.ORG_DCL_NO')?.value.trim();
+
+        if (['81', '82', '9M'].includes(stMtdValue) || hasOrgImport || hasOrgDclNo) {
             stMtdName = addAdditionalInfo(itemRow, stMtdName);
         }
 
