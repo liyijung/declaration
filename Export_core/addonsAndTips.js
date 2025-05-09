@@ -430,9 +430,14 @@ function validateDclDocType() {
                 if (!orgCountryValue || orgCountryValue.trim() === "") {
                     setError(item.querySelector(".ST_MTD"), "外貨復出口統計方式");
                     setError(item.querySelector(".ORG_COUNTRY"), "生產國別不可為空");
-                /*
-                2025/05/09 變更（G5 核銷 G1-TW）
                 } else if (orgCountryValue.toUpperCase() === "TW") {
+                    validationErrors.add(
+                        `外貨復出口統計方式，生產國別不可為 TW\n`
+                    );                    
+                    setError(item.querySelector(".ST_MTD"), "外貨復出口統計方式");
+                    setError(item.querySelector(".ORG_COUNTRY"), "生產國別不可為 TW");
+                /*
+                2025/05/09 變更（G5 核銷 G1-TW）                    
                     if (!orgImpDclNo || orgImpDclNo.trim() === "") {
                         validationErrors.add(
                             `外貨復出口統計方式且生產國別為 TW，\n` +
