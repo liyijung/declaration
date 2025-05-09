@@ -410,6 +410,8 @@ function validateDclDocType() {
                     setError(item.querySelector(".ST_MTD"), "國貨出口統計方式");
                     setError(item.querySelector(".ORG_COUNTRY"), "生產國別應為空或 TW");
                 }
+                /*
+                2025/05/09 變更（G5 核銷 G1-TW）
                 if (orgImpDclNo) {
                     validationErrors.add(
                         `國貨出口統計方式，原進口報單號碼及項次不應有值`
@@ -418,6 +420,7 @@ function validateDclDocType() {
                     setError(item.querySelector(".ORG_IMP_DCL_NO"), "原進口報單號碼及項次不應有值");
                     setError(item.querySelector(".ORG_IMP_DCL_NO_ITEM"), "原進口報單號碼及項次不應有值");
                 }
+                */
             }
     
             // 檢查條件 2：ST_MTD 為 外貨復出口統計方式 時
@@ -427,6 +430,8 @@ function validateDclDocType() {
                 if (!orgCountryValue || orgCountryValue.trim() === "") {
                     setError(item.querySelector(".ST_MTD"), "外貨復出口統計方式");
                     setError(item.querySelector(".ORG_COUNTRY"), "生產國別不可為空");
+                /*
+                2025/05/09 變更（G5 核銷 G1-TW）
                 } else if (orgCountryValue.toUpperCase() === "TW") {
                     if (!orgImpDclNo || orgImpDclNo.trim() === "") {
                         validationErrors.add(
@@ -438,6 +443,7 @@ function validateDclDocType() {
                         setError(item.querySelector(".ORG_IMP_DCL_NO"), "原進口報單號碼及項次不可為空");
                         setError(item.querySelector(".ORG_IMP_DCL_NO_ITEM"), "原進口報單號碼及項次不可為空");
                     }
+                */
                 }
             }
             // 標記是否存在空的 ORG_COUNTRY
