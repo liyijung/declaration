@@ -225,7 +225,7 @@ function summarizeOrgCountry() {
 
         // 處理邏輯...
         let stMtdName = stMtdMapping[stMtdValue]?.value || stMtdValue;
-        if (['02', '04', '81', '82', '9M'].includes(stMtdValue)) {
+        if (['81', '82', '9M'].includes(stMtdValue)) {
             stMtdName = addAdditionalInfo(itemRow, stMtdName);
         }
 
