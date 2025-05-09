@@ -432,7 +432,7 @@ function validateDclDocType() {
                     setError(item.querySelector(".ORG_COUNTRY"), "生產國別不可為空");
                 } else if (orgCountryValue.toUpperCase() === "TW") {
                     validationErrors.add(
-                        `外貨復出口統計方式，生產國別不可為 TW\n`
+                        `外貨復出口統計方式，生產國別不可為 TW`
                     );                    
                     setError(item.querySelector(".ST_MTD"), "外貨復出口統計方式");
                     setError(item.querySelector(".ORG_COUNTRY"), "生產國別不可為 TW");
