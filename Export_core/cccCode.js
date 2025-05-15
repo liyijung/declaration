@@ -636,7 +636,7 @@ function updateFields(inputElement, item) {
         const condition445 = exportRegList.includes("445") && toCodePrefix === "JP";
         const condition446 = exportRegList.includes("446") && toCodePrefix === "JP";
         const condition447 = exportRegList.includes("447") && toCodePrefix === "JP";
-        const condition481 = exportRegList.includes("481") && toCodePrefix === "JP";
+        const condition481 = exportRegList.includes("481") && toCodePrefix === "US";
 
         // 若包含其他輸出規定 (不只是 S01、S03、S04、445、446、447、481)，也要高亮
         const hasOtherReg = exportRegList.some(reg => !["S01", "S03", "S04", "445", "446", "447", "481"].includes(reg));
