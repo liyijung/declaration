@@ -68,13 +68,8 @@ function searchData(showErrorMessage = false) {
                     hasNoData = false; // 有資料
 
                     // 填入資料並隱藏錯誤訊息
-                    document.getElementById('SHPR_C_NAME').value = record['廠商中文名稱'] || '';
-                    document.getElementById('SHPR_E_NAME').value = record['廠商英文名稱'] || '';
-                    document.getElementById('SHPR_C_ADDR').value = record['中文營業地址'] || '';
-                    document.getElementById('SHPR_E_ADDR').value = record['英文營業地址'] || '';
-                    document.getElementById('SHPR_TEL').value = record['電話號碼'] || '';
-                    document.getElementById('IMP_QUAL').value = record['進口資格'] || '';
-                    document.getElementById('EXP_QUAL').value = record['出口資格'] || '';
+                    fillSHPRFields(record);
+
                     noDataMessage.style.display = 'none'; // 隱藏"查無資料"訊息
 
                     // 檢查是否為非營業中
@@ -93,6 +88,40 @@ function searchData(showErrorMessage = false) {
         });
     }
     thingsToNote(); // 出口備註
+}
+
+// 覆蓋更新
+function fillSHPRFields(data) {
+    const fields = [
+        { id: 'SHPR_C_NAME', value: data['廠商中文名稱'] || '' },
+        { id: 'SHPR_E_NAME', value: data['廠商英文名稱'] || '' },
+        { id: 'SHPR_C_ADDR', value: data['中文營業地址'] || '' },
+        { id: 'SHPR_E_ADDR', value: data['英文營業地址'] || '' },
+        { id: 'SHPR_TEL', value: data['電話號碼'] || '' },
+        { id: 'IMP_QUAL', value: data['進口資格'] || '' },
+        { id: 'EXP_QUAL', value: data['出口資格'] || '' }
+    ];
+
+    const shouldPrompt = fields.some(field => {
+        const current = document.getElementById(field.id).value.trim();
+        return current && current !== field.value;
+    });
+
+    // 根據網址判斷提示語
+    const url = window.location.href.toLowerCase();
+    let label = '出口人欄位';
+
+    if (url.includes('import') || url.includes('mode=import') || url.includes('#import')) {
+        label = '進口人欄位';
+    } else if (url.includes('export') || url.includes('mode=export') || url.includes('#export')) {
+        label = '出口人欄位';
+    }
+
+    if (!shouldPrompt || confirm(`${label}資料不同，是否覆蓋更新？`)) {
+        fields.forEach(field => {
+            document.getElementById(field.id).value = field.value;
+        });
+    }
 }
 
 // 清空 SHPR 欄位
