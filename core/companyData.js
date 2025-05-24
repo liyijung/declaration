@@ -93,33 +93,56 @@ function searchData(showErrorMessage = false) {
 // 覆蓋更新
 function fillSHPRFields(data) {
     const fields = [
-        { id: 'SHPR_C_NAME', value: data['廠商中文名稱'] || '' },
-        { id: 'SHPR_E_NAME', value: data['廠商英文名稱'] || '' },
-        { id: 'SHPR_C_ADDR', value: data['中文營業地址'] || '' },
-        { id: 'SHPR_E_ADDR', value: data['英文營業地址'] || '' },
-        { id: 'SHPR_TEL', value: data['電話號碼'] || '' },
-        { id: 'IMP_QUAL', value: data['進口資格'] || '' },
-        { id: 'EXP_QUAL', value: data['出口資格'] || '' }
+        { id: 'SHPR_C_NAME', label: '廠商中文名稱', value: data['廠商中文名稱'] || '' },
+        { id: 'SHPR_E_NAME', label: '廠商英文名稱', value: data['廠商英文名稱'] || '' },
+        { id: 'SHPR_C_ADDR', label: '中文營業地址', value: data['中文營業地址'] || '' },
+        { id: 'SHPR_E_ADDR', label: '英文營業地址', value: data['英文營業地址'] || '' },
+        { id: 'SHPR_TEL', label: '電話號碼', value: data['電話號碼'] || '' },
+        { id: 'IMP_QUAL', label: '進口資格', value: data['進口資格'] || '' },
+        { id: 'EXP_QUAL', label: '出口資格', value: data['出口資格'] || '' }
     ];
 
-    const shouldPrompt = fields.some(field => {
+    const diffFields = fields.filter(field => {
         const current = document.getElementById(field.id).value.trim();
         return current && current !== field.value;
     });
 
-    // 根據網址判斷提示語
     const url = window.location.href.toLowerCase();
     let label = '出口人欄位';
-
     if (url.includes('import') || url.includes('mode=import') || url.includes('#import')) {
         label = '進口人欄位';
-    } else if (url.includes('export') || url.includes('mode=export') || url.includes('#export')) {
-        label = '出口人欄位';
     }
 
-    if (!shouldPrompt || confirm(`${label}資料不同，是否覆蓋更新？`)) {
+    if (diffFields.length === 0) {
+        // 無差異，直接填入
         fields.forEach(field => {
             document.getElementById(field.id).value = field.value;
+        });
+    } else {
+        const fieldList = diffFields.map(f => {
+            const current = document.getElementById(f.id).value.trim();
+            return `• ${f.label}：<br>　目前為「<b>${current}</b>」<br>　將覆蓋為「<b>${f.value}</b>」`;
+        }).join('<br><br>');
+
+        iziToast.question({
+            timeout: false,
+            close: false,
+            overlay: true,
+            displayMode: 'once',
+            title: `${label}資料不同`,
+            message: `以下欄位資料將被覆蓋，是否確定更新？<br><br>${fieldList}`,
+            position: 'topRight',
+            buttons: [
+                ['<button>是，覆蓋</button>', function (instance, toast) {
+                    fields.forEach(field => {
+                        document.getElementById(field.id).value = field.value;
+                    });
+                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                }, true],
+                ['<button>否，保留</button>', function (instance, toast) {
+                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                }]
+            ]
         });
     }
 }
