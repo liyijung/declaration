@@ -131,7 +131,7 @@ function fillSHPRFields(data) {
             displayMode: 'once',
             title: `${label}資料不同`,
             message: `以下欄位資料將被覆蓋，是否確定更新？<br><br>${fieldList}`,
-            position: 'topRight',
+            position: 'topCenter',
             buttons: [
                 ['<button>是，覆蓋</button>', function (instance, toast) {
                     fields.forEach(field => {
