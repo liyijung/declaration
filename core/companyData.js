@@ -121,7 +121,7 @@ function fillSHPRFields(data) {
     } else {
         const fieldList = diffFields.map(f => {
             const current = document.getElementById(f.id).value.trim();
-            return `• ${f.label}：<br>　目前為「<b>${current}</b>」<br>　將覆蓋為「<b>${f.value}</b>」`;
+            return `• ${f.label}：<br>　目前為「<b>${current}</b>」<br>　覆蓋為「<b>${f.value}</b>」`;
         }).join('<br><br>');
 
         iziToast.question({
