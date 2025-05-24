@@ -970,6 +970,22 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        // 檢查是否有任一 EXP_NO 有值（排除 ITEM_NO 為 *）
+        let hasExpNo = false;
+        document.querySelectorAll("#item-container .item-row").forEach(row => {
+            const isStarItem = row.querySelector(".ITEM_NO")?.checked;
+            if (isStarItem) return;
+
+            const expNo = row.querySelector(".EXP_NO")?.value.trim();
+            if (expNo) {
+                hasExpNo = true;
+            }
+        });
+
+        if (hasExpNo) {
+            fullFileName += "『複查輸出許可號碼及項次內容』";
+        }
+        
         // 加上副檔名
         fullFileName += ".xml";
 
