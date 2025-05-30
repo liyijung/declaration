@@ -4,7 +4,16 @@ input_file = r'C:\Users\Admin\Desktop\companyData.csv'  # 原始檔案路徑
 output_dir = r'C:\Users\Admin\Desktop\companyData'      # 輸出資料夾
 os.makedirs(output_dir, exist_ok=True)
 
-# 建立 0~9 的暫存檔
+# 自動移除 UTF-8 BOM（如有）
+with open(input_file, 'rb') as f:
+    raw = f.read()
+if raw.startswith(b'\xef\xbb\xbf'):
+    print("偵測到 UTF-8 BOM，已自動移除")
+    raw = raw[3:]
+with open(input_file, 'wb') as f:
+    f.write(raw)
+
+# 建立 0~9 的輸出檔案（無 BOM）
 files = {str(d): open(os.path.join(output_dir, f'companyData{d}.csv'), 'w', encoding='utf-8') for d in range(10)}
 
 with open(input_file, 'r', encoding='utf-8') as infile:
@@ -27,4 +36,4 @@ with open(input_file, 'r', encoding='utf-8') as infile:
 for f in files.values():
     f.close()
 
-print("依統一編號首碼分類，且完全保留原始格式。")
+print("已依統一編號首碼分類，並移除 BOM，輸出為 UTF-8")
