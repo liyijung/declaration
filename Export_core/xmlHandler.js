@@ -970,6 +970,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        // 若 REMARK1 含有指定警示文字，則在檔名中加上『必驗』
+        const remark1Text = document.getElementById("REMARK1")?.value || "";
+        if (remark1Text.includes("未向國際貿易署登記出進口廠商資料者，出口金額限制美金兩萬以下，且通關必驗，若金額超過美金兩萬需檢附輸出許可證才可出口")) {
+            fullFileName += "『必驗』";
+        }
+
         // 檢查是否有任一 EXP_NO 有值（排除 ITEM_NO 為 *）
         let hasExpNo = false;
         document.querySelectorAll("#item-container .item-row").forEach(row => {
@@ -985,7 +991,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (hasExpNo) {
             fullFileName += "『複查輸出許可號碼及項次內容』";
         }
-        
+
         // 加上副檔名
         fullFileName += ".xml";
 
