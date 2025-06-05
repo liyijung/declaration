@@ -542,7 +542,7 @@ function validateDclDocType() {
             if (!firstValueChecked) {
                 if (!isItemChecked) {
                     if (!stMtdCondition1.includes(stMtdValue)) {
-                        if (stMtdValue !== "53" && stMtdValue !== "9E") {
+                        if (stMtdValue !== "53" && stMtdValue !== "9E" && stMtdValue !== "8B") {
                             validationErrors.add("B9 報單第一個項次，應為國貨統計方式");
                         }
                     }
