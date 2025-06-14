@@ -102,20 +102,20 @@ function fillSHPRFields(data) {
         { id: 'EXP_QUAL', label: '出口資格', value: data['出口資格'] || '' }
     ];
 
-    const currentBanId = document.getElementById('SHPR_BAN_ID')?.value.trim();
+    // 改為判斷先前已填入的統編（透過 dataset 儲存）
+    const existingBanId = document.getElementById('SHPR_C_NAME').dataset.banId || '';
     const incomingBanId = data['統一編號']?.trim();
 
     const url = window.location.href.toLowerCase();
     let label = url.includes('import') || url.includes('mode=import') || url.includes('#import') ? '進口人欄位' : '出口人欄位';
 
-    if (currentBanId === incomingBanId) {
+    if (existingBanId === incomingBanId) {
         const diffFields = fields.filter(field => {
             const current = document.getElementById(field.id).value.trim();
             return current && current !== field.value;
         });
 
         if (diffFields.length === 0) {
-            // 無差異，直接填入
             fields.forEach(field => {
                 document.getElementById(field.id).value = field.value;
             });
@@ -138,6 +138,7 @@ function fillSHPRFields(data) {
                         fields.forEach(field => {
                             document.getElementById(field.id).value = field.value;
                         });
+                        document.getElementById('SHPR_C_NAME').dataset.banId = incomingBanId;
                         instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
                     }, true],
                     ['<button>否，保留</button>', function (instance, toast) {
@@ -147,10 +148,10 @@ function fillSHPRFields(data) {
             });
         }
     } else {
-        // 統編不同，直接填入所有欄位
         fields.forEach(field => {
             document.getElementById(field.id).value = field.value;
         });
+        document.getElementById('SHPR_C_NAME').dataset.banId = incomingBanId;
     }
 }
 
