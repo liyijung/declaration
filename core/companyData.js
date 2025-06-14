@@ -102,47 +102,54 @@ function fillSHPRFields(data) {
         { id: 'EXP_QUAL', label: '出口資格', value: data['出口資格'] || '' }
     ];
 
-    const diffFields = fields.filter(field => {
-        const current = document.getElementById(field.id).value.trim();
-        return current && current !== field.value;
-    });
+    const currentBanId = document.getElementById('SHPR_BAN_ID')?.value.trim();
+    const incomingBanId = data['統一編號']?.trim();
 
     const url = window.location.href.toLowerCase();
-    let label = '出口人欄位';
-    if (url.includes('import') || url.includes('mode=import') || url.includes('#import')) {
-        label = '進口人欄位';
-    }
+    let label = url.includes('import') || url.includes('mode=import') || url.includes('#import') ? '進口人欄位' : '出口人欄位';
 
-    if (diffFields.length === 0) {
-        // 無差異，直接填入
+    if (currentBanId === incomingBanId) {
+        const diffFields = fields.filter(field => {
+            const current = document.getElementById(field.id).value.trim();
+            return current && current !== field.value;
+        });
+
+        if (diffFields.length === 0) {
+            // 無差異，直接填入
+            fields.forEach(field => {
+                document.getElementById(field.id).value = field.value;
+            });
+        } else {
+            const fieldList = diffFields.map(f => {
+                const current = document.getElementById(f.id).value.trim();
+                return `• ${f.label}：<br>　目前為「<b>${current}</b>」<br>　覆蓋為「<b>${f.value}</b>」`;
+            }).join('<br><br>');
+
+            iziToast.question({
+                timeout: false,
+                close: false,
+                overlay: true,
+                displayMode: 'once',
+                title: `${label}資料不同`,
+                message: `以下欄位資料將被覆蓋，是否確定更新？<br><br>${fieldList}`,
+                position: 'topCenter',
+                buttons: [
+                    ['<button>是，覆蓋</button>', function (instance, toast) {
+                        fields.forEach(field => {
+                            document.getElementById(field.id).value = field.value;
+                        });
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                    }, true],
+                    ['<button>否，保留</button>', function (instance, toast) {
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                    }]
+                ]
+            });
+        }
+    } else {
+        // 統編不同，直接填入所有欄位
         fields.forEach(field => {
             document.getElementById(field.id).value = field.value;
-        });
-    } else {
-        const fieldList = diffFields.map(f => {
-            const current = document.getElementById(f.id).value.trim();
-            return `• ${f.label}：<br>　目前為「<b>${current}</b>」<br>　覆蓋為「<b>${f.value}</b>」`;
-        }).join('<br><br>');
-
-        iziToast.question({
-            timeout: false,
-            close: false,
-            overlay: true,
-            displayMode: 'once',
-            title: `${label}資料不同`,
-            message: `以下欄位資料將被覆蓋，是否確定更新？<br><br>${fieldList}`,
-            position: 'topCenter',
-            buttons: [
-                ['<button>是，覆蓋</button>', function (instance, toast) {
-                    fields.forEach(field => {
-                        document.getElementById(field.id).value = field.value;
-                    });
-                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
-                }, true],
-                ['<button>否，保留</button>', function (instance, toast) {
-                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
-                }]
-            ]
         });
     }
 }
