@@ -203,7 +203,13 @@ function handleCheck() {
             docOtrDesc.value = docOtrDesc.value
                 ? `${docOtrDesc.value}\n${newContent}`
                 : newContent;
+
+            document.getElementById('longTermLabel').style.display = 'inline';
         }
+
+        if (validEntries.length === 0) {
+            document.getElementById('longTermLabel').style.display = 'none';
+        }        
     });
 };
 
@@ -501,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             switch (input.id) {
                 case 'SHPR_BAN_ID':
+                    handleCheck();
                     searchData();
                     break;
                 case 'BUYER_E_NAME':
