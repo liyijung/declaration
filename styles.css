@@ -974,3 +974,16 @@ button {
     display: inline-flex; /* 保持在同一排 */
     gap: 2px;
 }
+
+.long-term-label {
+    position: absolute;
+    top: 4px;
+    color: #007bff;
+    background-color: #e8f5ff;
+    padding: 2px 6px;
+    font-size: 14px;
+    border: 1px #91caff;
+    border-radius: 4px;
+    display: none;
+    white-space: nowrap;
+}
