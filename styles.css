@@ -1077,3 +1077,17 @@ button {
     background-color: #e6f7ff;
     transition: background-color 0.2s;
 }
+
+/* 重置按鈕樣式 */
+.reset-btn {
+    margin-left: auto;
+    margin-right: 8px;
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: #eee;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.reset-btn:hover {
+    background-color: #ccc;
+}
