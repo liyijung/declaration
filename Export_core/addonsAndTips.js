@@ -1002,6 +1002,13 @@ document.addEventListener('DOMContentLoaded', () => {
             input.focus();
             clearBtn.style.display = 'none';
 
+            // 查詢國家代碼：清除後立即更新過濾結果
+            if (
+                ['searchCode', 'searchChinese', 'searchEnglish', 'searchRegion', 'countryKeyword'].includes(input.id)
+            ) {
+                filterCountryTable();
+            }
+            
             switch (input.id) {
                 case 'SHPR_BAN_ID':
                     handleCheck();
