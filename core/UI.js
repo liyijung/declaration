@@ -814,3 +814,85 @@ function startItemIntroGuide() {
         exitOnEsc: false
     }).start();
 }
+
+// 查詢國家代碼
+let countryList = [];
+
+Papa.parse("countryMapping.csv", {
+    download: true,
+    header: true,
+    complete: function (results) {
+        countryList = results.data;
+        filterCountryTable();
+    }
+});
+
+function filterAlphabets(input) {
+    input.value = input.value.replace(/[^a-zA-Z]/g, '');
+}
+
+function openCountryModal() {
+    document.getElementById("countryModal").style.display = "block";
+    document.body.style.overflow = "hidden"; // 禁止背景滾動
+    filterCountryTable();
+}
+
+function closeCountryModal() {
+    document.getElementById("countryModal").style.display = "none";
+    document.body.style.overflow = ""; // 恢復背景滾動
+}
+
+function filterCountryTable() {
+    const keyword = document.getElementById("countryKeyword").value.toLowerCase();
+    const code = document.getElementById("searchCode").value.toLowerCase();
+    const chinese = document.getElementById("searchChinese").value;
+    const english = document.getElementById("searchEnglish").value.toLowerCase();
+    const region = document.getElementById("searchRegion").value;
+
+    const filtered = countryList.filter(entry => {
+        const matchKeyword =
+            !keyword || (
+                entry["代碼"]?.toLowerCase().includes(keyword) ||
+                entry["中文國家名稱"]?.includes(keyword) ||
+                entry["英文國家名稱"]?.toLowerCase().includes(keyword) ||
+                entry["地區"]?.includes(keyword)
+            );
+
+        return matchKeyword &&
+            entry["代碼"]?.toLowerCase().includes(code) &&
+            entry["中文國家名稱"]?.includes(chinese) &&
+            entry["英文國家名稱"]?.toLowerCase().includes(english) &&
+            entry["地區"]?.includes(region);
+    });
+
+    const tbody = document.getElementById("countryTableBody");
+    tbody.innerHTML = '';
+    filtered.forEach(entry => {
+        const row = document.createElement("tr");
+
+        const codeCell = document.createElement("td");
+        codeCell.textContent = entry["代碼"];
+        codeCell.style.color = '#005eff';
+        codeCell.style.cursor = 'pointer';
+        codeCell.onclick = () => {
+            document.getElementById("CNEE_COUNTRY_CODE").value = entry["代碼"];
+            closeCountryModal();
+        };
+
+        const zhCell = document.createElement("td");
+        zhCell.textContent = entry["中文國家名稱"];
+
+        const enCell = document.createElement("td");
+        enCell.textContent = entry["英文國家名稱"];
+
+        const regionCell = document.createElement("td");
+        regionCell.textContent = entry["地區"];
+
+        row.appendChild(codeCell);
+        row.appendChild(zhCell);
+        row.appendChild(enCell);
+        row.appendChild(regionCell);
+        tbody.appendChild(row);
+    });
+
+}
