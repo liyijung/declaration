@@ -116,7 +116,34 @@
                 <label for="CNEE_COUNTRY_CODE">買方國家代碼</label>
                 <input type="text" id="CNEE_COUNTRY_CODE" name="CNEE_COUNTRY_CODE" oninput="filterAlphabets(this)"
                 placeholder="範例：HK、CN、KR、SG(英文代碼)">
+                <button type="button" onclick="openCountryModal()">查詢</button>
             </div>
+            
+            <!-- 彈跳視窗 -->
+            <div id="countryModal" class="country-modal" style="display: none;">
+                <div class="country-modal-content">
+                    <div class="country-modal-header">
+                        <h3>查詢國家代碼</h3>
+                        <span class="country-close" onclick="closeCountryModal()">&times;</span>
+                    </div>
+                    <div class="country-search-fields">
+                        <input type="text" id="countryKeyword" placeholder="🔍 全欄位關鍵字查詢" oninput="filterCountryTable()">
+                        <input type="text" id="searchCode" placeholder="國家代碼" oninput="filterCountryTable()">
+                        <input type="text" id="searchChinese" placeholder="中文名稱" oninput="filterCountryTable()">
+                        <input type="text" id="searchEnglish" placeholder="英文名稱" oninput="filterCountryTable()">
+                        <input type="text" id="searchRegion" placeholder="地區" oninput="filterCountryTable()">
+                    </div>
+                    <div class="country-scroll-area">
+                        <table id="country-table">
+                            <thead>
+                                <tr><th>國家代碼</th><th>中文名稱</th><th>英文名稱</th><th>地區</th></tr>
+                            </thead>
+                            <tbody id="countryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
             <div class="header-group">
                 <label for="CNEE_BAN_ID" style="background: #ffffff00;">買方統一編號</label>
                 <input type="text" id="CNEE_BAN_ID" name="CNEE_BAN_ID" oninput="filterAlphanumeric(this)"
