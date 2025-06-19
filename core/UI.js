@@ -896,3 +896,14 @@ function filterCountryTable() {
     });
 
 }
+
+function resetCountryFilters() {
+    // 清除每個欄位的值
+    ['countryKeyword', 'searchCode', 'searchChinese', 'searchEnglish', 'searchRegion'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.value = '';
+    });
+
+    // 觸發查詢
+    filterCountryTable();
+}
