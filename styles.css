@@ -999,7 +999,7 @@ button {
 
 .country-modal-content {
     background-color: #fff;
-    margin: 60px auto;  /* 上方 60px，下方也固定留空 */
+    margin: 100px auto;  /* 上下方留空 */
     padding: 20px;
     width: 90%;
     max-width: 900px;
