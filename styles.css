@@ -1103,19 +1103,19 @@ button {
 .mark-info-tooltip .mark-info-text {
     visibility: hidden;
     opacity: 0;
-    width: 600px;
+    width: 510px;
     background-color: rgba(0, 0, 0, 0.85);
     color: #fff;
     text-align: left;
     border-radius: 6px;
-    padding: 8px;
+    padding: 4px;
     position: absolute;
     z-index: 1000;
     bottom: 125%; /* 提示顯示在上方 */
     left: 0;
     transition: opacity 0.2s;
     font-size: 15px;
-    line-height: 1.6;
+    line-height: 2;
     white-space: pre-wrap;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
