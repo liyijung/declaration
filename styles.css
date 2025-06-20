@@ -1091,3 +1091,49 @@ button {
 .reset-btn:hover {
     background-color: #ccc;
 }
+
+/* 提示容器 */
+.mark-info-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+/* 提示內容 */
+.mark-info-tooltip .mark-info-text {
+    visibility: hidden;
+    opacity: 0;
+    width: 340px;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 12px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%; /* 提示顯示在上方 */
+    left: 0;
+    transition: opacity 0.2s;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* 箭頭 */
+.mark-info-tooltip .mark-info-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+}
+
+/* 滑鼠懸停時顯示 */
+.mark-info-tooltip:hover .mark-info-text {
+    visibility: visible;
+    opacity: 1;
+}
