@@ -31,6 +31,13 @@
             padding-bottom: 10px;
         }
 
+        .unit-note {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
         /* 查詢欄位外框 */
         .unit-search-fields {
             max-width: 960px;
@@ -148,6 +155,10 @@
 <body>
     <h2 class="unit-page-title">常用計量單位查詢</h2>
 
+    <p class="unit-note">
+        以「 * 」表示之計量單位代碼係未編列於聯合國 UNTDED 之代碼，經與相關機關協商統一編訂。
+    </p>
+    
     <div class="unit-search-fields">
         <div class="unit-search-row">
             <input type="text" id="unitKeyword" placeholder="全欄位關鍵字" oninput="filterUnitTable()">
