@@ -1,3 +1,53 @@
+const CSV_VERSION = '20250621'; // 手動設定，每次 GitHub 更新 CSV 就改版本
+
+let csvCache = {};  // 記憶體快取（每次頁面載入有效）
+const versionKey = 'csv_cache_version';
+
+window.addEventListener('DOMContentLoaded', () => {
+    const localVersion = localStorage.getItem(versionKey);
+    if (localVersion !== CSV_VERSION) {
+        // 版本不同：清空所有快取，重新載入
+        csvCache = {};
+        localStorage.setItem(versionKey, CSV_VERSION);
+        preloadAllCSV(); // ✅ 預載全部 CSV
+    } else {
+        console.log('⏩ CSV 版本一致，略過重新載入');
+    }
+});
+
+async function preloadAllCSV() {
+    console.log('📦 開始預載 CSV 資料（版本：' + CSV_VERSION + '）');
+
+    for (let i = 0; i < 100; i++) {
+        await new Promise(resolve => setTimeout(resolve, 50));  // 避免卡頓
+
+        const prefix = i.toString().padStart(2, '0');
+        const filePath = `companyData/companyData${prefix}.csv?v=${CSV_VERSION}`;
+
+        try {
+            const response = await fetch(filePath);
+            const text = await response.text();
+
+            await new Promise(resolve => {
+                Papa.parse(text, {
+                    header: true,
+                    skipEmptyLines: true,
+                    worker: true,
+                    complete: function(results) {
+                        csvCache[prefix] = results.data;
+                        console.log(`✅ ${filePath} 預載完成`);
+                        resolve();
+                    }
+                });
+            });
+        } catch (err) {
+            console.warn(`⚠️ 載入失敗：${filePath}`, err);
+        }
+    }
+
+    console.log('🎉 所有 CSV 已依版本預載完畢');
+}
+
 // 依據統一編號的前兩碼對應相應的CSV檔案
 let csvFiles = Array.from({ length: 100 }, (_, i) => {
     const prefix = i.toString().padStart(2, '0');
@@ -47,39 +97,52 @@ function searchData(showErrorMessage = false) {
         dclDocExamInput.value = ''; // 格式不符則清空
     }
 
+    const prefix = searchCode.substring(0, 2);
     const fileToSearch = getMatchingFile(searchCode);
 
-    if (fileToSearch) {
-        Papa.parse(fileToSearch, {
+    // ✅ 已預載（或已從 Papa.parse() 載入過）
+    if (csvCache[prefix]) {
+        const record = csvCache[prefix].find(row => row['統一編號'] === searchCode);
+        handleSearchResult(record, searchCode);
+    }
+    // ❗ 尚未載入對應 prefix，fallback 下載並快取
+    else if (fileToSearch) {
+        Papa.parse(fileToSearch + `?v=${CSV_VERSION}`, {
             download: true,
             header: true,
+            worker: true,
             complete: function(results) {
+                csvCache[prefix] = results.data;
                 const record = results.data.find(row => row['統一編號'] === searchCode);
-
-                if (record) {
-                    hasNoData = false; // 有資料
-
-                    // 填入資料並隱藏錯誤訊息
-                    fillSHPRFields(record);
-
-                    noDataMessage.style.display = 'none'; // 隱藏"查無資料"訊息
-
-                    // 檢查是否為非營業中
-                    if (record['進口資格'] === '無' && record['出口資格'] === '無') {
-                        alert('該公司無進出口資格，請確認是否為非營業中。');
-                    }
-                } else {
-                    hasNoData = true; // 查無資料
-                    clearSHPRFields(); // 清空欄位
-                    noDataMessage.style.display = 'inline'; // 顯示"查無資料"訊息
-                    
-                    // 查找出口備註是否有 "未向國際貿易署登記出進口廠商資料者"
-                    checkUnregisteredCompany(searchCode);
-                }
+                handleSearchResult(record, searchCode);
             }
         });
     }
+
     thingsToNote(); // 出口備註
+}
+
+function handleSearchResult(record, searchCode) {
+    if (record) {
+        hasNoData = false; // 有資料
+
+        // 填入資料並隱藏錯誤訊息
+        fillSHPRFields(record);
+
+        noDataMessage.style.display = 'none'; // 隱藏"查無資料"訊息
+
+        // 檢查是否為非營業中
+        if (record['進口資格'] === '無' && record['出口資格'] === '無') {
+            alert('該公司無進出口資格，請確認是否為非營業中。');
+        }
+    } else {
+        hasNoData = true; // 查無資料
+        clearSHPRFields(); // 清空欄位
+        noDataMessage.style.display = 'inline'; // 顯示"查無資料"訊息
+
+        // 查找出口備註是否有 "未向國際貿易署登記出進口廠商資料者"
+        checkUnregisteredCompany(searchCode);
+    }
 }
 
 // 覆蓋更新
