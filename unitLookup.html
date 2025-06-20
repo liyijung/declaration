@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <title>常用計量單位查詢</title>
+    <link rel="icon" href="favicon_A.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            padding: 0px 20px 20px 20px;
+            background-color: #f7f9fb;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* 標題 */
+        .unit-page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 30px 0 20px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        /* 查詢欄位外框 */
+        .unit-search-fields {
+            max-width: 960px;
+            margin: 0 auto 20px;
+        }
+
+        /* 查詢區 */
+        .unit-search-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px auto;
+            max-width: 960px;
+        }
+
+        .unit-search-row input {
+            padding: 8px 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            min-width: 160px;
+            flex: 1;
+            max-width: 220px;
+        }
+
+        .unit-search-row button {
+            padding: 8px 14px;
+            font-size: 14px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .unit-search-row button:hover {
+            background-color: #ccc;
+        }
+
+        .unit-search-fields input {
+            padding: 8px;
+            font-size: 14px;
+            width: 180px;
+        }
+
+        .unit-search-fields button {
+            padding: 8px 12px;
+            font-size: 14px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .unit-search-fields button:hover {
+            background-color: #004999;
+        }
+
+        /* 表格外框 */
+        .unit-table-container {
+            max-width: 960px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #e9eff8;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f1f7ff;
+        }
+
+        /* 表格 */
+        #unitTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #unitTable thead {
+            background-color: #f5f5f5;
+        }
+
+        #unitTable th,
+        #unitTable td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        #unitTable tbody tr:hover {
+            background-color: #f0f8ff;
+        }
+    </style>
+</head>
+
+<body>
+    <h2 class="unit-page-title">常用計量單位查詢</h2>
+
+    <div class="unit-search-fields">
+        <div class="unit-search-row">
+            <input type="text" id="unitKeyword" placeholder="全欄位關鍵字" oninput="filterUnitTable()">
+            <input type="text" id="searchUnitCode" placeholder="代碼" oninput="filterUnitTable()">
+            <input type="text" id="searchUnitMeaning" placeholder="代碼意義" oninput="filterUnitTable()">
+            <input type="text" id="searchUnitEnglish" placeholder="英文說明" oninput="filterUnitTable()">
+        </div>
+    </div>
+
+    <div class="unit-table-container">
+        <table id="unitTable">
+            <thead>
+                <tr>
+                    <th>代碼</th>
+                    <th>代碼意義</th>
+                    <th>英文說明</th>
+                </tr>
+            </thead>
+            <tbody id="unitTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let unitList = [];
+
+        Papa.parse("unitMapping.csv", {
+            download: true,
+            header: true,
+            complete: function (results) {
+                unitList = results.data;
+                filterUnitTable();
+            }
+        });
+
+        function filterUnitTable() {
+            const keyword = document.getElementById("unitKeyword").value.toLowerCase();
+            const code = document.getElementById("searchUnitCode").value.toLowerCase();
+            const meaning = document.getElementById("searchUnitMeaning").value.toLowerCase();
+            const english = document.getElementById("searchUnitEnglish").value.toLowerCase();
+
+            const filtered = unitList.filter(entry => {
+                const matchKeyword = !keyword || (
+                    entry["代碼"]?.toLowerCase().includes(keyword) ||
+                    entry["代碼意義"]?.toLowerCase().includes(keyword) ||
+                    entry["英文說明"]?.toLowerCase().includes(keyword)
+                );
+
+                return matchKeyword &&
+                    entry["代碼"]?.toLowerCase().includes(code) &&
+                    entry["代碼意義"]?.toLowerCase().includes(meaning) &&
+                    entry["英文說明"]?.toLowerCase().includes(english);
+            });
+
+            const tbody = document.getElementById("unitTableBody");
+            tbody.innerHTML = '';
+            filtered.forEach(entry => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${entry["代碼"]}</td><td>${entry["代碼意義"]}</td><td>${entry["英文說明"]}</td>`;
+                tbody.appendChild(row);
+            });
+        }
+
+    </script>
+</body>
+
+</html>
