@@ -1103,7 +1103,7 @@ button {
 .mark-info-tooltip .mark-info-text {
     visibility: hidden;
     opacity: 0;
-    width: 340px;
+    width: 500px;
     background-color: rgba(0, 0, 0, 0.85);
     color: #fff;
     text-align: left;
