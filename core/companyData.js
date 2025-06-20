@@ -1,27 +1,19 @@
-// 依據統一編號的不同範圍對應相應的CSV檔案
-let csvFiles = [
-    { range: ['0'], file: 'companyData0.csv' },
-    { range: ['1'], file: 'companyData1.csv' },
-    { range: ['2'], file: 'companyData2.csv' },
-    { range: ['3'], file: 'companyData3.csv' },
-    { range: ['4'], file: 'companyData4.csv' },
-    { range: ['5'], file: 'companyData5.csv' },
-    { range: ['6'], file: 'companyData6.csv' },
-    { range: ['7'], file: 'companyData7.csv' },
-    { range: ['8'], file: 'companyData8.csv' },
-    { range: ['9'], file: 'companyData9.csv' },
-];
+// 依據統一編號的前兩碼對應相應的CSV檔案
+let csvFiles = Array.from({ length: 100 }, (_, i) => {
+    const prefix = i.toString().padStart(2, '0');
+    return { range: [prefix], file: `companyData${prefix}.csv` };
+});
 
 // 根據統一編號匹配應該加載的CSV檔案
 function getMatchingFile(searchCode) {
-    const prefix1 = searchCode.substring(0, 1); // 取統一編號的第 1 碼
+    if (searchCode.length < 2) return null; // 避免出錯
+
+    const prefix2 = searchCode.substring(0, 2); // 取統一編號前兩碼
 
     let matchingFile = csvFiles.find(item => {
-        // 使用前 1 碼進行匹配
-        return prefix1 === item.range[0];
+        return item.range.includes(prefix2);
     });
 
-    // 檢查是否找到相應檔案，並回傳包含路徑的檔名
     return matchingFile ? `companyData/${matchingFile.file}` : null;
 }
 
