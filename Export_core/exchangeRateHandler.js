@@ -97,7 +97,7 @@ document.getElementById("CURRENCY")?.addEventListener("input", function () {
     const validCurrencies = [
         "ARS", "AUD", "BRL", "CAD", "CHF", "CLP", "CNY", "DKK", "EUR", "GBP",
         "HKD", "IDR", "ILS", "INR", "JPY", "KRW", "MYR", "NOK", "NZD", "PEN",
-        "PHP", "PLN", "SEK", "SGD", "THB", "TWD", "USD", "ZAR", ""
+        "PHP", "PLN", "SEK", "SGD", "THB", "TWD", "USD", "VND", "ZAR", ""
     ];
     const input = this.value.toUpperCase();
     const errorElement = document.getElementById("currency-error");
