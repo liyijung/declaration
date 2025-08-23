@@ -637,8 +637,27 @@ async function exportToPDF() {
                 return decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
             }
 
+            // 單價格式化：整數部分加千分號，四捨五入到小數第6位，並去掉尾端多餘的0
+            function formatUnitPrice(value) {
+                if (isNaN(value) || value === null) return '';
+                
+                // 四捨五入到小數第6位
+                let roundedValue = parseFloat(value).toFixed(6);
+
+                // 移除尾端多餘的0與小數點
+                roundedValue = roundedValue.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.0+$/, '');
+
+                // 分離整數與小數
+                const [integerPart, decimalPart] = roundedValue.split('.');
+
+                // 整數部分加千分號
+                const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                return decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
+            }
+
             // 單價居中對齊，顯示時加入千分號
-            const unitPriceDisplay = formatWithThousandsSeparator(item.values[1].value); // 格式化單價用於顯示
+            const unitPriceDisplay = formatUnitPrice(item.values[1].value); // 格式化單價用於顯示
             const unitPriceWidth = doc.getTextWidth(unitPriceDisplay);
             const unitPriceStartX = unitPriceX - unitPriceWidth / 2;
             doc.text(unitPriceDisplay, unitPriceStartX, startY);
@@ -895,3 +914,4 @@ async function exportToPDF() {
 
 // 為輸出PDF按鈕添加事件監聽器
 document.getElementById('export-to-pdf').addEventListener('click', exportToPDF);
+
