@@ -657,7 +657,7 @@ async function exportToPDF() {
             }
 
             // 單價居中對齊，顯示時加入千分號
-            const unitPriceDisplay = formatUnitPrice(item.values[1].value); // 格式化單價用於顯示
+            const unitPriceDisplay = formatWithThousandsSeparator(item.values[1].value); // 格式化單價用於顯示
             const unitPriceWidth = doc.getTextWidth(unitPriceDisplay);
             const unitPriceStartX = unitPriceX - unitPriceWidth / 2;
             doc.text(unitPriceDisplay, unitPriceStartX, startY);
@@ -914,4 +914,5 @@ async function exportToPDF() {
 
 // 為輸出PDF按鈕添加事件監聽器
 document.getElementById('export-to-pdf').addEventListener('click', exportToPDF);
+
 
