@@ -712,6 +712,59 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        // === 產地檢查（忽略標點與大小寫） ===
+        // 表頭：DOC_MARKS_DESC / DOC_OTR_DESC
+        const marksText = document.getElementById('DOC_MARKS_DESC')?.value || '';
+        const otrText   = document.getElementById('DOC_OTR_DESC')?.value || '';
+
+        const badMarks = findConflictLines(marksText);
+        const badOtr   = findConflictLines(otrText);
+
+        // 項次：逐個 DESCRIPTION
+        const badDescAll = [];
+        document.querySelectorAll('#item-container .item-row').forEach((row, idx) => {
+        const desc = row.querySelector('.DESCRIPTION')?.value || '';
+        const badLines = findConflictLines(desc);
+        if (badLines.length > 0) {
+            badDescAll.push({
+            rowIndex: idx + 1, // 視覺列序
+            itemNo: row.querySelector('.item-number label')?.textContent?.trim() || '',
+            lines: badLines
+            });
+        }
+        });
+
+        // 產地檢查未通過，彙整訊息並中止匯出
+        if (badMarks.length || badOtr.length || badDescAll.length) {
+        let msg = '❌ 產地檢查未通過：\n\n';
+
+        if (badMarks.length) {
+            msg += '【標記及貨櫃號碼（DOC_MARKS_DESC）】\n';
+            badMarks.forEach(b => { msg += `  - 第 ${b.lineNo} 行：${b.text}\n`; });
+            msg += '\n';
+        }
+
+        if (badOtr.length) {
+            msg += '【其它申報事項（DOC_OTR_DESC）】\n';
+            badOtr.forEach(b => { msg += `  - 第 ${b.lineNo} 行：${b.text}\n`; });
+            msg += '\n';
+        }
+
+        if (badDescAll.length) {
+            msg += '【項次品名（DESCRIPTION）】\n';
+            badDescAll.forEach(entry => {
+            const label = entry.itemNo ? `項次 ${entry.itemNo}` : `第 ${entry.rowIndex} 列`;
+            msg += `  - ${label}\n`;
+            entry.lines.forEach(b => { msg += `      第 ${b.lineNo} 行：${b.text}\n`; });
+            });
+            msg += '\n';
+        }
+
+        alert(msg.trimEnd());
+        return; // 中止匯出
+        }
+        // === 檢查結束 ===
+
         // 匯出XML(已完成檢查)
         const headerFields = [
             'FILE_NO', 'LOT_NO', 'SHPR_BAN_ID', 'DCL_DOC_EXAM', 'SHPR_BONDED_ID', 
@@ -1035,4 +1088,44 @@ function unescapeXml(escaped) {
             case '&apos;': return "'";
         }
     });
+}
+
+// ====== 工具：全形→半形 ======
+function toHalfWidth(str) {
+  return (str || '').replace(/[\uff01-\uff5e]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+}
+
+// ====== 工具：忽略標點、大小寫、全形半形；中文同義正規化 ======
+function hasChinaTaiwanConflict(line) {
+  const raw = (line || '').toString();
+  const half = toHalfWidth(raw);
+
+  // --- 英文：移除非英文字母，轉小寫 ---
+  const en = half.toLowerCase().replace(/[^a-z]/g, '');
+  const enHit = en.includes('china') && en.includes('taiwan');
+
+  // --- 中文：移除標點/符號/空白 ---
+  // 注意：需要支援 /u（Unicode）旗標
+  const zhNorm = half
+    .replace(/\u3000/g, ' ')              // 全形空白 → 半形
+    .replace(/[\p{P}\p{S}\s]/gu, '')      // 移除標點、符號、空白
+    .replace(/臺/g, '台')                 // 臺灣 → 台灣
+    .replace(/台湾/g, '台灣')             // 简体台湾 → 台灣
+    .replace(/中国/g, '中國');            // 简体中国 → 中國
+
+  const zhHit = zhNorm.includes('中國') && zhNorm.includes('台灣');
+
+  return enHit || zhHit;
+}
+
+// 對多行內容逐行檢查，回傳行號與原文
+function findConflictLines(multilineText) {
+  const lines = (multilineText || '').toString().split(/\r?\n/);
+  const bad = [];
+  lines.forEach((ln, idx) => {
+    if (ln.trim() && hasChinaTaiwanConflict(ln)) {
+      bad.push({ lineNo: idx + 1, text: ln });
+    }
+  });
+  return bad;
 }
