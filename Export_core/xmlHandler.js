@@ -1095,27 +1095,32 @@ function toHalfWidth(str) {
   return (str || '').replace(/[\uff01-\uff5e]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
 }
 
-// ====== 工具：忽略標點、大小寫、全形半形；中文同義正規化 ======
+// ====== 修正版：忽略標點/大小寫/全形半形，支持中英混寫 ======
 function hasChinaTaiwanConflict(line) {
   const raw = (line || '').toString();
   const half = toHalfWidth(raw);
 
-  // --- 英文：移除非英文字母，轉小寫 ---
+  // 英文正規化：只留 a-z
   const en = half.toLowerCase().replace(/[^a-z]/g, '');
-  const enHit = en.includes('china') && en.includes('taiwan');
+  const hasChinaEn  = en.includes('china');
+  const hasTaiwanEn = en.includes('taiwan');
 
-  // --- 中文：移除標點/符號/空白 ---
-  // 注意：需要支援 /u（Unicode）旗標
+  // 中文正規化：去標點/符號/空白 + 繁簡一律
   const zhNorm = half
-    .replace(/\u3000/g, ' ')              // 全形空白 → 半形
-    .replace(/[\p{P}\p{S}\s]/gu, '')      // 移除標點、符號、空白
-    .replace(/臺/g, '台')                 // 臺灣 → 台灣
-    .replace(/台湾/g, '台灣')             // 简体台湾 → 台灣
-    .replace(/中国/g, '中國');            // 简体中国 → 中國
+    .replace(/\u3000/g, ' ')
+    .replace(/[\p{P}\p{S}\s]/gu, '')
+    .replace(/臺/g, '台')      // 臺 → 台
+    .replace(/台湾/g, '台灣')  // 简体台湾 → 台灣
+    .replace(/中国/g, '中國'); // 简体中国 → 中國
 
-  const zhHit = zhNorm.includes('中國') && zhNorm.includes('台灣');
+  const hasChinaZh  = zhNorm.includes('中國');
+  const hasTaiwanZh = zhNorm.includes('台灣');
 
-  return enHit || zhHit;
+  // 交叉判斷：任一語言命中「中國」且任一語言命中「台灣」就算衝突
+  const hasChina  = hasChinaEn  || hasChinaZh;
+  const hasTaiwan = hasTaiwanEn || hasTaiwanZh;
+
+  return hasChina && hasTaiwan;
 }
 
 // 對多行內容逐行檢查，回傳行號與原文
@@ -1129,3 +1134,4 @@ function findConflictLines(multilineText) {
   });
   return bad;
 }
+
