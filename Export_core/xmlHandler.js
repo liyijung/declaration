@@ -712,58 +712,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // === 產地檢查（忽略標點與大小寫） ===
-        // 表頭：DOC_MARKS_DESC / DOC_OTR_DESC
-        const marksText = document.getElementById('DOC_MARKS_DESC')?.value || '';
-        const otrText   = document.getElementById('DOC_OTR_DESC')?.value || '';
-
-        const badMarks = findConflictLines(marksText);
-        const badOtr   = findConflictLines(otrText);
-
-        // 項次：逐個 DESCRIPTION
-        const badDescAll = [];
-        document.querySelectorAll('#item-container .item-row').forEach((row, idx) => {
-        const desc = row.querySelector('.DESCRIPTION')?.value || '';
-        const badLines = findConflictLines(desc);
-        if (badLines.length > 0) {
-            badDescAll.push({
-            rowIndex: idx + 1, // 視覺列序
-            itemNo: row.querySelector('.item-number label')?.textContent?.trim() || '',
-            lines: badLines
-            });
+        // 產地檢查呼叫
+        if (!runOriginCheck()) {
+            return;
         }
-        });
-
-        // 產地檢查未通過，彙整訊息並中止匯出
-        if (badMarks.length || badOtr.length || badDescAll.length) {
-        let msg = '❌ 產地檢查未通過：\n\n';
-
-        if (badMarks.length) {
-            msg += '【標記及貨櫃號碼（DOC_MARKS_DESC）】\n';
-            badMarks.forEach(b => { msg += `  - 第 ${b.lineNo} 行：${b.text}\n`; });
-            msg += '\n';
-        }
-
-        if (badOtr.length) {
-            msg += '【其它申報事項（DOC_OTR_DESC）】\n';
-            badOtr.forEach(b => { msg += `  - 第 ${b.lineNo} 行：${b.text}\n`; });
-            msg += '\n';
-        }
-
-        if (badDescAll.length) {
-            msg += '【項次品名（DESCRIPTION）】\n';
-            badDescAll.forEach(entry => {
-            const label = entry.itemNo ? `項次 ${entry.itemNo}` : `第 ${entry.rowIndex} 列`;
-            msg += `  - ${label}\n`;
-            entry.lines.forEach(b => { msg += `      第 ${b.lineNo} 行：${b.text}\n`; });
-            });
-            msg += '\n';
-        }
-
-        alert(msg.trimEnd());
-        return; // 中止匯出
-        }
-        // === 檢查結束 ===
 
         // 匯出XML(已完成檢查)
         const headerFields = [
@@ -1058,7 +1010,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 為輸出XML按鈕添加事件監聽器
-    document.getElementById('export-to-xml').addEventListener('click', exportToXML);
+    document.getElementById('export-to-xml').addEventListener('click', async () => {
+        if (typeof showLoading === 'function') showLoading();
+        try {
+            await exportToXML();
+        } finally {
+            if (typeof hideLoading === 'function') hideLoading();
+        }
+    });
+    
 });
 
 // 轉義 XML 保留字符的函數
@@ -1090,48 +1050,103 @@ function unescapeXml(escaped) {
     });
 }
 
-// ====== 工具：全形→半形 ======
-function toHalfWidth(str) {
-  return (str || '').replace(/[\uff01-\uff5e]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
-}
+// ===== 產地檢查工具 =====
+const FULLWIDTH_RE = /[\uff01-\uff5e]/g;
+const ZH_PUNCT_RE  = /[\p{P}\p{S}\s]/gu;
+const SIMP_MAP_RE  = /(臺|台湾|中国)/g;
+const RAW_TOKENS_LOWER = ['china', 'taiwan'];
+const RAW_TOKENS_ZH    = ['中國', '中国', '台灣', '台湾', '臺'];
 
-// ====== 修正版：忽略標點/大小寫/全形半形，支持中英混寫 ======
+function toHalfWidthFast(s) {
+    return s.replace(FULLWIDTH_RE, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+}
+const simpMap = { '臺': '台', '台湾': '台灣', '中国': '中國' };
+function unifyZhVariants(s) { return s.replace(SIMP_MAP_RE, m => simpMap[m]); }
+
 function hasChinaTaiwanConflict(line) {
-  const raw = (line || '').toString();
-  const half = toHalfWidth(raw);
+    if (!line) return false;
+    // ① 原文超輕量早退（中英關鍵詞）
+    const rawLower = line.toLowerCase();
+    const maybeEn = RAW_TOKENS_LOWER.some(t => rawLower.includes(t));
+    const maybeZh = RAW_TOKENS_ZH.some(t => line.includes(t));
+    if (!(maybeEn || maybeZh)) return false;
 
-  // 英文正規化：只留 a-z
-  const en = half.toLowerCase().replace(/[^a-z]/g, '');
-  const hasChinaEn  = en.includes('china');
-  const hasTaiwanEn = en.includes('taiwan');
-
-  // 中文正規化：去標點/符號/空白 + 繁簡一律
-  const zhNorm = half
-    .replace(/\u3000/g, ' ')
-    .replace(/[\p{P}\p{S}\s]/gu, '')
-    .replace(/臺/g, '台')      // 臺 → 台
-    .replace(/台湾/g, '台灣')  // 简体台湾 → 台灣
-    .replace(/中国/g, '中國'); // 简体中国 → 中國
-
-  const hasChinaZh  = zhNorm.includes('中國');
-  const hasTaiwanZh = zhNorm.includes('台灣');
-
-  // 交叉判斷：任一語言命中「中國」且任一語言命中「台灣」就算衝突
-  const hasChina  = hasChinaEn  || hasChinaZh;
-  const hasTaiwan = hasTaiwanEn || hasTaiwanZh;
-
-  return hasChina && hasTaiwan;
+    // ② 嚴格判斷
+    const half = toHalfWidthFast(line);
+    const en = half.toLowerCase().replace(/[^a-z]/g, '');
+    const hasChinaEn  = en.includes('china');
+    const hasTaiwanEn = en.includes('taiwan');
+    const zhNorm = unifyZhVariants(half).replace(ZH_PUNCT_RE, '');
+    const hasChinaZh  = zhNorm.includes('中國');
+    const hasTaiwanZh = zhNorm.includes('台灣');
+    return (hasChinaEn || hasChinaZh) && (hasTaiwanEn || hasTaiwanZh);
 }
 
-// 對多行內容逐行檢查，回傳行號與原文
 function findConflictLines(multilineText) {
-  const lines = (multilineText || '').toString().split(/\r?\n/);
-  const bad = [];
-  lines.forEach((ln, idx) => {
-    if (ln.trim() && hasChinaTaiwanConflict(ln)) {
-      bad.push({ lineNo: idx + 1, text: ln });
+    if (!multilineText) return [];
+    const raw = String(multilineText);
+    // 整段早退：完全沒關鍵詞就不切行
+    const rawLower = raw.toLowerCase();
+    const hasAnyToken =
+        RAW_TOKENS_LOWER.some(t => rawLower.includes(t)) ||
+        RAW_TOKENS_ZH.some(t => raw.includes(t));
+    if (!hasAnyToken) return [];
+
+    const lines = raw.split(/\r?\n/);
+    const bad = [];
+    for (let i = 0; i < lines.length; i++) {
+        const ln = lines[i];
+        if (ln && ln.trim() && hasChinaTaiwanConflict(ln)) {
+            bad.push({ lineNo: i + 1, text: ln });
+        }
     }
-  });
-  return bad;
+    return bad;
 }
 
+// 回傳 true=通過、false=不通過
+function runOriginCheck() {
+    const marksText = document.getElementById('DOC_MARKS_DESC')?.value || '';
+    const otrText   = document.getElementById('DOC_OTR_DESC')?.value || '';
+
+    const badMarks = findConflictLines(marksText);
+    const badOtr   = findConflictLines(otrText);
+
+    // 項次逐行
+    const badDescAll = [];
+    document.querySelectorAll('#item-container .item-row').forEach((row, idx) => {
+        const desc = row.querySelector('.DESCRIPTION')?.value || '';
+        const badLines = findConflictLines(desc);
+        if (badLines.length) {
+            badDescAll.push({
+                rowIndex: idx + 1,
+                itemNo: row.querySelector('.item-number label')?.textContent?.trim() || '',
+                lines: badLines
+            });
+        }
+    });
+
+    if (badMarks.length || badOtr.length || badDescAll.length) {
+        let msg = '❌ 產地檢查未通過：\n\n';
+        if (badMarks.length) {
+            msg += '【標記及貨櫃號碼（DOC_MARKS_DESC）】\n';
+            badMarks.forEach(b => { msg += `  - 第 ${b.lineNo} 行：${b.text}\n`; });
+            msg += '\n';
+        }
+        if (badOtr.length) {
+            msg += '【其它申報事項（DOC_OTR_DESC）】\n';
+            badOtr.forEach(b => { msg += `  - 第 ${b.lineNo} 行：${b.text}\n`; });
+            msg += '\n';
+        }
+        if (badDescAll.length) {
+            msg += '【項次品名（DESCRIPTION）】\n';
+            badDescAll.forEach(entry => {
+                const label = entry.itemNo ? `項次 ${entry.itemNo}` : `第 ${entry.rowIndex} 列`;
+                entry.lines.forEach(b => { msg += `  - ${label} 第 ${b.lineNo} 行：${b.text}\n`; });
+        });
+        msg += '\n';
+        }
+        alert(msg.trimEnd());
+        return false;
+    }
+    return true;
+}
