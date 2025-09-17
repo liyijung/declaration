@@ -712,6 +712,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        // 一般倉：勾選時，報單號碼(後5碼) 必填且為 5 碼「大寫英文或數字」
+        const gwEl    = document.getElementById('general-warehouse');
+        const last5El = document.getElementById('DOC_DOC_NO_Last5');
+        if (gwEl && gwEl.checked) {
+            let last5 = (last5El?.value || '').trim().toUpperCase(); // 自動轉大寫
+            last5El.value = last5; // 寫回輸入框，確保顯示為大寫
+            // 僅允許 5 碼 A–Z 或 0–9
+            if (!/^[A-Z0-9]{5}$/.test(last5)) {
+                alert('已勾選「一般倉」，請填入「報單號碼(後5碼)」，且必須為 5 碼大寫英文或數字。');
+                return; // 中止匯出
+            }
+        }
+
         // 產地檢查呼叫
         if (!runOriginCheck()) {
             return;
@@ -1150,3 +1163,4 @@ function runOriginCheck() {
     }
     return true;
 }
+
