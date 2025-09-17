@@ -92,7 +92,7 @@ function calculateAmounts() {
     }
 
     const exchangeRate = parseFloat(document.getElementById('exchange-rate').value) || 0;
-    const exchangeThreshold = exchangeRate > 0 ? Math.round((0.5 / exchangeRate) * 100) / 100 : 0;
+    const exchangeThreshold = exchangeRate > 0 ? Math.round((1 / exchangeRate) * 100) / 100 : 0;
     const lowTotalPriceAlerts = []; // 存放低於門檻的提示
 
     const items = document.querySelectorAll('#item-container .item-row');
@@ -301,3 +301,4 @@ function calculate() {
     // 更新核算狀態
     document.getElementById("calculation-status").value = "已執行";
 }
+
