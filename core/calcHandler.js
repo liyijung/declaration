@@ -232,6 +232,57 @@ function calculateAmounts() {
         }
     });
 
+    // ===【台幣離岸價格不得低於項次總數(不含*的項次) 檢查】===
+    (function () {
+        const rate = new Decimal(exchangeRate || 0);
+        if (rate.lte(0)) return; // 無匯率則不檢查
+
+        // 有效項次數（排除 item-number 為 '*'）
+        const validItemCount = Array.from(items).reduce((cnt, row) => {
+            const label = row.querySelector('.item-number label')?.textContent.trim();
+            return (label && label !== '*') ? cnt + 1 : cnt;
+        }, 0);
+
+        // 取表頭金額與費用
+        const totalAmt = new Decimal(totalDocumentAmount || 0);
+        const frt = new Decimal(freight || 0);
+        const ins = new Decimal(insurance || 0);
+        const add = new Decimal(additionalCost || 0);
+        const sub = new Decimal(deductibleCost || 0);
+
+        // 依更正後規則計算離岸基礎金額（外幣）
+        let base;
+        if (termsSales === 'EXW') {
+            // EXW: (總金額 + 應加費用)
+            base = totalAmt.add(add);
+        } else if (['FOB', 'CFR', 'C&I', 'CIF'].includes(termsSales)) {
+            // FOB / CFR / C&I / CIF
+            // (總金額 - 運費 - 保險費 - 應加費用 + 應減費用)
+            base = totalAmt.sub(frt).sub(ins).sub(add).add(sub);
+        } else {
+            // 非上述條件則不檢查
+            return;
+        }
+
+        if (base.lt(0)) base = new Decimal(0);
+
+        // 台幣離岸價格 = base * 匯率，四捨五入至整數
+        const twdOffshore = base.mul(rate);
+        const twdOffshoreRounded = twdOffshore.toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
+
+        // 組提示
+        let offshoreAlert = '';
+        if (twdOffshoreRounded.lt(validItemCount)) {
+            offshoreAlert =
+                `➤ 計算後台幣離岸價格：TWD ${twdOffshoreRounded.toString()}；有效項次數：${validItemCount}\n` +
+                `台幣離岸價格低於有效項次數，請確認金額或分攤。`;
+        }
+
+        if (offshoreAlert) {
+            calculationAlerts += (calculationAlerts ? '\n' : '') + offshoreAlert + '\n';
+        }
+    })();
+
     // 合併顯示計算結果提示與關鍵字提示
     const combinedAlerts = [calculationAlerts, ...keywordAlerts, ...lowTotalPriceAlerts].join('\n');
     if (combinedAlerts) {
@@ -301,4 +352,5 @@ function calculate() {
     // 更新核算狀態
     document.getElementById("calculation-status").value = "已執行";
 }
+
 
