@@ -254,6 +254,7 @@
 			<div class="row" style="margin-top:10px">
 				<button class="btn" id="btnStart">開啟相機＋即時掃描</button>
 				<button class="btn danger" id="btnStop" disabled>停止</button>
+				<!-- <button class="btn secondary" id="btnSwitch" disabled>切換鏡頭</button> -->
 				<label class="inline"><input type="checkbox" id="stopOnHit"> 命中即停</label>
 				<label class="inline">OCR 間隔(ms)
 					<input type="number" id="intervalMs" value="1200" style="width:100px" />
@@ -359,6 +360,7 @@
 
 			const btnStart = document.getElementById('btnStart');
 			const btnStop = document.getElementById('btnStop');
+			const btnSwitch = document.getElementById('btnSwitch');
 			const stopOnHit = document.getElementById('stopOnHit');
 			const intervalMs = document.getElementById('intervalMs');
 			const intervalSec = document.getElementById('intervalSec');
@@ -497,6 +499,14 @@
 			// ===== 相機 + 連續掃描 =====
 			btnStart.addEventListener('click', startLive);
 			btnStop.addEventListener('click', stopLive);
+			btnSwitch.addEventListener('click', async () => {
+				if (devices.length <= 1) return;
+				const idx = devices.findIndex(d => d.deviceId === currentDeviceId);
+				const next = devices[(idx + 1) % devices.length];
+				currentDeviceId = next.deviceId;
+				localStorage.setItem(LS_KEY_CAMERA, currentDeviceId);
+				if (scanning) { await stopLive(); await startLive(); }
+			});
 
 			async function startLive() {
 				if (scanning) return;
