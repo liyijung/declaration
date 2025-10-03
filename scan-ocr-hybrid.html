@@ -569,7 +569,9 @@
 
 					devices = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
 					const back = devices.find(d => /back|rear|environment/i.test(d.label));
-					currentDeviceId = (back || devices[0])?.deviceId || undefined;
+					if (!currentDeviceId) {  // 只在第一次設定
+						currentDeviceId = (back || devices[0])?.deviceId || undefined;
+					}
 
 					videoStream = await navigator.mediaDevices.getUserMedia({
 						video: { deviceId: currentDeviceId ? { exact: currentDeviceId } : undefined, facingMode: currentDeviceId ? undefined : 'environment' },
