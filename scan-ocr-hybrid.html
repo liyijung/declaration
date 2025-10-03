@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+	<title>混合式即時掃描：條碼優先＋OCR（支援 Excel/URL 清單與 ROI）</title>
+	<style>
+		:root {
+			--ok: #11a36d;
+			--bad: #e23b3b;
+			--muted: #888;
+			--brand: #3066e5
+		}
+
+		* {
+			box-sizing: border-box
+		}
+
+		body {
+			font-family: "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+			margin: 0;
+			background: #f7f9fb;
+			color: #222
+		}
+
+		header {
+			padding: 14px 16px;
+			background: #fff;
+			position: sticky;
+			top: 0;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+			z-index: 5
+		}
+
+		h1 {
+			margin: 0;
+			font-size: 18px
+		}
+
+		main {
+			padding: 14px
+		}
+
+		.panel {
+			background: #fff;
+			border: 1px solid #eee;
+			border-radius: 12px;
+			padding: 12px;
+			margin-bottom: 12px
+		}
+
+		.row {
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+			align-items: center
+		}
+
+		.btn {
+			appearance: none;
+			border: 0;
+			padding: 10px 14px;
+			border-radius: 10px;
+			background: var(--brand);
+			color: #fff;
+			font-weight: 600;
+			font-size: 14px
+		}
+
+		.btn.secondary {
+			background: #e3e8ff;
+			color: #2a3a8c
+		}
+
+		.btn.danger {
+			background: #e23b3b
+		}
+
+		select,
+		input[type="text"],
+		input[type="url"],
+		input[type="number"] {
+			padding: 8px 10px;
+			border: 1px solid #ddd;
+			border-radius: 10px;
+			font-size: 14px;
+			background: #fff
+		}
+
+		input[type="file"] {
+			font-size: 14px
+		}
+
+		.hint {
+			color: #666;
+			font-size: 12px
+		}
+
+		#videoWrap {
+			position: relative;
+			border-radius: 14px;
+			overflow: hidden;
+			background: #000
+		}
+
+		video {
+			width: 100%
+		}
+
+		#overlayMsg {
+			position: absolute;
+			left: 8px;
+			bottom: 8px;
+			padding: 8px 10px;
+			border-radius: 10px;
+			background: linear-gradient(0deg, #777, #999);
+			color: #fff;
+			font-weight: 700
+		}
+
+		.stat {
+			background: #fff;
+			border: 1px solid #eee;
+			border-radius: 10px;
+			padding: 8px 10px;
+			font-size: 12px
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse
+		}
+
+		th,
+		td {
+			padding: 8px;
+			border-bottom: 1px dashed #eee;
+			font-family: ui-monospace, Menlo, Consolas, monospace
+		}
+
+		.ok {
+			color: var(--ok);
+			font-weight: 700
+		}
+
+		.bad {
+			color: var(--bad);
+			font-weight: 700
+		}
+
+		.pill {
+			display: inline-block;
+			padding: 2px 8px;
+			border-radius: 999px;
+			background: #eef2ff;
+			color: #334
+		}
+
+		label.inline {
+			display: flex;
+			align-items: center;
+			gap: 6px
+		}
+
+		/* ROI 方框 */
+		#roi {
+			position: absolute;
+			border: 2px solid rgba(255, 255, 255, .9);
+			border-radius: 8px;
+			box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .25);
+			touch-action: none
+		}
+
+		#roi .handle {
+			position: absolute;
+			width: 16px;
+			height: 16px;
+			background: #fff;
+			border: 2px solid #333;
+			border-radius: 50%
+		}
+
+		#roi .handle.nw {
+			left: -10px;
+			top: -10px
+		}
+
+		#roi .handle.ne {
+			right: -10px;
+			top: -10px
+		}
+
+		#roi .handle.sw {
+			left: -10px;
+			bottom: -10px
+		}
+
+		#roi .handle.se {
+			right: -10px;
+			bottom: -10px
+		}
+	</style>
+</head>
+
+<body>
+	<header>
+		<h1>混合式即時掃描：條碼優先＋OCR（免按拍照）</h1>
+	</header>
+	<main>
+
+		<!-- 清單：上傳 Excel/CSV 或從 URL 載入 CSV -->
+		<section class="panel">
+			<div class="row" style="justify-content:space-between">
+				<div class="pill">步驟 1. 載入清單</div>
+				<div class="row">
+					<button class="btn" id="btnUseColumn" disabled>載入此欄為清單</button>
+					<button class="btn secondary" id="btnClearCache">清除快取</button>
+				</div>
+			</div>
+
+			<div class="row" style="margin-top:6px">
+				<input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+				<label>工作表
+					<select id="sheetSelect" disabled></select>
+				</label>
+				<label>欄位
+					<select id="colSelect" disabled></select>
+				</label>
+			</div>
+
+			<div class="row" style="margin-top:6px">
+				<label class="inline"><input type="checkbox" id="ignoreJoiners" checked> 忽略空白與連字號</label>
+				<label>白名單字元
+					<input type="text" id="whitelistChars" value="SF0123456789" size="20" />
+				</label>
+				<span class="hint">規格：SF+13 碼數字 或 12 碼數字（可自動修正 O↔0、I↔1…）。</span>
+			</div>
+
+			<div class="row" style="margin-top:6px">
+				<div class="stat">清單筆數：<b id="countList">0</b></div>
+				<div class="stat">來源：<b id="listSource">—</b></div>
+				<div class="stat">更新時間：<b id="listTime">—</b></div>
+			</div>
+		</section>
+
+		<!-- 相機 + 連續辨識（條碼→OCR） -->
+		<section class="panel">
+			<div class="row" style="justify-content:space-between">
+				<div class="pill">步驟 2. 即時掃描</div>
+				<div class="row">
+					<div class="stat">擷取碼數：<b id="countExtracted">0</b></div>
+					<div class="stat">命中：<b id="countHit">0</b></div>
+					<div class="stat">未命中：<b id="countMiss">0</b></div>
+				</div>
+			</div>
+
+			<div id="videoWrap" style="margin-top:6px">
+				<video id="video" playsinline></video>
+				<canvas id="canvas" style="display:none"></canvas>
+				<div id="roi" hidden>
+					<div class="handle nw"></div>
+					<div class="handle ne"></div>
+					<div class="handle sw"></div>
+					<div class="handle se"></div>
+				</div>
+				<div id="overlayMsg">尚未開始</div>
+			</div>
+
+			<div class="row" style="margin-top:10px">
+				<button class="btn" id="btnStart">開啟相機＋即時掃描</button>
+				<button class="btn danger" id="btnStop" disabled>停止</button>
+				<label class="inline"><input type="checkbox" id="stopOnHit"> 命中即停</label>
+				<label class="inline">OCR 間隔(ms)
+					<input type="number" id="intervalMs" value="500" style="width:100px" />
+					<span id="intervalSec" class="hint">(約 1.2 秒)</span>
+				</label>
+				<label class="inline"><input type="checkbox" id="useROI" checked> 使用 ROI 區域</label>
+				<button class="btn secondary" id="btnResetROI">重設 ROI</button>
+			</div>
+
+			<div class="hint" style="margin-top:8px">
+				條碼（Code128/QR 等）會優先嘗試；若連續數次抓不到條碼，會自動改跑 OCR。建議對準號碼區塊並拖曳 ROI 以提升準確度。
+			</div>
+		</section>
+
+		<!-- 結果 -->
+		<section class="panel">
+			<div class="row" style="justify-content:space-between">
+				<div class="pill">擷取結果</div>
+				<div class="row">
+					<button class="btn secondary" id="btnClearResult">清除結果</button>
+					<button class="btn secondary" id="btnExportCSV">匯出結果 CSV</button>
+				</div>
+			</div>
+			<div class="hint" id="ocrTime">單次 OCR 用時：—</div>
+			<table id="resultTable">
+				<thead>
+					<tr>
+						<th>代碼</th>
+						<th>來源</th>
+						<th>比對</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</section>
+
+	</main>
+
+	<!-- ZXing（條碼） -->
+	<script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
+	<!-- Tesseract.js（OCR） -->
+	<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+	<script>
+		/* ---- 多重 CDN 載入工具（可延伸加入你的 GitHub Pages 連結） ---- */
+		async function loadScriptSeq(urls) {
+			for (const url of urls) {
+				try {
+					await new Promise((resolve, reject) => {
+						const s = document.createElement('script');
+						s.src = url;
+						s.async = true;
+						s.crossOrigin = 'anonymous';
+						s.onload = resolve;
+						s.onerror = () => reject(new Error('load fail: ' + url));
+						document.head.appendChild(s);
+					});
+					return; // 成功就結束
+				} catch (e) {
+					console.warn('[XLSX] 失敗，嘗試下一個：', e.message);
+				}
+			}
+			throw new Error('所有 CDN 都載入失敗');
+		}
+
+		async function ensureXLSX() {
+			if (window.XLSX) return;
+			const urls = [
+				// jsDelivr 主域 / Fastly / GCore（有時不同邊緣網路可通）
+				'https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js',
+				'https://fastly.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js',
+				'https://gcore.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js',
+				// unpkg 備援
+				'https://unpkg.com/xlsx@0.20.3/dist/xlsx.full.min.js',
+				// cdnjs（版本較舊，但 API 夠用）
+				'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+				// 你的自家鏡像（可選）：把同檔案放到 GitHub Pages / Cloudflare Pages
+				// 'https://你的網域/path/xlsx.full.min.js'
+			];
+			await loadScriptSeq(urls);
+			if (!window.XLSX) throw new Error('XLSX still undefined after load');
+		}
+
+		(function () {
+			// ===== 規格（你提供）=====
+			const REGEX = /^(?:SF\d{13}|\d{12})$/;
+
+			// ===== 狀態 =====
+			let listSet = new Set();
+			let workbook = null, sheetNames = [], activeSheet = null, headerRow = [];
+			let videoStream = null, currentDeviceId = null, devices = [];
+			let codeReader = null; // ZXing
+			let worker = null;     // Tesseract worker
+			let loopTimer = null, isBusy = false;
+			let lastBarcodeTs = 0;       // 最近條碼命中時間
+			let ocrCooldownMs = 900;     // 兩次 OCR 最短間隔（避免過度耗電）
+			let missBarcodeTimes = 0;    // 連續沒有條碼的次數
+			let barcodeFirstTries = 2;   // 每輪先試幾次條碼（每 ~0.3s/次）
+			let extractedSet = new Set();
+			let hitCount = 0, missCount = 0;
+
+			// ===== ROI 狀態（相對 videoWrap 的百分比座標）=====
+			let roiEnabled = true;
+			let roi = { x: 0.2, y: 0.3, w: 0.6, h: 0.4 }; // 預設 ROI
+			let dragging = null; // 'move' 或 handle 名稱
+			let scanning = false; // 是否正在即時掃描
+			
+			// ===== DOM =====
+			const fileInput = document.getElementById('fileInput');
+			const sheetSelect = document.getElementById('sheetSelect');
+			const colSelect = document.getElementById('colSelect');
+			const btnUseColumn = document.getElementById('btnUseColumn');
+
+			const ignoreJoiners = document.getElementById('ignoreJoiners');
+			const whitelistChars = document.getElementById('whitelistChars');
+
+			const countList = document.getElementById('countList');
+			const listSource = document.getElementById('listSource');
+			const listTime = document.getElementById('listTime');
+
+			const videoWrap = document.getElementById('videoWrap');
+			const video = document.getElementById('video');
+			const canvas = document.getElementById('canvas');
+			const overlayMsg = document.getElementById('overlayMsg');
+
+			const btnStart = document.getElementById('btnStart');
+			const btnStop = document.getElementById('btnStop');
+			const stopOnHit = document.getElementById('stopOnHit');
+			const intervalMs = document.getElementById('intervalMs');
+			const intervalSec = document.getElementById('intervalSec');
+
+			function updateIntervalHint() {
+				const ms = Number(intervalMs.value) || 0;
+				intervalSec.textContent = `(約 ${(ms / 1000).toFixed(2)} 秒)`;
+			}
+
+			// 初始化
+			updateIntervalHint();
+			// 監聽輸入變更
+			intervalMs.addEventListener('input', updateIntervalHint);
+
+			const countExtracted = document.getElementById('countExtracted');
+			const countHit = document.getElementById('countHit');
+			const countMiss = document.getElementById('countMiss');
+			const resultBody = document.querySelector('#resultTable tbody');
+			const ocrTime = document.getElementById('ocrTime');
+
+			const btnLoadCache = document.getElementById('btnLoadCache');
+			const btnClearCache = document.getElementById('btnClearCache');
+			const btnClearResult = document.getElementById('btnClearResult');
+			const btnExportCSV = document.getElementById('btnExportCSV');
+
+			const useROI = document.getElementById('useROI');
+			const roiBox = document.getElementById('roi');
+			const btnResetROI = document.getElementById('btnResetROI');
+
+			// ===== ROI 初始設定 =====
+			useROI.checked = true;   // 預設勾選
+			useROI.disabled = true;    // 未開機前不可用
+			btnResetROI.disabled = true;			
+			updateROIBox();          // 預設畫出 ROI
+
+			// ===== Excel/CSV 上傳 =====
+			fileInput.addEventListener('change', async (e) => {
+				await ensureXLSX();              // ★ 新增：確保已載入
+				resetExcelState();
+				const f = e.target.files?.[0]; if (!f) return;
+				listSource.textContent = f.name; listTime.textContent = new Date().toLocaleString();
+
+				// ✅ 建議一律交給 SheetJS 解析（CSV/Excel 都可）
+				const buf = await f.arrayBuffer();
+				workbook = XLSX.read(buf, { type: 'array', raw: true, codepage: 65001 });
+
+				afterWorkbookLoaded();
+			});
+
+			function resetExcelState() {
+				workbook = null; sheetNames = []; activeSheet = null; headerRow = [];
+				sheetSelect.innerHTML = ''; colSelect.innerHTML = '';
+				sheetSelect.disabled = true; colSelect.disabled = true; btnUseColumn.disabled = true;
+				listSet = new Set(); countList.textContent = '0';
+			}
+
+			function afterWorkbookLoaded() {
+				sheetNames = workbook.SheetNames || [];
+				if (!sheetNames.length) { toast('讀不到工作表', 'bad'); return; }
+				sheetSelect.disabled = false;
+				sheetSelect.innerHTML = sheetNames.map((s, i) => `<option value="${i}">${escapeHtml(s)}</option>`).join('');
+				setActiveSheetByIndex(0);
+			}
+			sheetSelect.addEventListener('change', e => setActiveSheetByIndex(Number(e.target.value || 0)));
+
+			function setActiveSheetByIndex(idx) {
+				activeSheet = workbook.Sheets[sheetNames[idx]];
+				const rows = XLSX.utils.sheet_to_json(activeSheet, { header: 1, raw: true, defval: '' });
+
+				// 先抓第一列當表頭；若為空，從前幾列推斷欄數並生成「欄1、欄2…」
+				let headers = (rows[0] || []).map(v => String(v).trim());
+				if (!headers.length || headers.every(h => h === '')) {
+					// 找出前 20 列的最長欄數
+					const maxCols = Math.max(0, ...rows.slice(0, 20).map(r => (r || []).length));
+					headers = Array.from({ length: maxCols }, (_, i) => `欄${i + 1}`);
+				}
+
+				headerRow = headers;
+				fillColSelect(headerRow);
+
+				// 依常見關鍵字猜欄位；若猜不到就預設 0
+				const guess = guessCodeColumnIndex(headerRow);
+				colSelect.value = String(guess >= 0 ? guess : 0);
+
+				// 確保下拉啟用
+				sheetSelect.disabled = false;
+				colSelect.disabled = false;
+				btnUseColumn.disabled = false;
+			}
+
+			function fillColSelect(headers) {
+				colSelect.innerHTML = headers.map((h, i) =>
+					`<option value="${i}">${escapeHtml(h || '(無標題)')}（第${i + 1}欄）</option>`
+				).join('');
+				// 如果真的沒有偵測到任何欄，至少放一個欄位 1，避免整個 disabled
+				if (!headers.length) {
+					colSelect.innerHTML = `<option value="0">欄1（第1欄）</option>`;
+				}
+				colSelect.disabled = false;
+				btnUseColumn.disabled = false;
+			}
+
+			function guessCodeColumnIndex(headers) {
+				const keys = ['明單', '明細單', '清單', '號碼', '代碼', '條碼', '碼號', '編號', '單號', 'tracking', 'hawb', '主號', '分號', 'no', 'code', 'barcode'];
+				const lowered = headers.map(h => String(h || '').toLowerCase());
+				for (let i = 0; i < lowered.length; i++) {
+					if (keys.some(k => lowered[i].includes(k))) return i;
+				}
+				return headers.length === 1 ? 0 : -1;
+			}
+
+			btnUseColumn.addEventListener('click', () => {
+				if (!activeSheet) {
+					toast('尚未選擇工作表', 'bad');
+					return;
+				}
+				const colIndex = Number(colSelect.value || 0);
+				const rows = XLSX.utils.sheet_to_json(activeSheet, { header: 1, raw: true, defval: '' });
+				const values = [];
+				for (let r = 1; r < rows.length; r++) {
+					const v = rows[r][colIndex];
+					if (v === null || v === undefined) continue;
+					const n = sanitizeOCR(String(v));
+					if (REGEX.test(n)) values.push(n);
+				}
+				loadListValues(values, listSource.textContent || '上傳檔案');
+
+				// ★ 加這一行：提示成功
+				toast("已載入清單，共 " + values.length + " 筆", "ok");
+			});
+
+			function loadListValues(values, sourceLabel) {
+				listSet = new Set(values);
+				countList.textContent = String(listSet.size);
+				listSource.textContent = sourceLabel;
+				listTime.textContent = new Date().toLocaleString();
+				try {
+					localStorage.setItem('ocr_list_values', JSON.stringify(values));
+					localStorage.setItem('ocr_list_meta', JSON.stringify({
+						source: sourceLabel,
+						time: listTime.textContent,
+						ignoreJoiners: !!ignoreJoiners.checked,
+						whitelist: whitelistChars.value || ''
+					}));
+				} catch (_) { }
+			}
+
+			// 清除快取
+			btnClearCache.addEventListener('click', () => {
+				localStorage.removeItem('ocr_list_values');
+				localStorage.removeItem('ocr_list_meta');
+				toast('已清除快取', 'muted');
+			});
+
+			// ===== 相機 + 連續掃描 =====
+			btnStart.addEventListener('click', startLive);
+			btnStop.addEventListener('click', stopLive);
+
+			async function startLive() {
+				try {
+					// ZXing 初始化
+					codeReader = new ZXing.BrowserMultiFormatReader();
+					// Tesseract worker（一次建立即可）
+					if (!worker) {
+						worker = await Tesseract.createWorker('eng', 1);
+						await worker.setParameters({
+							tessedit_char_whitelist: whitelistChars.value || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'
+						});
+					}
+
+					devices = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+					const back = devices.find(d => /back|rear|environment/i.test(d.label));
+					currentDeviceId = (back || devices[0])?.deviceId || undefined;
+
+					videoStream = await navigator.mediaDevices.getUserMedia({
+						video: { deviceId: currentDeviceId ? { exact: currentDeviceId } : undefined, facingMode: currentDeviceId ? undefined : 'environment' },
+						audio: false
+					});
+					video.srcObject = videoStream;
+					await video.play();
+
+					scanning = true;
+					useROI.disabled = false;
+					btnResetROI.disabled = false;
+					updateROIBox();
+
+					// 啟用停止按鈕
+					btnStop.disabled = false;
+
+					// 啟動 ZXing 連續解碼（條碼優先通道）
+					codeReader.decodeFromVideoDevice(currentDeviceId, video, (result, err) => {
+						if (result && result.getText) {
+							const raw = result.getText().toString();
+							onCandidate(raw, 'BARCODE');
+							lastBarcodeTs = Date.now();
+							missBarcodeTimes = 0;
+							if (stopOnHit.checked && listSet.has(sanitizeOCR(raw))) { stopLive(); }
+						} else if (err) {
+							// 失敗會頻繁發生，忽略即可；累積未命中次數供 fallback 參考
+							if (Date.now() - lastBarcodeTs > 400) { missBarcodeTimes++; }
+						}
+					});
+
+					toast('即時掃描中（條碼優先 → OCR）', 'muted');
+					// 啟動 OCR 循環（僅在條碼連續失敗一段時間才執行）
+					const baseInterval = Math.max(600, Number(intervalMs.value) || 1200);
+					if (loopTimer) clearInterval(loopTimer);
+					loopTimer = setInterval(runOCRTick, baseInterval);
+					// 顯示 ROI
+					updateROIBox();
+				} catch (e) {
+					toast('相機啟動失敗：' + (e?.message || e), 'bad');
+				}
+			}
+
+			function stopLive() {
+				if (loopTimer) { clearInterval(loopTimer); loopTimer = null; }
+				isBusy = false;
+				try { codeReader?.reset(); } catch (_) { }
+				try { video.pause(); } catch (_) { }
+				try { video.srcObject?.getTracks()?.forEach(t => t.stop()); } catch (_) { }
+				video.srcObject = null;
+				videoStream = null;
+				btnStop.disabled = true;
+				toast('已停止', 'muted');
+
+				scanning = false;
+				useROI.disabled = true;
+				btnResetROI.disabled = true;
+				updateROIBox(); // 會把 ROI 隱藏
+			}
+
+			// OCR 週期任務（當條碼連續多次抓不到，才跑）
+			async function runOCRTick() {
+				if (isBusy || !videoStream) return;
+				const since = Date.now() - lastBarcodeTs;
+				if (missBarcodeTimes < barcodeFirstTries && since < 600) { return; } // 近期已有條碼嘗試，暫不 OCR
+				if (since < ocrCooldownMs) return;
+
+				isBusy = true;
+				const t0 = performance.now();
+				try {
+					// 擷取畫面（可裁切 ROI）
+					const vw = video.videoWidth || 1280, vh = video.videoHeight || 720;
+					let sx = 0, sy = 0, sw = vw, sh = vh;
+					if (roiEnabled) {
+						const r = pixelROI(vw, vh);
+						sx = r.x; sy = r.y; sw = r.w; sh = r.h;
+					}
+					const maxW = 800;
+					const scale = sw > maxW ? maxW / sw : 1;
+					const w = Math.round(sw * scale), h = Math.round(sh * scale);
+
+					canvas.width = w; canvas.height = h;
+					const ctx = canvas.getContext('2d');
+					ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
+
+					const { data } = await worker.recognize(canvas);
+					const rawText = (data.text || '').toUpperCase();
+
+					const candidates = extractCandidates(rawText);
+					let added = 0, anyHit = false;
+					for (const cand of candidates) {
+						if (extractedSet.has(cand)) continue;
+						extractedSet.add(cand);
+						added++;
+						const inList = listSet.has(cand);
+						if (inList) anyHit = true;
+						updateResult(cand, inList, 'OCR');
+					}
+
+					const t1 = performance.now();
+					ocrTime.textContent = '單次 OCR 用時：' + ((t1 - t0) / 1000).toFixed(2) + ' 秒';
+
+					if (added === 0) {
+						toast('辨識中…（條碼未得、OCR 未擷取到有效碼）', 'muted');
+					} else {
+						toast(anyHit ? '✔ 命中清單' : '✘ 未命中', anyHit ? 'ok' : 'bad');
+						if (anyHit && stopOnHit.checked) { await stopLive(); }
+					}
+				} catch (e) {
+					toast('OCR 失敗：' + (e?.message || e), 'bad');
+				} finally {
+					isBusy = false;
+				}
+			}
+
+			// 條碼/OCR 候選處理
+			function onCandidate(text, source) {
+				const cand = sanitizeOCR(text);
+				if (!REGEX.test(cand)) return;
+				if (extractedSet.has(cand)) return;
+				extractedSet.add(cand);
+				const inList = listSet.has(cand);
+				updateResult(cand, inList, source);
+				toast(inList ? '✔ 命中清單' : '✘ 未命中', inList ? 'ok' : 'bad');
+			}
+
+			// ===== 候選碼抽取與正規化 =====
+			function extractCandidates(ocrText) {
+				const collapsed = ocrText.replace(/[\s\-–—_]/g, '');
+				const out = new Set();
+
+				(collapsed.match(/SF\d{13}|\d{12}/g) || []).forEach(s => {
+					const fixed = sanitizeOCR(s);
+					if (REGEX.test(fixed)) out.add(fixed);
+				});
+
+				const tokens = ocrText.split(/[^A-Z0-9\-]+/i).filter(Boolean);
+				for (const tk of tokens) {
+					const fixed = sanitizeOCR(tk);
+					if (REGEX.test(fixed)) out.add(fixed);
+					if (/^SF[0-9\-\s]+$/i.test(tk)) {
+						const merged = sanitizeOCR(tk.replace(/[\s\-]/g, ''));
+						if (REGEX.test(merged)) out.add(merged);
+					}
+				}
+				return Array.from(out);
+			}
+
+			function toHalfWidth(str) {
+				return str.replace(/[\uFF01-\uFF5E]/g, ch =>
+					String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)
+				).replace(/\u3000/g, ' ');
+			}
+
+			function sanitizeOCR(raw) {
+				let s = toHalfWidth((raw || '')).toUpperCase();
+				if (ignoreJoiners.checked) { s = s.replace(/[\s\-–—_]/g, ''); }
+				const fixDigits = t => t
+					.replace(/[O〇]/g, '0')
+					.replace(/[I|l]/g, '1')
+					.replace(/B/g, '8')
+					.replace(/S/g, '5')
+					.replace(/Z/g, '2');
+				if (s.startsWith('SF')) s = 'SF' + fixDigits(s.slice(2)); else s = fixDigits(s);
+				const allow = new RegExp('[^' + escapeForClass(whitelistChars.value || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-') + ']', 'g');
+				s = s.replace(allow, '');
+				return s;
+			}
+			function escapeForClass(chars) { return chars.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'); }
+
+			// ===== 結果顯示/統計 =====
+			function updateResult(code, inList, source) {
+				const tr = document.createElement('tr');
+				const td1 = document.createElement('td'); td1.textContent = code;
+				const tdS = document.createElement('td'); tdS.textContent = source || '—';
+				const td2 = document.createElement('td'); td2.textContent = inList ? '在清單' : '不在清單';
+				td2.className = inList ? 'ok' : 'bad';
+				tr.appendChild(td1); tr.appendChild(tdS); tr.appendChild(td2);
+				resultBody.prepend(tr);
+
+				if (inList) hitCount++; else missCount++;
+				countHit.textContent = String(hitCount);
+				countMiss.textContent = String(missCount);
+				countExtracted.textContent = String(extractedSet.size);
+
+				if (!inList) vibrate(120);
+			}
+
+			btnClearResult.addEventListener('click', () => {
+				extractedSet.clear(); hitCount = 0; missCount = 0;
+				resultBody.innerHTML = ''; countExtracted.textContent = '0'; countHit.textContent = '0'; countMiss.textContent = '0';
+				ocrTime.textContent = '單次 OCR 用時：—';
+			});
+
+			btnExportCSV.addEventListener('click', () => {
+				const rows = [['code', 'source', 'status']];
+				Array.from(resultBody.querySelectorAll('tr')).reverse().forEach(tr => {
+					const tds = tr.querySelectorAll('td');
+					rows.push([tds[0].textContent, tds[1].textContent, tds[2].textContent]);
+				});
+				const csv = rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+				const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a'); a.href = url; a.download = 'scan_results.csv'; a.click();
+				URL.revokeObjectURL(url);
+			});
+
+			// ===== ROI 互動 =====
+			useROI.addEventListener('change', () => {
+				updateROIBox();
+			});
+			btnResetROI.addEventListener('click', () => {
+				roi = { x: 0.2, y: 0.3, w: 0.6, h: 0.4 };
+				updateROIBox();
+			});
+
+			function updateROIBox() {
+				// 只有「正在掃描」且「使用 ROI 被勾選」時顯示
+				const shouldShow = scanning && useROI.checked;
+				roiEnabled = shouldShow;       // 同步內部使用的 roiEnabled
+				roiBox.hidden = !shouldShow;
+				if (!shouldShow) return;
+
+				const rect = videoWrap.getBoundingClientRect();
+				const x = rect.width * roi.x, y = rect.height * roi.y;
+				const w = rect.width * roi.w, h = rect.height * roi.h;
+				roiBox.style.left = x + 'px';
+				roiBox.style.top = y + 'px';
+				roiBox.style.width = w + 'px';
+				roiBox.style.height = h + 'px';
+			}
+
+			window.addEventListener('resize', updateROIBox);
+
+			// ROI 拖曳/縮放
+			['mousedown', 'touchstart'].forEach(evt => {
+				roiBox.addEventListener(evt, startDrag, { passive: false });
+			});
+			['mousemove', 'touchmove'].forEach(evt => {
+				window.addEventListener(evt, onDrag, { passive: false });
+			});
+			['mouseup', 'touchend', 'touchcancel'].forEach(evt => {
+				window.addEventListener(evt, endDrag, { passive: false });
+			});
+
+			function posFromEvent(e) {
+				const t = e.touches ? e.touches[0] : e;
+				const r = videoWrap.getBoundingClientRect();
+				return { x: (t.clientX - r.left) / r.width, y: (t.clientY - r.top) / r.height };
+			}
+			function startDrag(e) {
+				e.preventDefault();
+				const target = e.target;
+				if (target.classList.contains('handle')) dragging = target.classList[1]; else dragging = 'move';
+			}
+			function onDrag(e) {
+				if (!dragging || !roiEnabled) return;
+				e.preventDefault();
+				const p = posFromEvent(e);
+				const minW = 0.1, minH = 0.1;
+				if (dragging === 'move') {
+					// 以中心對齊
+					const cx = p.x - roi.w / 2, cy = p.y - roi.h / 2;
+					roi.x = clamp(cx, 0, 1 - roi.w);
+					roi.y = clamp(cy, 0, 1 - roi.h);
+				} else {
+					// 角點縮放
+					let x1 = roi.x, y1 = roi.y, x2 = roi.x + roi.w, y2 = roi.y + roi.h;
+					if (dragging === 'nw') { x1 = p.x; y1 = p.y; }
+					if (dragging === 'ne') { x2 = p.x; y1 = p.y; }
+					if (dragging === 'sw') { x1 = p.x; y2 = p.y; }
+					if (dragging === 'se') { x2 = p.x; y2 = p.y; }
+					// 規整
+					const nx = Math.min(x1, x2), ny = Math.min(y1, y2), nw = Math.abs(x2 - x1), nh = Math.abs(y2 - y1);
+					roi.x = clamp(nx, 0, 1); roi.y = clamp(ny, 0, 1);
+					roi.w = Math.max(minW, Math.min(nw, 1 - roi.x));
+					roi.h = Math.max(minH, Math.min(nh, 1 - roi.y));
+				}
+				updateROIBox();
+			}
+			function endDrag() { dragging = null; }
+			function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+			function pixelROI(vw, vh) {
+				return { x: Math.round(roi.x * vw), y: Math.round(roi.y * vh), w: Math.round(roi.w * vw), h: Math.round(roi.h * vh) };
+			}
+
+			// ===== 小工具 =====
+			function toast(msg, type) {
+				overlayMsg.textContent = msg;
+				overlayMsg.style.background =
+					type === 'bad' ? 'linear-gradient(0deg,#e23b3b,#ff6b6b)' :
+						type === 'ok' ? 'linear-gradient(0deg,#11a36d,#23c485)' :
+							'linear-gradient(0deg,#777,#999)';
+			}
+			function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) { } }
+			function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+
+		})();
+	</script>
+</body>
+
+</html>
