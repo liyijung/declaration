@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-	<title>混合式即時掃描：條碼優先＋OCR（支援 Excel 清單）</title>
+	<title>混合式即時掃描：條碼優先＋OCR</title>
 	<style>
 		:root {
 			--ok: #11a36d;
@@ -80,8 +80,7 @@
 		select,
 		input[type="text"],
 		input[type="url"],
-		input[type="number"],
-		input[type="file"] {
+		input[type="number"] {
 			padding: 8px 10px;
 			border: 1px solid #ddd;
 			border-radius: 10px;
@@ -89,9 +88,42 @@
 			background: #fff
 		}
 
+		input[type="file"] {
+			font-size: 14px
+		}
+
 		.hint {
 			color: #666;
 			font-size: 12px
+		}
+
+		/* 視訊區：固定比例，影片鋪滿 */
+		#videoWrap {
+			position: relative;
+			border-radius: 14px;
+			overflow: hidden;
+			background: #000;
+			aspect-ratio: 16/9;
+			width: 100%;
+		}
+
+		#video {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		#overlayMsg {
+			position: absolute;
+			left: 8px;
+			bottom: 8px;
+			padding: 8px 10px;
+			border-radius: 10px;
+			background: linear-gradient(0deg, #777, #999);
+			color: #fff;
+			font-weight: 700
 		}
 
 		.stat {
@@ -104,14 +136,32 @@
 
 		table {
 			width: 100%;
-			border-collapse: collapse
+			border-collapse: collapse;
+			table-layout: fixed;
 		}
 
 		th,
 		td {
 			padding: 8px;
 			border-bottom: 1px dashed #eee;
-			font-family: ui-monospace, Menlo, Consolas, monospace
+			font-family: ui-monospace, Menlo, Consolas, monospace;
+			text-align: left;
+		}
+
+		/* 固定欄寬避免對不齊 */
+		th:nth-child(1),
+		td:nth-child(1) {
+			width: 60%;
+		}
+
+		th:nth-child(2),
+		td:nth-child(2) {
+			width: 20%;
+		}
+
+		th:nth-child(3),
+		td:nth-child(3) {
+			width: 20%;
 		}
 
 		.ok {
@@ -137,59 +187,6 @@
 			align-items: center;
 			gap: 6px
 		}
-
-		/* 相機容器固定比例，影片鋪滿 */
-		#videoWrap {
-			position: relative;
-			border-radius: 14px;
-			overflow: hidden;
-			background: #000;
-			aspect-ratio: 16 / 9;
-			width: 100%;
-		}
-
-		#video {
-			position: absolute;
-			inset: 0;
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
-
-		#overlayMsg {
-			position: absolute;
-			left: 8px;
-			bottom: 8px;
-			padding: 8px 10px;
-			border-radius: 10px;
-			background: linear-gradient(0deg, #777, #999);
-			color: #fff;
-			font-weight: 700
-		}
-
-		/* 固定結果表格欄寬與對齊 */
-		#resultTable {
-			table-layout: fixed;
-			width: 100%;
-		}
-
-		#resultTable th,
-		#resultTable td {
-			vertical-align: middle;
-		}
-
-		/* 代碼靠左；來源/比對置中 */
-		#resultTable th:nth-child(1),
-		#resultTable td:nth-child(1) {
-			text-align: left;
-		}
-
-		#resultTable th:nth-child(2),
-		#resultTable td:nth-child(2),
-		#resultTable th:nth-child(3),
-		#resultTable td:nth-child(3) {
-			text-align: center;
-		}
 	</style>
 </head>
 
@@ -199,7 +196,7 @@
 	</header>
 	<main>
 
-		<!-- 清單：上傳 Excel/CSV -->
+		<!-- 清單 -->
 		<section class="panel">
 			<div class="row" style="justify-content:space-between">
 				<div class="pill">步驟 1. 載入清單</div>
@@ -221,10 +218,13 @@
 
 			<div class="row" style="margin-top:6px">
 				<label class="inline"><input type="checkbox" id="ignoreJoiners" checked> 忽略空白與連字號</label>
-				<label>白名單字元
-					<input type="text" id="whitelistChars" value="SF0123456789" size="20" />
+				<label>字元白名單（Tesseract）
+					<input type="text" id="whitelistChars" value="SF0123456789" size="18" />
 				</label>
-				<span class="hint">規格：SF+13 碼數字 或 12 碼數字（可自動修正 O↔0、I↔1…）。</span>
+				<label>格式白名單（正則，逗號或 | 分隔）
+					<input type="text" id="formatPatterns" value="SF\\d{13},\\d{12}" size="22" />
+				</label>
+				<span class="hint">字元白名單限制 OCR 字元；格式白名單再用正則過濾（預設：SF+13碼或12碼數字）。</span>
 			</div>
 
 			<div class="row" style="margin-top:6px">
@@ -234,7 +234,7 @@
 			</div>
 		</section>
 
-		<!-- 相機 + 連續辨識（條碼→OCR） -->
+		<!-- 相機 + 連續辨識 -->
 		<section class="panel">
 			<div class="row" style="justify-content:space-between">
 				<div class="pill">步驟 2. 即時掃描</div>
@@ -254,15 +254,16 @@
 			<div class="row" style="margin-top:10px">
 				<button class="btn" id="btnStart">開啟相機＋即時掃描</button>
 				<button class="btn danger" id="btnStop" disabled>停止</button>
+				<button class="btn secondary" id="btnSwitch" disabled>切換鏡頭</button>
 				<label class="inline"><input type="checkbox" id="stopOnHit"> 命中即停</label>
 				<label class="inline">OCR 間隔(ms)
-					<input type="number" id="intervalMs" value="500" style="width:100px" />
-					<span id="intervalSec" class="hint">(約 0.50 秒)</span>
+					<input type="number" id="intervalMs" value="1200" style="width:100px" />
+					<span id="intervalSec" class="hint">(約 1.2 秒)</span>
 				</label>
 			</div>
 
 			<div class="hint" style="margin-top:8px">
-				條碼（Code128/QR 等）會優先嘗試；若連續數次抓不到條碼，會自動改跑 OCR。建議對準號碼區塊以提升準確度。
+				條碼（Code128/QR 等）會優先嘗試；若持續抓不到條碼，會自動改跑 OCR。
 			</div>
 		</section>
 
@@ -276,13 +277,7 @@
 				</div>
 			</div>
 			<div class="hint" id="ocrTime">單次 OCR 用時：—</div>
-			
 			<table id="resultTable">
-				<colgroup>
-					<col style="width: 55%"> <!-- 代碼 -->
-					<col style="width: 15%"> <!-- 來源 -->
-					<col style="width: 30%"> <!-- 比對 -->
-				</colgroup>
 				<thead>
 					<tr>
 						<th>代碼</th>
@@ -292,7 +287,6 @@
 				</thead>
 				<tbody></tbody>
 			</table>
-
 		</section>
 
 	</main>
@@ -303,7 +297,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 	<script>
-		/* ---- 多重 CDN 載入 SheetJS（解析 Excel/CSV） ---- */
+		/* ---- 多重 CDN 載入工具（for XLSX） ---- */
 		async function loadScriptSeq(urls) {
 			for (const url of urls) {
 				try {
@@ -314,7 +308,7 @@
 						document.head.appendChild(s);
 					});
 					return;
-				} catch (e) { console.warn('[XLSX] 失敗，嘗試下一個：', e.message); }
+				} catch (e) { console.warn('[XLSX] 失敗，下一個：', e.message); }
 			}
 			throw new Error('所有 CDN 都載入失敗');
 		}
@@ -332,9 +326,6 @@
 		}
 
 		(function () {
-			// ===== 規格 =====
-			const REGEX = /^(?:SF\d{13}|\d{12})$/;
-
 			// ===== 狀態 =====
 			let listSet = new Set();
 			let workbook = null, sheetNames = [], activeSheet = null, headerRow = [];
@@ -346,6 +337,9 @@
 			let extractedSet = new Set(); let hitCount = 0, missCount = 0;
 			let scanning = false;
 
+			const LS_KEY_CAMERA = 'preferred_camera_id';
+			currentDeviceId = localStorage.getItem(LS_KEY_CAMERA) || null;
+
 			// ===== DOM =====
 			const fileInput = document.getElementById('fileInput');
 			const sheetSelect = document.getElementById('sheetSelect');
@@ -354,6 +348,7 @@
 
 			const ignoreJoiners = document.getElementById('ignoreJoiners');
 			const whitelistChars = document.getElementById('whitelistChars');
+			const formatInput = document.getElementById('formatPatterns');
 
 			const countList = document.getElementById('countList');
 			const listSource = document.getElementById('listSource');
@@ -365,6 +360,7 @@
 
 			const btnStart = document.getElementById('btnStart');
 			const btnStop = document.getElementById('btnStop');
+			const btnSwitch = document.getElementById('btnSwitch');
 			const stopOnHit = document.getElementById('stopOnHit');
 			const intervalMs = document.getElementById('intervalMs');
 			const intervalSec = document.getElementById('intervalSec');
@@ -386,6 +382,27 @@
 			const btnClearResult = document.getElementById('btnClearResult');
 			const btnExportCSV = document.getElementById('btnExportCSV');
 
+			// ===== 格式白名單：編譯與判斷 =====
+			let formatRegexes = [];
+			function compileFormats(str) {
+				const raw = String(str || '').trim();
+				if (!raw) return [];
+				const parts = raw.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+				const regs = [];
+				for (const p of parts) {
+					const pat = (p.startsWith('^') ? p : '^' + p) + (p.endsWith('$') ? '' : '$');
+					try { regs.push(new RegExp(pat)); }
+					catch (e) { console.warn('格式白名單無效：', p, e.message); }
+				}
+				return regs;
+			}
+			function isAllowedFormat(code) {
+				if (!formatRegexes.length) return true;
+				return formatRegexes.some(re => re.test(code));
+			}
+			formatRegexes = compileFormats(formatInput.value);
+			formatInput.addEventListener('input', () => { formatRegexes = compileFormats(formatInput.value); });
+
 			// ===== Excel/CSV 上傳 =====
 			fileInput.addEventListener('change', async (e) => {
 				await ensureXLSX();
@@ -404,7 +421,6 @@
 				sheetSelect.disabled = true; colSelect.disabled = true; btnUseColumn.disabled = true;
 				listSet = new Set(); countList.textContent = '0';
 			}
-
 			function afterWorkbookLoaded() {
 				sheetNames = workbook.SheetNames || [];
 				if (!sheetNames.length) { toast('讀不到工作表', 'bad'); return; }
@@ -430,13 +446,11 @@
 
 				sheetSelect.disabled = false; colSelect.disabled = false; btnUseColumn.disabled = false;
 			}
-
 			function fillColSelect(headers) {
 				colSelect.innerHTML = headers.map((h, i) => `<option value="${i}">${escapeHtml(h || '(無標題)')}（第${i + 1}欄）</option>`).join('');
 				if (!headers.length) { colSelect.innerHTML = `<option value="0">欄1（第1欄）</option>`; }
 				colSelect.disabled = false; btnUseColumn.disabled = false;
 			}
-
 			function guessCodeColumnIndex(headers) {
 				const keys = ['明單', '明細單', '清單', '號碼', '代碼', '條碼', '碼號', '編號', '單號', 'tracking', 'hawb', '主號', '分號', 'no', 'code', 'barcode'];
 				const lowered = headers.map(h => String(h || '').toLowerCase());
@@ -453,7 +467,7 @@
 					const v = rows[r][colIndex];
 					if (v === null || v === undefined) continue;
 					const n = sanitizeOCR(String(v));
-					if (REGEX.test(n)) values.push(n);
+					if (isAllowedFormat(n)) values.push(n);
 				}
 				loadListValues(values, listSource.textContent || '上傳檔案');
 				toast(`已載入清單，共 ${values.length} 筆`, 'ok');
@@ -468,11 +482,14 @@
 					localStorage.setItem('ocr_list_values', JSON.stringify(values));
 					localStorage.setItem('ocr_list_meta', JSON.stringify({
 						source: sourceLabel, time: listTime.textContent,
-						ignoreJoiners: !!ignoreJoiners.checked, whitelist: whitelistChars.value || ''
+						ignoreJoiners: !!ignoreJoiners.checked,
+						whitelist: whitelistChars.value || '',
+						format: formatInput.value || ''
 					}));
 				} catch (_) { }
 			}
 
+			// 清除快取
 			btnClearCache.addEventListener('click', () => {
 				localStorage.removeItem('ocr_list_values');
 				localStorage.removeItem('ocr_list_meta');
@@ -482,12 +499,22 @@
 			// ===== 相機 + 連續掃描 =====
 			btnStart.addEventListener('click', startLive);
 			btnStop.addEventListener('click', stopLive);
+			btnSwitch.addEventListener('click', async () => {
+				if (devices.length <= 1) return;
+				const idx = devices.findIndex(d => d.deviceId === currentDeviceId);
+				const next = devices[(idx + 1) % devices.length];
+				currentDeviceId = next.deviceId;
+				localStorage.setItem(LS_KEY_CAMERA, currentDeviceId);
+				if (scanning) { await stopLive(); await startLive(); }
+			});
 
 			async function startLive() {
 				if (scanning) return;
 				btnStart.disabled = true;
+
 				try {
 					codeReader = new ZXing.BrowserMultiFormatReader();
+
 					if (!worker) {
 						worker = await Tesseract.createWorker('eng', 1);
 						await worker.setParameters({
@@ -499,21 +526,29 @@
 					const back = devices.find(d => /back|rear|environment/i.test(d.label));
 					if (!currentDeviceId) { currentDeviceId = (back || devices[0])?.deviceId || undefined; }
 
-					videoStream = await navigator.mediaDevices.getUserMedia({
-						video: { deviceId: currentDeviceId ? { exact: currentDeviceId } : undefined, facingMode: currentDeviceId ? undefined : 'environment' },
+					const constraints = {
+						video: currentDeviceId ? { deviceId: { exact: currentDeviceId } } : { facingMode: 'environment' },
 						audio: false
-					});
+					};
+					videoStream = await navigator.mediaDevices.getUserMedia(constraints);
 					video.srcObject = videoStream; await video.play();
+
+					// 開啟成功後，記住實際使用到的 deviceId（有些瀏覽器會替換）
+					const realId = videoStream.getVideoTracks()[0]?.getSettings()?.deviceId;
+					if (realId) {
+					currentDeviceId = realId;
+					localStorage.setItem(LS_KEY_CAMERA, realId);
+					}
 
 					scanning = true;
 					btnStop.disabled = false;
+					btnSwitch.disabled = devices.length > 1 ? false : true;
 
 					codeReader.decodeFromVideoDevice(currentDeviceId, video, (result, err) => {
 						if (result && result.getText) {
 							const raw = result.getText().toString();
 							onCandidate(raw, 'BARCODE');
-							lastBarcodeTs = Date.now();
-							missBarcodeTimes = 0;
+							lastBarcodeTs = Date.now(); missBarcodeTimes = 0;
 							if (stopOnHit.checked && listSet.has(sanitizeOCR(raw))) { stopLive(); }
 						} else if (err) {
 							if (Date.now() - lastBarcodeTs > 400) { missBarcodeTimes++; }
@@ -524,27 +559,28 @@
 					const baseInterval = Math.max(600, Number(intervalMs.value) || 1200);
 					if (loopTimer) clearInterval(loopTimer);
 					loopTimer = setInterval(runOCRTick, baseInterval);
+
 				} catch (e) {
 					toast('相機啟動失敗：' + (e?.message || e), 'bad');
-				} finally {
-					if (!scanning) btnStart.disabled = false;
+					btnStart.disabled = false;
 				}
 			}
 
-			function stopLive() {
+			async function stopLive() {
 				if (!scanning) return;
 				if (loopTimer) { clearInterval(loopTimer); loopTimer = null; }
 				isBusy = false;
-				try { codeReader?.reset(); } catch (_) { }
+				try { await codeReader?.reset(); } catch (_) { }
 				try { video.pause(); } catch (_) { }
 				try { video.srcObject?.getTracks()?.forEach(t => t.stop()); } catch (_) { }
 				video.srcObject = null; videoStream = null;
 				btnStop.disabled = true; btnStart.disabled = false;
-				scanning = false;
 				toast('已停止', 'muted');
+				scanning = false;
+				// 保留 currentDeviceId，不變更鏡頭選擇
 			}
 
-			// OCR 週期任務（當條碼連續多次抓不到，才跑）
+			// OCR 週期任務
 			async function runOCRTick() {
 				if (isBusy || !videoStream) return;
 				const since = Date.now() - lastBarcodeTs;
@@ -555,13 +591,14 @@
 				const t0 = performance.now();
 				try {
 					const vw = video.videoWidth || 1280, vh = video.videoHeight || 720;
+					const sx = 0, sy = 0, sw = vw, sh = vh; // 全畫面（無 ROI）
 					const maxW = 800;
-					const scale = vw > maxW ? maxW / vw : 1;
-					const w = Math.round(vw * scale), h = Math.round(vh * scale);
+					const scale = sw > maxW ? maxW / sw : 1;
+					const w = Math.round(sw * scale), h = Math.round(sh * scale);
 
 					canvas.width = w; canvas.height = h;
 					const ctx = canvas.getContext('2d');
-					ctx.drawImage(video, 0, 0, vw, vh, 0, 0, w, h); // 整張畫面
+					ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
 
 					const { data } = await worker.recognize(canvas);
 					const rawText = (data.text || '').toUpperCase();
@@ -583,7 +620,7 @@
 						toast('辨識中…（條碼未得、OCR 未擷取到有效碼）', 'muted');
 					} else {
 						toast(anyHit ? '✔ 命中清單' : '✘ 未命中', anyHit ? 'ok' : 'bad');
-						if (anyHit && stopOnHit.checked) { stopLive(); }
+						if (anyHit && stopOnHit.checked) { await stopLive(); }
 					}
 				} catch (e) {
 					toast('OCR 失敗：' + (e?.message || e), 'bad');
@@ -592,10 +629,10 @@
 				}
 			}
 
-			// 條碼/OCR 候選處理
+			// 候選處理
 			function onCandidate(text, source) {
 				const cand = sanitizeOCR(text);
-				if (!REGEX.test(cand)) return;
+				if (!isAllowedFormat(cand)) return;
 				if (extractedSet.has(cand)) return;
 				extractedSet.add(cand);
 				const inList = listSet.has(cand);
@@ -603,24 +640,20 @@
 				toast(inList ? '✔ 命中清單' : '✘ 未命中', inList ? 'ok' : 'bad');
 			}
 
-			// 候選碼抽取與正規化
+			// 候選抽取與正規化
 			function extractCandidates(ocrText) {
 				const collapsed = ocrText.replace(/[\s\-–—_]/g, '');
 				const out = new Set();
 
-				(collapsed.match(/SF\d{13}|\d{12}/g) || []).forEach(s => {
+				(collapsed.match(/[A-Z0-9\-]{6,}/g) || []).forEach(s => {
 					const fixed = sanitizeOCR(s);
-					if (REGEX.test(fixed)) out.add(fixed);
+					if (isAllowedFormat(fixed)) out.add(fixed);
 				});
 
 				const tokens = ocrText.split(/[^A-Z0-9\-]+/i).filter(Boolean);
 				for (const tk of tokens) {
 					const fixed = sanitizeOCR(tk);
-					if (REGEX.test(fixed)) out.add(fixed);
-					if (/^SF[0-9\-\s]+$/i.test(tk)) {
-						const merged = sanitizeOCR(tk.replace(/[\s\-]/g, ''));
-						if (REGEX.test(merged)) out.add(merged);
-					}
+					if (isAllowedFormat(fixed)) out.add(fixed);
 				}
 				return Array.from(out);
 			}
@@ -632,7 +665,12 @@
 			function sanitizeOCR(raw) {
 				let s = toHalfWidth((raw || '')).toUpperCase();
 				if (ignoreJoiners.checked) { s = s.replace(/[\s\-–—_]/g, ''); }
-				const fixDigits = t => t.replace(/[O〇]/g, '0').replace(/[I|l]/g, '1').replace(/B/g, '8').replace(/S/g, '5').replace(/Z/g, '2');
+				const fixDigits = t => t
+					.replace(/[O〇]/g, '0')
+					.replace(/[I|l]/g, '1')
+					.replace(/B/g, '8')
+					.replace(/S/g, '5')
+					.replace(/Z/g, '2');
 				if (s.startsWith('SF')) s = 'SF' + fixDigits(s.slice(2)); else s = fixDigits(s);
 				const allow = new RegExp('[^' + escapeForClass(whitelistChars.value || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-') + ']', 'g');
 				s = s.replace(allow, '');
@@ -645,7 +683,8 @@
 				const tr = document.createElement('tr');
 				const td1 = document.createElement('td'); td1.textContent = code;
 				const tdS = document.createElement('td'); tdS.textContent = source || '—';
-				const td2 = document.createElement('td'); td2.textContent = inList ? '在清單' : '不在清單'; td2.className = inList ? 'ok' : 'bad';
+				const td2 = document.createElement('td'); td2.textContent = inList ? '在清單' : '不在清單';
+				td2.className = inList ? 'ok' : 'bad';
 				tr.appendChild(td1); tr.appendChild(tdS); tr.appendChild(td2);
 				resultBody.prepend(tr);
 
@@ -689,6 +728,5 @@
 		})();
 	</script>
 </body>
-
 
 </html>
