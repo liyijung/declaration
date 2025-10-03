@@ -187,6 +187,44 @@
 			align-items: center;
 			gap: 6px
 		}
+
+		/* ROI 方框 */
+		#roi {
+			position: absolute;
+			border: 2px solid rgba(255, 255, 255, .95);
+			border-radius: 8px;
+			box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .25);
+			touch-action: none
+		}
+
+		#roi .handle {
+			position: absolute;
+			width: 16px;
+			height: 16px;
+			background: #fff;
+			border: 2px solid #333;
+			border-radius: 50%
+		}
+
+		#roi .handle.nw {
+			left: -10px;
+			top: -10px
+		}
+
+		#roi .handle.ne {
+			right: -10px;
+			top: -10px
+		}
+
+		#roi .handle.sw {
+			left: -10px;
+			bottom: -10px
+		}
+
+		#roi .handle.se {
+			right: -10px;
+			bottom: -10px
+		}
 	</style>
 </head>
 
@@ -249,6 +287,12 @@
 			<div id="videoWrap" style="margin-top:6px">
 				<video id="video" playsinline></video>
 				<canvas id="canvas" style="display:none"></canvas>
+				<div id="roi" hidden>
+					<div class="handle nw"></div>
+					<div class="handle ne"></div>
+					<div class="handle sw"></div>
+					<div class="handle se"></div>
+				</div>
 				<div id="overlayMsg">尚未開始</div>
 			</div>
 
@@ -337,6 +381,10 @@
 			let extractedSet = new Set(); let hitCount = 0, missCount = 0;
 			let scanning = false;
 
+			// ROI（相對 #videoWrap 的百分比座標）
+			let roi = { x: 0.1, y: 0.35, w: 0.8, h: 0.3 }; // 預設框
+			let dragging = null; // 'move' 或 'nw' | 'ne' | 'sw' | 'se'
+
 			const LS_KEY_CAMERA = 'preferred_camera_id';
 			currentDeviceId = localStorage.getItem(LS_KEY_CAMERA) || null;
 
@@ -363,6 +411,24 @@
 			const stopOnHit = document.getElementById('stopOnHit');
 			const intervalMs = document.getElementById('intervalMs');
 			const intervalSec = document.getElementById('intervalSec');
+
+			const videoWrap = document.getElementById('videoWrap');
+			const roiBox = document.getElementById('roi');
+
+			function updateROIBox() {
+				// 只在掃描中顯示 ROI
+				roiBox.hidden = !scanning;
+				if (!scanning) return;
+
+				const rect = videoWrap.getBoundingClientRect();
+				const x = rect.width * roi.x, y = rect.height * roi.y;
+				const w = rect.width * roi.w, h = rect.height * roi.h;
+				roiBox.style.left = x + 'px';
+				roiBox.style.top = y + 'px';
+				roiBox.style.width = w + 'px';
+				roiBox.style.height = h + 'px';
+			}
+			window.addEventListener('resize', updateROIBox);
 
 			function updateIntervalHint() {
 				const ms = Number(intervalMs.value) || 0;
@@ -548,6 +614,8 @@
 					if (loopTimer) clearInterval(loopTimer);
 					loopTimer = setInterval(runOCRTick, baseInterval);
 
+					scanning = true;
+					updateROIBox(); // 顯示 ROI
 				} catch (e) {
 					toast('相機啟動失敗：' + (e?.message || e), 'bad');
 					btnStart.disabled = false;
@@ -566,6 +634,9 @@
 				toast('已停止', 'muted');
 				scanning = false;
 				// 不改變 currentDeviceId；下次仍用同一顆鏡頭
+
+				scanning = false;
+				updateROIBox(); // 隱藏 ROI
 			}
 
 			// OCR 週期任務（條碼抓不到才跑）
@@ -579,7 +650,8 @@
 				const t0 = performance.now();
 				try {
 					const vw = video.videoWidth || 1280, vh = video.videoHeight || 720;
-					const sx = 0, sy = 0, sw = vw, sh = vh; // 全畫面
+					const r = pixelROI(vw, vh);
+					const sx = r.x, sy = r.y, sw = r.w, sh = r.h;  // ← 使用 ROI
 					const maxW = 800;
 					const scale = sw > maxW ? maxW / sw : 1;
 					const w = Math.round(sw * scale), h = Math.round(sh * scale);
@@ -702,6 +774,58 @@
 				URL.revokeObjectURL(url);
 			});
 
+			function posFromEvent(e) {
+				const t = e.touches ? e.touches[0] : e;
+				const r = videoWrap.getBoundingClientRect();
+				return { x: (t.clientX - r.left) / r.width, y: (t.clientY - r.top) / r.height };
+			}
+			function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+			function pixelROI(vw, vh) {
+				return {
+					x: Math.round(roi.x * vw), y: Math.round(roi.y * vh),
+					w: Math.round(roi.w * vw), h: Math.round(roi.h * vh)
+				};
+			}
+
+			// 事件綁定
+			['mousedown', 'touchstart'].forEach(evt => {
+				roiBox.addEventListener(evt, (e) => {
+					if (!scanning) return;
+					e.preventDefault();
+					const target = e.target;
+					dragging = target.classList.contains('handle') ? target.classList[1] : 'move';
+				}, { passive: false });
+			});
+			['mousemove', 'touchmove'].forEach(evt => {
+				window.addEventListener(evt, (e) => {
+					if (!dragging || !scanning) return;
+					e.preventDefault();
+					const p = posFromEvent(e);
+					const minW = 0.08, minH = 0.08;
+
+					if (dragging === 'move') {
+						const cx = p.x - roi.w / 2, cy = p.y - roi.h / 2;
+						roi.x = clamp(cx, 0, 1 - roi.w);
+						roi.y = clamp(cy, 0, 1 - roi.h);
+					} else {
+						let x1 = roi.x, y1 = roi.y, x2 = roi.x + roi.w, y2 = roi.y + roi.h;
+						if (dragging === 'nw') { x1 = p.x; y1 = p.y; }
+						if (dragging === 'ne') { x2 = p.x; y1 = p.y; }
+						if (dragging === 'sw') { x1 = p.x; y2 = p.y; }
+						if (dragging === 'se') { x2 = p.x; y2 = p.y; }
+						const nx = Math.min(x1, x2), ny = Math.min(y1, y2),
+							nw = Math.abs(x2 - x1), nh = Math.abs(y2 - y1);
+						roi.x = clamp(nx, 0, 1); roi.y = clamp(ny, 0, 1);
+						roi.w = Math.max(minW, Math.min(nw, 1 - roi.x));
+						roi.h = Math.max(minH, Math.min(nh, 1 - roi.y));
+					}
+					updateROIBox();
+				}, { passive: false });
+			});
+			['mouseup', 'touchend', 'touchcancel'].forEach(evt => {
+				window.addEventListener(evt, () => { dragging = null; }, { passive: true });
+			});
+
 			// 小工具
 			function toast(msg, type) {
 				overlayMsg.textContent = msg;
@@ -716,6 +840,4 @@
 	</script>
 </body>
 
-
 </html>
-
