@@ -104,7 +104,7 @@
 			overflow: hidden;
 			background: #000;
 			aspect-ratio: 16/9;
-			width: 100%;
+			width: 100%
 		}
 
 		#video {
@@ -112,7 +112,7 @@
 			inset: 0;
 			width: 100%;
 			height: 100%;
-			object-fit: cover;
+			object-fit: cover
 		}
 
 		#overlayMsg {
@@ -137,7 +137,7 @@
 		table {
 			width: 100%;
 			border-collapse: collapse;
-			table-layout: fixed;
+			table-layout: fixed
 		}
 
 		th,
@@ -151,17 +151,17 @@
 		/* 固定欄寬避免對不齊 */
 		th:nth-child(1),
 		td:nth-child(1) {
-			width: 60%;
+			width: 50%
 		}
 
 		th:nth-child(2),
 		td:nth-child(2) {
-			width: 20%;
+			width: 25%
 		}
 
 		th:nth-child(3),
 		td:nth-child(3) {
-			width: 20%;
+			width: 25%
 		}
 
 		.ok {
@@ -222,6 +222,7 @@
 					<input type="text" id="whitelistChars" value="SF0123456789" size="18" />
 				</label>
 				<label>格式白名單（正則，逗號或 | 分隔）
+					<!-- 這裡改為單斜線 \d，避免筆數=0 -->
 					<input type="text" id="formatPatterns" value="SF\d{13},\d{12}" size="22" />
 				</label>
 				<span class="hint">字元白名單限制 OCR 字元；格式白名單再用正則過濾（預設：SF+13碼或12碼數字）。</span>
@@ -254,7 +255,6 @@
 			<div class="row" style="margin-top:10px">
 				<button class="btn" id="btnStart">開啟相機＋即時掃描</button>
 				<button class="btn danger" id="btnStop" disabled>停止</button>
-				<!-- <button class="btn secondary" id="btnSwitch" disabled>切換鏡頭</button> -->
 				<label class="inline"><input type="checkbox" id="stopOnHit"> 命中即停</label>
 				<label class="inline">OCR 間隔(ms)
 					<input type="number" id="intervalMs" value="1200" style="width:100px" />
@@ -360,7 +360,6 @@
 
 			const btnStart = document.getElementById('btnStart');
 			const btnStop = document.getElementById('btnStop');
-			const btnSwitch = document.getElementById('btnSwitch');
 			const stopOnHit = document.getElementById('stopOnHit');
 			const intervalMs = document.getElementById('intervalMs');
 			const intervalSec = document.getElementById('intervalSec');
@@ -382,14 +381,16 @@
 			const btnClearResult = document.getElementById('btnClearResult');
 			const btnExportCSV = document.getElementById('btnExportCSV');
 
-			// ===== 格式白名單：編譯與判斷 =====
+			// ===== 格式白名單：編譯與判斷（自動把 \\d 轉成 \d 以防輸入錯誤） =====
 			let formatRegexes = [];
 			function compileFormats(str) {
 				const raw = String(str || '').trim();
 				if (!raw) return [];
 				const parts = raw.split(/[,|]/).map(s => s.trim()).filter(Boolean);
 				const regs = [];
-				for (const p of parts) {
+				for (let p of parts) {
+					// 把 \\d, \\w 等轉為單斜線
+					p = p.replace(/\\\\/g, '\\');
 					const pat = (p.startsWith('^') ? p : '^' + p) + (p.endsWith('$') ? '' : '$');
 					try { regs.push(new RegExp(pat)); }
 					catch (e) { console.warn('格式白名單無效：', p, e.message); }
@@ -499,14 +500,6 @@
 			// ===== 相機 + 連續掃描 =====
 			btnStart.addEventListener('click', startLive);
 			btnStop.addEventListener('click', stopLive);
-			btnSwitch.addEventListener('click', async () => {
-				if (devices.length <= 1) return;
-				const idx = devices.findIndex(d => d.deviceId === currentDeviceId);
-				const next = devices[(idx + 1) % devices.length];
-				currentDeviceId = next.deviceId;
-				localStorage.setItem(LS_KEY_CAMERA, currentDeviceId);
-				if (scanning) { await stopLive(); await startLive(); }
-			});
 
 			async function startLive() {
 				if (scanning) return;
@@ -533,16 +526,11 @@
 					videoStream = await navigator.mediaDevices.getUserMedia(constraints);
 					video.srcObject = videoStream; await video.play();
 
-					// 開啟成功後，記住實際使用到的 deviceId（有些瀏覽器會替換）
-					const realId = videoStream.getVideoTracks()[0]?.getSettings()?.deviceId;
-					if (realId) {
-					currentDeviceId = realId;
-					localStorage.setItem(LS_KEY_CAMERA, realId);
-					}
+					// 記住鏡頭（雖然沒有切換按鈕，仍保留使用者偏好）
+					if (currentDeviceId) localStorage.setItem(LS_KEY_CAMERA, currentDeviceId);
 
 					scanning = true;
 					btnStop.disabled = false;
-					btnSwitch.disabled = devices.length > 1 ? false : true;
 
 					codeReader.decodeFromVideoDevice(currentDeviceId, video, (result, err) => {
 						if (result && result.getText) {
@@ -577,10 +565,10 @@
 				btnStop.disabled = true; btnStart.disabled = false;
 				toast('已停止', 'muted');
 				scanning = false;
-				// 保留 currentDeviceId，不變更鏡頭選擇
+				// 不改變 currentDeviceId；下次仍用同一顆鏡頭
 			}
 
-			// OCR 週期任務
+			// OCR 週期任務（條碼抓不到才跑）
 			async function runOCRTick() {
 				if (isBusy || !videoStream) return;
 				const since = Date.now() - lastBarcodeTs;
@@ -591,7 +579,7 @@
 				const t0 = performance.now();
 				try {
 					const vw = video.videoWidth || 1280, vh = video.videoHeight || 720;
-					const sx = 0, sy = 0, sw = vw, sh = vh; // 全畫面（無 ROI）
+					const sx = 0, sy = 0, sw = vw, sh = vh; // 全畫面
 					const maxW = 800;
 					const scale = sw > maxW ? maxW / sw : 1;
 					const w = Math.round(sw * scale), h = Math.round(sh * scale);
@@ -629,7 +617,7 @@
 				}
 			}
 
-			// 候選處理
+			// 條碼/OCR 候選處理
 			function onCandidate(text, source) {
 				const cand = sanitizeOCR(text);
 				if (!isAllowedFormat(cand)) return;
@@ -659,8 +647,7 @@
 			}
 
 			function toHalfWidth(str) {
-				return str.replace(/[\uFF01-\uFF5E]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0))
-					.replace(/\u3000/g, ' ');
+				return str.replace(/[\uFF01-\uFF5E]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)).replace(/\u3000/g, ' ');
 			}
 			function sanitizeOCR(raw) {
 				let s = toHalfWidth((raw || '')).toUpperCase();
