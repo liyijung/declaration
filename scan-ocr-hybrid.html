@@ -222,7 +222,7 @@
 					<input type="text" id="whitelistChars" value="SF0123456789" size="18" />
 				</label>
 				<label>格式白名單（正則，逗號或 | 分隔）
-					<input type="text" id="formatPatterns" value="SF\\d{13},\\d{12}" size="22" />
+					<input type="text" id="formatPatterns" value="SF\d{13},\d{12}" size="22" />
 				</label>
 				<span class="hint">字元白名單限制 OCR 字元；格式白名單再用正則過濾（預設：SF+13碼或12碼數字）。</span>
 			</div>
@@ -728,5 +728,6 @@
 		})();
 	</script>
 </body>
+
 
 </html>
