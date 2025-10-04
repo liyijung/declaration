@@ -625,6 +625,7 @@
 				}
 
 				ocrStaging.clear();
+				barcodeStaging.clear();
 			}
 
 			async function stopLive() {
@@ -642,6 +643,7 @@
 
 				scanning = false;
 				ocrStaging.clear();
+				barcodeStaging.clear();
 
 				updateROIBox(); // 隱藏 ROI
 			}
@@ -721,6 +723,14 @@
 			function onCandidate(text, source) {
 				const cand = sanitizeOCR(text);
 				if (!isAllowedFormat(cand)) return;
+
+				// 條碼雙確認（若只想在「只辨識條碼」時才啟動，把條件改成：
+				// if (source === 'BARCODE' && typeof barcodeDoubleConfirm === 'function' ? barcodeDoubleConfirm() : barcodeDoubleConfirm) { ... }
+				if (source === 'BARCODE' && (typeof barcodeDoubleConfirm === 'function' ? barcodeDoubleConfirm() : barcodeDoubleConfirm)) {
+					pruneBarcodeStaging();
+					if (!acceptBarcodeIfConfirmed(cand)) return; // 第一次先暫存，不入表
+				}
+
 				if (extractedSet.has(cand)) return;
 				extractedSet.add(cand);
 				const inList = listSet.has(cand);
@@ -773,6 +783,33 @@
 			const ocrConfirm = { repeats: 2, windowMs: 4000 }; // 兩次一致、4秒內視為有效
 			const ocrStaging = new Map(); // 暫存每次辨識的代碼
 
+			// === 條碼雙重確認（要用就把 barcodeDoubleConfirm 設 true）===
+			const barcodeDoubleConfirm = true; // 或改成 () => document.getElementById('barcodeOnly').checked
+			const barcodeConfirm = { repeats: 2, windowMs: 2000 };
+			const barcodeStaging = new Map();
+
+			function acceptBarcodeIfConfirmed(cand) {
+				if (extractedSet.has(cand)) return false;
+				const now = Date.now();
+				const rec = barcodeStaging.get(cand);
+				if (!rec || (now - rec.ts) > barcodeConfirm.windowMs) {
+					barcodeStaging.set(cand, { count: 1, ts: now });
+					return false;
+				}
+				rec.count++; rec.ts = now;
+				if (rec.count >= barcodeConfirm.repeats) {
+					barcodeStaging.delete(cand);
+					return true;
+				}
+				return false;
+			}
+			function pruneBarcodeStaging() {
+				const now = Date.now();
+				for (const [k, v] of barcodeStaging) {
+					if (now - v.ts > barcodeConfirm.windowMs) barcodeStaging.delete(k);
+				}
+			}
+
 			function acceptIfConfirmed(cand) {
 				if (extractedSet.has(cand)) return false;
 				const now = Date.now();
@@ -822,10 +859,11 @@
 
 			btnClearResult.addEventListener('click', () => {
 				extractedSet.clear(); hitCount = 0; missCount = 0;
-				resultBody.innerHTML = ''; 
+				resultBody.innerHTML = '';
 				countExtracted.textContent = '0'; countHit.textContent = '0'; countMiss.textContent = '0';
 				ocrTime.textContent = '單次 OCR 用時：—';
-				ocrStaging.clear(); 
+				ocrStaging.clear();
+				barcodeStaging.clear();
 			});
 
 			btnExportCSV.addEventListener('click', () => {
