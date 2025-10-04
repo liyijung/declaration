@@ -299,6 +299,7 @@
 			<div class="row" style="margin-top:10px">
 				<button class="btn" id="btnStart">開啟相機＋即時掃描</button>
 				<button class="btn danger" id="btnStop" disabled>停止</button>
+				<label class="inline"><input type="checkbox" id="barcodeOnly"> 只辨識條碼</label>
 				<label class="inline"><input type="checkbox" id="stopOnHit"> 命中即停</label>
 				<label class="inline">OCR 間隔(ms)
 					<input type="number" id="intervalMs" value="1200" style="width:100px" />
@@ -414,6 +415,7 @@
 
 			const videoWrap = document.getElementById('videoWrap');
 			const roiBox = document.getElementById('roi');
+			const barcodeOnly = document.getElementById('barcodeOnly');
 
 			function updateROIBox() {
 				// 只在掃描中顯示 ROI
@@ -574,11 +576,13 @@
 				try {
 					codeReader = new ZXing.BrowserMultiFormatReader();
 
-					if (!worker) {
-						worker = await Tesseract.createWorker('eng', 1);
-						await worker.setParameters({
-							tessedit_char_whitelist: whitelistChars.value || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'
-						});
+					if (!barcodeOnly.checked) {
+						if (!worker) {
+							worker = await Tesseract.createWorker('eng', 1);
+							await worker.setParameters({
+								tessedit_char_whitelist: whitelistChars.value || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-'
+							});
+						}
 					}
 
 					devices = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
@@ -610,9 +614,11 @@
 					});
 
 					toast('即時掃描中（條碼優先 → OCR）', 'muted');
-					const baseInterval = Math.max(600, Number(intervalMs.value) || 1200);
-					if (loopTimer) clearInterval(loopTimer);
-					loopTimer = setInterval(runOCRTick, baseInterval);
+					if (loopTimer) { clearInterval(loopTimer); loopTimer = null; }
+					if (!barcodeOnly.checked) {
+						const baseInterval = Math.max(600, Number(intervalMs.value) || 1200);
+						loopTimer = setInterval(runOCRTick, baseInterval);
+					}
 
 					scanning = true;
 					updateROIBox(); // 顯示 ROI
@@ -638,6 +644,20 @@
 				scanning = false;
 				updateROIBox(); // 隱藏 ROI
 			}
+
+			barcodeOnly.addEventListener('change', () => {
+				// 掃描中切換：控制 OCR 計時器開關
+				if (!scanning) return;
+				if (loopTimer) { clearInterval(loopTimer); loopTimer = null; }
+				if (!barcodeOnly.checked) {
+					const baseInterval = Math.max(600, Number(intervalMs.value) || 1200);
+					loopTimer = setInterval(runOCRTick, baseInterval);
+				} else {
+					// 只辨識條碼時，確保不會跑 OCR
+					// 也可提示一下
+					toast('已切換為只辨識條碼', 'muted');
+				}
+			});
 
 			// OCR 週期任務（條碼抓不到才跑）
 			async function runOCRTick() {
@@ -841,4 +861,3 @@
 </body>
 
 </html>
-
