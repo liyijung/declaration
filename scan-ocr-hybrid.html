@@ -741,12 +741,17 @@
 			function sanitizeOCR(raw) {
 				let s = toHalfWidth((raw || '')).toUpperCase();
 				if (ignoreJoiners.checked) { s = s.replace(/[\s\-–—_]/g, ''); }
-				const fixDigits = t => t
-					.replace(/[O〇]/g, '0')
-					.replace(/[I|l]/g, '1')
-					.replace(/B/g, '8')
-					.replace(/S/g, '5')
-					.replace(/Z/g, '2');
+				const fixDigits = t => {
+				  // 若整串含 O 與 9 混雜，則不強制轉 O → 0
+				  if (t.includes('9') && t.includes('O')) return t;
+				  return t
+				    .replace(/[〇]/g, '0')
+				    .replace(/[I|l]/g, '1')
+				    .replace(/B/g, '8')
+				    .replace(/S/g, '5')
+				    .replace(/Z/g, '2')
+				    .replace(/O/g, '0'); // 最後才轉 O→0，降低誤轉風險
+				};
 				if (s.startsWith('SF')) s = 'SF' + fixDigits(s.slice(2)); else s = fixDigits(s);
 				const allow = new RegExp('[^' + escapeForClass(whitelistChars.value || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-') + ']', 'g');
 				s = s.replace(allow, '');
@@ -858,3 +863,4 @@
 </body>
 
 </html>
+
