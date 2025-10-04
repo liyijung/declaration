@@ -623,6 +623,8 @@
 					toast('相機啟動失敗：' + (e?.message || e), 'bad');
 					btnStart.disabled = false;
 				}
+
+				ocrStaging.clear();
 			}
 
 			async function stopLive() {
@@ -639,6 +641,8 @@
 				// 不改變 currentDeviceId；下次仍用同一顆鏡頭
 
 				scanning = false;
+				ocrStaging.clear();
+
 				updateROIBox(); // 隱藏 ROI
 			}
 
@@ -680,14 +684,21 @@
 					const { data } = await worker.recognize(canvas);
 					const rawText = (data.text || '').toUpperCase();
 
+					// === OCR 雙重確認（僅收兩次一致的結果） ===
+					pruneStaging(); // 清掉過期暫存
+
 					const candidates = extractCandidates(rawText);
 					let added = 0, anyHit = false;
+
 					for (const cand of candidates) {
-						if (extractedSet.has(cand)) continue;
-						extractedSet.add(cand); added++;
-						const inList = listSet.has(cand);
-						if (inList) anyHit = true;
-						updateResult(cand, inList, 'OCR');
+						if (!isAllowedFormat(cand)) continue;
+						if (acceptIfConfirmed(cand)) { // ✅ 雙重確認通過
+							extractedSet.add(cand);
+							added++;
+							const inList = listSet.has(cand);
+							if (inList) anyHit = true;
+							updateResult(cand, inList, 'OCR');
+						}
 					}
 
 					const t1 = performance.now();
@@ -757,6 +768,38 @@
 				s = s.replace(allow, '');
 				return s;
 			}
+
+			// === OCR 雙重確認機制 ===
+			const ocrConfirm = { repeats: 2, windowMs: 4000 }; // 兩次一致、4秒內視為有效
+			const ocrStaging = new Map(); // 暫存每次辨識的代碼
+
+			function acceptIfConfirmed(cand) {
+				if (extractedSet.has(cand)) return false;
+				const now = Date.now();
+				const rec = ocrStaging.get(cand);
+
+				if (!rec || (now - rec.ts) > ocrConfirm.windowMs) {
+					// 第一次或超時
+					ocrStaging.set(cand, { count: 1, ts: now });
+					return false;
+				}
+
+				rec.count++;
+				rec.ts = now;
+				if (rec.count >= ocrConfirm.repeats) {
+					ocrStaging.delete(cand);
+					return true; // 通過雙重確認
+				}
+				return false;
+			}
+
+			function pruneStaging() {
+				const now = Date.now();
+				for (const [k, v] of ocrStaging) {
+					if (now - v.ts > ocrConfirm.windowMs) ocrStaging.delete(k);
+				}
+			}
+
 			function escapeForClass(chars) { return chars.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'); }
 
 			// 結果顯示/統計
@@ -779,8 +822,10 @@
 
 			btnClearResult.addEventListener('click', () => {
 				extractedSet.clear(); hitCount = 0; missCount = 0;
-				resultBody.innerHTML = ''; countExtracted.textContent = '0'; countHit.textContent = '0'; countMiss.textContent = '0';
+				resultBody.innerHTML = ''; 
+				countExtracted.textContent = '0'; countHit.textContent = '0'; countMiss.textContent = '0';
 				ocrTime.textContent = '單次 OCR 用時：—';
+				ocrStaging.clear(); 
 			});
 
 			btnExportCSV.addEventListener('click', () => {
