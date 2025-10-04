@@ -300,7 +300,6 @@
 				<button class="btn" id="btnStart">開啟相機＋即時掃描</button>
 				<button class="btn danger" id="btnStop" disabled>停止</button>
 				<label class="inline"><input type="checkbox" id="barcodeOnly"> 只辨識條碼</label>
-				<label class="inline"><input type="checkbox" id="stopOnHit"> 命中即停</label>
 				<label class="inline">OCR 間隔(ms)
 					<input type="number" id="intervalMs" value="1200" style="width:100px" />
 					<span id="intervalSec" class="hint">(約 1.2 秒)</span>
@@ -409,7 +408,6 @@
 
 			const btnStart = document.getElementById('btnStart');
 			const btnStop = document.getElementById('btnStop');
-			const stopOnHit = document.getElementById('stopOnHit');
 			const intervalMs = document.getElementById('intervalMs');
 			const intervalSec = document.getElementById('intervalSec');
 
@@ -607,7 +605,6 @@
 							const raw = result.getText().toString();
 							onCandidate(raw, 'BARCODE');
 							lastBarcodeTs = Date.now(); missBarcodeTimes = 0;
-							if (stopOnHit.checked && listSet.has(sanitizeOCR(raw))) { stopLive(); }
 						} else if (err) {
 							if (Date.now() - lastBarcodeTs > 400) { missBarcodeTimes++; }
 						}
@@ -700,7 +697,7 @@
 						toast('辨識中…（條碼未得、OCR 未擷取到有效碼）', 'muted');
 					} else {
 						toast(anyHit ? '✔ 命中清單' : '✘ 未命中', anyHit ? 'ok' : 'bad');
-						if (anyHit && stopOnHit.checked) { await stopLive(); }
+						if (anyHit) { toast('✔ 命中清單', 'ok'); }
 					}
 				} catch (e) {
 					toast('OCR 失敗：' + (e?.message || e), 'bad');
