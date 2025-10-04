@@ -669,6 +669,20 @@
 					const vw = video.videoWidth || 1280, vh = video.videoHeight || 720;
 					const r = pixelROI(vw, vh);
 					const sx = r.x, sy = r.y, sw = r.w, sh = r.h;  // ← 使用 ROI
+
+					// === 防晃動檢測 ===
+			        canvas.width = sw; 
+			        canvas.height = sh;
+			        const ctx = canvas.getContext('2d');
+			        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+			        if (detectMotion(ctx, sw, sh)) {
+			            toast('畫面晃動，略過本次 OCR', 'muted');
+			            isBusy = false;
+			            return;
+			        }
+			        // =====================
+			
+			        // 🔹 接著才進行 OCR					
 					const maxW = 800;
 					const scale = sw > maxW ? maxW / sw : 1;
 					const w = Math.round(sw * scale), h = Math.round(sh * scale);
@@ -859,8 +873,25 @@
 			function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) { } }
 			function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 		})();
+
+		let lastFrameData = null;
+		const motionThreshold = 20; // 可調整靈敏度（越小越敏感）
+		
+		function detectMotion(ctx, width, height) {
+		    const frame = ctx.getImageData(0, 0, width, height);
+		    if (!lastFrameData) { lastFrameData = frame.data; return false; }
+		
+		    let diff = 0;
+		    for (let i = 0; i < frame.data.length; i += 4) {
+		        diff += Math.abs(frame.data[i] - lastFrameData[i]);
+		    }
+		    diff /= (width * height);
+		    lastFrameData = frame.data;
+		    return diff > motionThreshold; // true = 晃動
+		}
 	</script>
 </body>
 
 </html>
+
 
