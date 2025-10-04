@@ -618,6 +618,9 @@
 					}
 
 					scanning = true;
+					lastSmallGray = null;
+					stableFrames = 0;
+
 					updateROIBox(); // 顯示 ROI
 				} catch (e) {
 					toast('相機啟動失敗：' + (e?.message || e), 'bad');
@@ -641,7 +644,7 @@
 				scanning = false;
 				lastSmallGray = null;
 				stableFrames = 0;
-				
+
 				updateROIBox(); // 隱藏 ROI
 			}
 
@@ -681,17 +684,16 @@
 					ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
 
 					// 加上防晃動檢查
-			        if (detectMotion(ctx, w, h)) {
-			            toast('畫面晃動中，暫停 OCR', 'muted');
-			            isBusy = false;
-			            return;
-			        }
-					
-					if (stableFrames < MOTION.minStable) { 
-					  isBusy = false; 
-					  return; 
-					}					
-					
+					const shaky = detectMotion(ctx, w, h);
+					if (shaky) {
+						if (!wasShaky) toast('畫面晃動中，暫停 OCR', 'muted');
+						wasShaky = true;
+						isBusy = false;
+						return;
+					}
+					wasShaky = false;
+					if (stableFrames < MOTION.minStable) { isBusy = false; return; }
+
 					const { data } = await worker.recognize(canvas);
 					const rawText = (data.text || '').toUpperCase();
 
@@ -757,15 +759,15 @@
 				let s = toHalfWidth((raw || '')).toUpperCase();
 				if (ignoreJoiners.checked) { s = s.replace(/[\s\-–—_]/g, ''); }
 				const fixDigits = t => {
-				  // 若整串含 O 與 9 混雜，則不強制轉 O → 0
-				  if (t.includes('9') && t.includes('O')) return t;
-				  return t
-				    .replace(/[〇]/g, '0')
-				    .replace(/[I|l]/g, '1')
-				    .replace(/B/g, '8')
-				    .replace(/S/g, '5')
-				    .replace(/Z/g, '2')
-				    .replace(/O/g, '0'); // 最後才轉 O→0，降低誤轉風險
+					// 若整串含 O 與 9 混雜，則不強制轉 O → 0
+					if (t.includes('9') && t.includes('O')) return t;
+					return t
+						.replace(/[〇]/g, '0')
+						.replace(/[I|l]/g, '1')
+						.replace(/B/g, '8')
+						.replace(/S/g, '5')
+						.replace(/Z/g, '2')
+						.replace(/O/g, '0'); // 最後才轉 O→0，降低誤轉風險
 				};
 				if (s.startsWith('SF')) s = 'SF' + fixDigits(s.slice(2)); else s = fixDigits(s);
 				const allow = new RegExp('[^' + escapeForClass(whitelistChars.value || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-') + ']', 'g');
@@ -874,46 +876,51 @@
 			function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) { } }
 			function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 		})();
-		
+
 		// 防晃動
 		const MOTION = {
-		  sampleW: 64,      // 縮小後寬度
-		  sampleH: 36,      // 縮小後高度
-		  threshold: 0.06,  // 0~1，數字越大越不敏感（可試 0.06~0.08）
-		  minStable: 2      // 需要連續幾幀穩定才允許 OCR
+			sampleW: 64,      // 縮小後寬度
+			sampleH: 36,      // 縮小後高度
+			threshold: 0.08,  // 0~1，數字越大越不敏感（可試 0.06~0.08）
+			minStable: 2      // 需要連續幾幀穩定才允許 OCR
 		};
 		let lastSmallGray = null;
 		let stableFrames = 0;
 		const _off = document.createElement('canvas');
 		const _offCtx = _off.getContext('2d');
-		
+
 		/** 回傳 true = 有晃動（暫停 OCR） */
 		function detectMotion(ctx, w, h) {
-		  _off.width = MOTION.sampleW;
-		  _off.height = MOTION.sampleH;
-		
-		  // 縮小取樣（等於做降噪）
-		  _offCtx.drawImage(ctx.canvas, 0, 0, w, h, 0, 0, MOTION.sampleW, MOTION.sampleH);
-		  const data = _offCtx.getImageData(0, 0, MOTION.sampleW, MOTION.sampleH).data;
-		
-		  // 轉灰階
-		  const cur = new Uint8ClampedArray(MOTION.sampleW * MOTION.sampleH);
-		  for (let i = 0, j = 0; i < data.length; i += 4, j++) {
-		    cur[j] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-		  }
-		
-		  if (!lastSmallGray) { lastSmallGray = cur; stableFrames = 0; return true; }
-		
-		  // 計算平均差（0~1）
-		  let diff = 0;
-		  for (let i = 0; i < cur.length; i++) diff += Math.abs(cur[i] - lastSmallGray[i]);
-		  diff /= (cur.length * 255);
-		
-		  lastSmallGray = cur;
-		
-		  if (diff > MOTION.threshold) { stableFrames = 0; return true; }
-		  stableFrames++;
-		  return false;
+			_off.width = MOTION.sampleW;
+			_off.height = MOTION.sampleH;
+
+			// 縮小取樣（等於做降噪）
+			_offCtx.drawImage(ctx.canvas, 0, 0, w, h, 0, 0, MOTION.sampleW, MOTION.sampleH);
+			const data = _offCtx.getImageData(0, 0, MOTION.sampleW, MOTION.sampleH).data;
+
+			// 轉灰階
+			const cur = new Uint8ClampedArray(MOTION.sampleW * MOTION.sampleH);
+			for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+				cur[j] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+			}
+
+			// ⭐ 第一幀直接視為穩定，不顯示「晃動中」
+			if (!lastSmallGray) {
+				lastSmallGray = cur;
+				stableFrames = 1;   // 第一幀算穩定
+				return false;       // 不當作晃動
+			}
+
+			// 計算平均差（0~1）
+			let diff = 0;
+			for (let i = 0; i < cur.length; i++) diff += Math.abs(cur[i] - lastSmallGray[i]);
+			diff /= (cur.length * 255);
+
+			lastSmallGray = cur;
+
+			if (diff > MOTION.threshold) { stableFrames = 0; return true; }
+			stableFrames++;
+			return false;
 		}
 	</script>
 </body>
