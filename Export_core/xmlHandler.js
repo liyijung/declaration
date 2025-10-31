@@ -730,6 +730,11 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // CITES 檢查呼叫
+        if (!runCITESCheck()) {
+            return;
+        }
+
         // 匯出XML(已完成檢查)
         const headerFields = [
             'FILE_NO', 'LOT_NO', 'SHPR_BAN_ID', 'DCL_DOC_EXAM', 'SHPR_BONDED_ID', 
@@ -1164,3 +1169,56 @@ function runOriginCheck() {
     return true;
 }
 
+// ===== CITES 檢查工具 =====
+// 規則：若 DOC_OTR_DESC（其它申報事項）含 "CITES"（不分大小寫），
+//      則所有「非大品名(*)」項次之 EXP_NO 與 EXP_SEQ_NO 不得為空。
+// 回傳：true = 通過；false = 擋下並已提示。
+function runCITESCheck() {
+    const otrRaw = (document.getElementById('DOC_OTR_DESC')?.value || '').trim();
+    if (!otrRaw) return true;
+
+    // 使用更穩健的邊界判斷，避免誤判字串片段（如 exCITESs）
+    const hasCites = /(?:^|[^A-Za-z])CITES(?:[^A-Za-z]|$)/i.test(otrRaw);
+    if (!hasCites) return true;
+
+    const lackList = [];
+    const rows = document.querySelectorAll('#item-container .item-row');
+
+    rows.forEach((row, idx) => {
+        // 大品名（ITEM_NO 勾選）略過
+        const isStarItem = row.querySelector('.ITEM_NO')?.checked;
+        if (isStarItem) return;
+
+        const itemLabel =
+            row.querySelector('.item-number label')?.textContent?.trim() ||
+            `第 ${idx + 1} 列`;
+
+        const expNo    = row.querySelector('.EXP_NO')?.value?.trim() || '';
+        const expSeqNo = row.querySelector('.EXP_SEQ_NO')?.value?.trim() || '';
+
+        const miss = [];
+        if (!expNo)    miss.push('輸出許可號碼');
+        if (!expSeqNo) miss.push('輸出許可項次');
+
+        if (miss.length) {
+            lackList.push(`- 項次 ${itemLabel}：${miss.join('、')}`);
+        }
+    });
+
+    if (lackList.length) {
+        alert(
+            '其它申報事項含有「CITES」，以下項次需補齊管制品欄位，\n' +
+            '並於出口報單的「申請審驗方式」欄位填報代碼「8」：\n\n' +
+            lackList.join('\n')
+        );
+        return false; // 擋下匯出
+    }
+
+    // 通過檢查後自動設定查驗'8'
+    const examTypeEl = document.getElementById('EXAM_TYPE');
+    if (examTypeEl) {
+        examTypeEl.value = '8';
+    }
+
+    return true;
+}
