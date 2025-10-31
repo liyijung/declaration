@@ -311,6 +311,12 @@ async function exportToPDF() {
             shouldSetExamType = true;
         }
 
+        // 若其它申報事項含 CITES（不分大小寫），更新 EXAM_TYPE 為 '8'
+        const otrRaw = (document.getElementById('DOC_OTR_DESC')?.value || '').trim();
+        if (/(?:^|[^A-Za-z])CITES(?:[^A-Za-z]|$)/i.test(otrRaw)) {
+            shouldSetExamType = true;
+        }
+
         // 如果需要顯示 "8"，顯示在指定位置
         if (shouldSetExamType) {
             document.getElementById('EXAM_TYPE').value = '8';
@@ -914,6 +920,7 @@ async function exportToPDF() {
 
 // 為輸出PDF按鈕添加事件監聽器
 document.getElementById('export-to-pdf').addEventListener('click', exportToPDF);
+
 
 
 
