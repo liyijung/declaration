@@ -1,4 +1,4 @@
-// 匯入XML的功能 
+// 匯入XML的功能
 function importXML(event) {
     clearField(); // 清空輸入框內容
 
@@ -1222,3 +1222,4 @@ function runCITESCheck() {
 
     return true;
 }
+
