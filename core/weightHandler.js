@@ -1,4 +1,4 @@
-// 開啟攤重彈跳框
+// 開啟攤重彈跳框 
 function openSpreadWeightModal(mode = "1") {
     const modal = document.getElementById("spread-weight-modal");
     const overlay = document.getElementById("drag-overlay");
