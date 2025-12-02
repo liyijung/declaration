@@ -4,10 +4,10 @@ function importXML(event) {
 
     // 清空 calculation-status
     document.getElementById('calculation-status').value = "";
-    
+
     const file = event.target.files[0];
     if (file) {
-        
+
         // 匹配檔名前面的數字部分
         const match = file.name.match(/^\d+/);
         const fileNumber = match ? match[0] : ''; // 如果沒有匹配到，設為空字符串
@@ -20,16 +20,24 @@ function importXML(event) {
         document.getElementById('REMARK').value = fileRemark;
 
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
 
             // 解析表頭資料
             const headerFields = xmlDoc.getElementsByTagName("head")[0].getElementsByTagName("fields");
             Array.from(headerFields).forEach(field => {
-                const fieldName = field.getElementsByTagName("field_name")[0].textContent;
-                const fieldValue = unescapeXml(field.getElementsByTagName("field_value")[0].textContent);
-                const element = document.getElementById(fieldName);
+                const nameNode = field.getElementsByTagName("field_name")[0];
+                if (!nameNode) return;                          // 沒有 field_name 就略過
+
+                const valueNode = field.getElementsByTagName("field_value")[0];
+                if (!valueNode || !valueNode.textContent) return; // 沒有值就略過（避免 undefined）
+
+                const rawName = nameNode.textContent.trim();
+                const mappedName = xmlHeaderNameMap[rawName] || rawName;  // ★ 使用 mapping
+                const fieldValue = unescapeXml(valueNode.textContent);
+
+                const element = document.getElementById(mappedName);
                 if (element) {
                     element.value = fieldValue;
                 }
@@ -54,9 +62,18 @@ function importXML(event) {
                 const itemData = {};
                 const fields = item.getElementsByTagName("fields");
                 Array.from(fields).forEach(field => {
-                    const fieldName = field.getElementsByTagName("field_name")[0].textContent;
-                    const fieldValue = unescapeXml(field.getElementsByTagName("field_value")[0].textContent);
-                    itemData[fieldName] = fieldValue;
+                    const nameNode = field.getElementsByTagName("field_name")[0];
+                    if (!nameNode) return;                           // 沒欄位名就略過
+
+                    const rawName = nameNode.textContent.trim();
+                    const mappedName = xmlItemNameMap[rawName] || rawName;  // ★ 使用 mapping
+
+                    const valueNode = field.getElementsByTagName("field_value")[0];
+                    const fieldValue = valueNode && valueNode.textContent
+                        ? unescapeXml(valueNode.textContent)
+                        : '';                                        // 沒 value 就當空字串
+
+                    itemData[mappedName] = fieldValue;
                 });
                 const itemRow = createItemRow(itemData);
                 itemContainer.appendChild(itemRow);
@@ -105,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
             examType.value = '';
             copyQty.value = '0';
         }
-        
+
         // 用於顯示變數值的控制台日誌
         console.log("APP_DUTY_REFUND: " + appDutyRefund.value);
         console.log("MARK_TOT_LINES: " + markTotLines.value);
@@ -117,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('input[type="checkbox"][name="copy_option"]').forEach(checkbox => {
         checkbox.addEventListener('change', updateRemark1);
     });
-    
+
     async function exportToXML() {
         updateVariables(); // 在匯出XML之前更新變數
 
@@ -162,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 更新 SHPR_E_ADDR (若無值則使用 SHPR_C_ADDR)
         updateFieldIfEmpty('SHPR_E_ADDR', 'SHPR_C_ADDR');
-        
+
         // 單獨檢查 CNEE_C_NAME 和 CNEE_E_NAME
         let cneeCName = document.getElementById('CNEE_C_NAME');
         let cneeEName = document.getElementById('CNEE_E_NAME');
@@ -172,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
             (!cneeEName || !cneeEName.value.trim())
         ) {
             missingFields.push('賣方中/英名稱');
-        }        
+        }
 
         // 單獨檢查 CNEE_COUNTRY_CODE
         let countryCodeElement = document.getElementById('CNEE_COUNTRY_CODE');
@@ -189,13 +206,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        
+
         // 如果有未填寫的欄位，提示使用者
         if (missingFields.length > 0) {
             alert(`以下欄位為空，請填寫後再匯出：\n${missingFields.join('、')}`);
             return; // 中止匯出過程
         }
-        
+
         // 檢查總毛重是否大於總淨重
         let dclGw = parseFloat(document.getElementById('DCL_GW')?.value.trim());
         let dclNw = parseFloat(document.getElementById('DCL_NW')?.value.trim());
@@ -293,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return; // 中止匯出過程
             }
         }
-        
+
         // 如果 DCL_DOC_TYPE 是 B6，還需要檢查 SELLER_ITEM_CODE 和 BOND_NOTE
         if (['B6'].includes(dclDocType)) {
             itemRequiredFields.push(
@@ -325,13 +342,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 return; // 中止匯出過程
             }
         }
-    
+
         let itemContainer = document.querySelectorAll("#item-container .item-row");
         let itemNoCheckedCount = 0; // 用來計算連續勾選大品名註記的次數
-        
+
         for (let item of itemContainer) {
             let itemNoChecked = item.querySelector('.ITEM_NO').checked;
-            
+
             if (itemNoChecked) { // 若 ITEM_NO 已勾選
                 itemNoCheckedCount++; // 計算連續勾選次數
 
@@ -341,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert('已勾選大品名註記，品名必須有值');
                     return; // 中止匯出過程
                 }
-                
+
                 // 檢查除了 DESCRIPTION 外，其他欄位是否有值
                 let invalidFields = [];
                 itemRequiredFields.forEach(field => {
@@ -387,12 +404,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 pairedFields.forEach(pair => {
                     let firstElement = item.querySelector(`.${pair.fields[0]}`);
                     let secondElement = item.querySelector(`.${pair.fields[1]}`);
-                
+
                     // 檢查成對欄位是否同時有值或同時為空
-                    if ((firstElement && firstElement.value.trim() && !secondElement.value.trim()) || 
+                    if ((firstElement && firstElement.value.trim() && !secondElement.value.trim()) ||
                         (secondElement && secondElement.value.trim() && !firstElement.value.trim())) {
                         itemMissingFields.push(`${pair.names[0]} 和 ${pair.names[1]} 必須同時有值`);
-                        
+
                         // 如果是 'EXP_NO' 和 'EXP_SEQ_NO'，設置旗標變數
                         if (pair.fields.includes('EXP_NO') && pair.fields.includes('EXP_SEQ_NO')) {
                             expNoAlreadyChecked = true;
@@ -418,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return; // 中止匯出過程
             }
         }
-        
+
         // 欄位碼數檢查設定
         const fieldLengthChecks = [
             { id: 'FILE_NO', name: '文件編號', validLengths: [10, 11] },
@@ -429,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 'TERMS_SALES', name: '貿易條件', validLengths: [3] },
             { id: 'CURRENCY', name: '幣別', validLengths: [3] },
         ];
-        
+
         // 執行碼數檢查
         let invalidLengthFields = [];
 
@@ -482,7 +499,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         // 移除符號進行長度檢查
                         value = value.replace(/[.\-]/g, '');
                     }
-        
+
                     let length = value.length;
                     if (!field.validLengths.includes(length)) {
                         invalidItemFields.push(`${field.name} (應為 ${field.validLengths.join(' 或 ')} 碼)`);
@@ -583,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (['G1', 'G7'].includes(dclDocType)) {
             let docMarksDesc = document.getElementById('DOC_MARKS_DESC')?.value.trim().toUpperCase() || '';
             let docOtrDesc = document.getElementById('DOC_OTR_DESC')?.value.trim().toUpperCase() || '';
-        
+
             // 檢查所有項次的 DESCRIPTION 是否包含 "MADE IN"（但忽略 ITEM_NO 為 "*" 的項次）
             let hasMadeInInDescription = Array.from(document.querySelectorAll("#item-container .item-row"))
                 .some(item => {
@@ -592,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return itemNo !== "*" && description.includes("MADE IN");
                 });
         }
-        
+
         // 取得核算狀態
         if (document.getElementById('calculation-status')?.value.trim() !== "已執行") {
             alert("請先執行核算後再匯出 XML！");
@@ -601,15 +618,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 匯出XML(已完成檢查)
         const headerFields = [
-            'FILE_NO', 'LOT_NO', 'SHPR_BAN_ID', 'DCL_DOC_EXAM', 'SHPR_BONDED_ID', 
-            'SHPR_C_NAME', 'SHPR_E_NAME', 'SHPR_C_ADDR', 'SHPR_E_ADDR', 'SHPR_TEL', 
-            'CNEE_C_NAME', 'CNEE_E_NAME', 'CNEE_E_ADDR', 
+            'FILE_NO', 'LOT_NO', 'SHPR_BAN_ID', 'DCL_DOC_EXAM', 'SHPR_BONDED_ID',
+            'SHPR_C_NAME', 'SHPR_E_NAME', 'SHPR_C_ADDR', 'SHPR_E_ADDR', 'SHPR_TEL',
+            'CNEE_C_NAME', 'CNEE_E_NAME', 'CNEE_E_ADDR',
             'CNEE_COUNTRY_CODE', 'CNEE_BAN_ID',
             'ARRIVAL_DATE', 'ACCEPTANCE_DATE', 'EXIT_DATE', 'JOURNEY_ID', 'LOADING_LOCATION',
-            'TOT_CTN', 'DOC_CTN_UM', 'CTN_DESC', 'DCL_GW', 'DCL_NW', 
-            'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'CAL_IP_TOT_ITEM_AMT', 
-            'FRT_AMT', 'INS_AMT', 'ADD_AMT', 'SUBTRACT_AMT', 
-            'DOC_MARKS_DESC', 'DOC_OTR_DESC', 'REMARK1', 
+            'TOT_CTN', 'DOC_CTN_UM', 'CTN_DESC', 'DCL_GW', 'DCL_NW',
+            'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'CAL_IP_TOT_ITEM_AMT',
+            'FRT_AMT', 'INS_AMT', 'ADD_AMT', 'SUBTRACT_AMT',
+            'DOC_MARKS_DESC', 'DOC_OTR_DESC', 'REMARK1',
             'FAC_BAN_ID_EX', 'FAC_BONDED_ID_EX',
             'FAC_BAN_ID', 'FAC_BONDED_ID', 'IN_BONDED_BAN', 'IN_BONDED_CODE',
             'APP_DUTY_REFUND', 'MARK_TOT_LINES', 'EXAM_TYPE', 'COPY_QTY',
@@ -617,14 +634,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const itemFields = [
             'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P',
-            'CCC_CODE', 'TAX_RATE', 'ST_MTD', 'ISCALC_WT', 'NET_WT', 'ORG_COUNTRY', 
+            'CCC_CODE', 'TAX_RATE', 'ST_MTD', 'ISCALC_WT', 'NET_WT', 'ORG_COUNTRY',
             'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC',
             'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
-            'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_SEQ_NO', 
-            'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY' ,'ST_UM',
+            'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_SEQ_NO',
+            'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM',
         ];
-        
-        let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Root>\n  <sys_code>GICCDS</sys_code>\n<head>\n  <head_table_name>DOC_HEAD</head_table_name>\n';
+
+        let xmlContent =
+            '<?xml version="1.0" encoding="UTF-8"?>\n' +
+            '<Root>\n' +
+            '  <sys_code>GICCDSI</sys_code>\n' +
+            '<head>\n' +
+            '  <head_table_name>DOC_H_I</head_table_name>\n';
 
         // 取得製單人員輸入值，若為空則預設為 ''
         let maker = document.getElementById('Maker') ? document.getElementById('Maker').value : '';
@@ -647,8 +669,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // 過濾非可見字符、控制代碼及無效字符
                 value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
-                .replace(/[\u00A0]/g, ' ')
-                .trim();
+                    .replace(/[\u00A0]/g, ' ')
+                    .trim();
 
                 // 對 CURRENCY 欄位進行特殊處理
                 if (id === 'CURRENCY') {
@@ -675,13 +697,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     xmlContent += `  <fields>\n    <field_name>${tagName}</field_name>\n    <field_value>${fileNo}</field_value>\n  </fields>\n`;
                     return; // 已處理完 FILE_NO，不再走通用流程
                 }
-                
+
                 // 對 LOT_NO 欄位進行處理
                 if (id === 'LOT_NO') {
                     // 全形轉半形
-                    value = value.replace(/[\uff01-\uff5e]/g, function(ch) { 
-                        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0); 
-                    }); 
+                    value = value.replace(/[\uff01-\uff5e]/g, function (ch) {
+                        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+                    });
 
                     // 只允許 S, F 和數字
                     value = value.replace(/[^SF0-9]/gi, '');
@@ -748,21 +770,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     return; // 避免 `headerFields.forEach` 繼續處理 `REMARK1`
                 }
-                
-                // 將當前欄位加入 XML
-                xmlContent += `  <fields>\n    <field_name>${id}</field_name>\n    <field_value>${value}</field_value>\n  </fields>\n`;
+
+                // 將當前欄位加入 XML（使用 mapping）
+                const xmlHeaderName = headerToXmlNameMap[id] || id;
+
+                xmlContent +=
+                    `  <fields>\n` +
+                    `    <field_name>${xmlHeaderName}</field_name>\n` +
+                    `    <field_value>${value}</field_value>\n` +
+                    `  </fields>\n`;
+
             }
         });
 
-        xmlContent += '  </head>\n<detail>\n  <detail_table_name>DOCINVBD</detail_table_name>\n';
+        xmlContent += '  </head>\n<detail>\n  <detail_table_name>DI_INVBD</detail_table_name>\n';
 
         let itemCounter = 1; // 初始化計數參數
         document.querySelectorAll("#item-container .item-row").forEach((item) => {
             xmlContent += '  <items>\n';
             let itemNo = item.querySelector('.ITEM_NO').checked ? '*' : (itemCounter++).toString();
-        
+
             xmlContent += `    <fields>\n      <field_name>ITEM_NO</field_name>\n      <field_value>${itemNo}</field_value>\n    </fields>\n`;
-        
+
             itemFields.forEach(className => {
                 let value;
                 if (className === 'ISCALC_WT') {
@@ -770,10 +799,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     value = item.querySelector(`.${className}`).value || '';
                     value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
-                    .replace(/[\u00A0]/g, ' ')
-                    .trim();
+                        .replace(/[\u00A0]/g, ' ')
+                        .trim();
                     value = escapeXml(value);
-                    
+
                     // 替換單位及稅則
                     value = replaceValue(className, value);
 
@@ -784,13 +813,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         value = value.replace(/\n\s*\n/g, '\n'); // 移除多個連續的空行
                     }
                 }
-                xmlContent += `    <fields>\n      <field_name>${className}</field_name>\n      <field_value>${value}</field_value>\n    </fields>\n`;
+
+                const xmlTagName = itemToXmlNameMap[className] || className;  // ★ 使用 mapping
+
+                xmlContent +=
+                    `    <fields>\n` +
+                    `      <field_name>${xmlTagName}</field_name>\n` +
+                    `      <field_value>${value}</field_value>\n` +
+                    `    </fields>\n`;
             });
 
             // 設定 PER_ST 的值
             let perStValue = (item.querySelector('.ITEM_NO').checked) ? '' : '1';
             xmlContent += `    <fields>\n      <field_name>PER_ST</field_name>\n      <field_value>${perStValue}</field_value>\n    </fields>\n`;
-            
+
             xmlContent += '  </items>\n';
         });
         xmlContent += '</detail>\n</Root>';
@@ -855,3 +891,54 @@ function unescapeXml(escaped) {
         }
     });
 }
+
+// ===== 表頭：XML TAG → 系統欄位 ID =====
+const xmlHeaderNameMap = {
+    'DOC_HEAD_DOC_NO': 'FILE_NO',
+    'P_DOC_ITEM_FRN': 'CAL_IP_TOT_ITEM_AMT',
+    'COPY_NUM': 'COPY_QTY',
+    'DOC_IMP_DATE': 'ARRIVAL_DATE',
+    'DCL_DATE': 'ACCEPTANCE_DATE',
+    'DOC_EXP_DATE': 'EXIT_DATE',
+    'FLY_NO': 'JOURNEY_ID',          // 船舶航次/班機班次
+    'FROM_CODE': 'LOADING_LOCATION', // 起運口岸(代碼)
+    // 其他欄位名稱相同的就不用寫
+};
+
+// ===== 表頭：系統欄位 ID → XML TAG =====
+const headerToXmlNameMap = {
+    CAL_IP_TOT_ITEM_AMT: 'P_DOC_ITEM_FRN',
+    COPY_QTY: 'COPY_NUM',
+    ARRIVAL_DATE: 'DOC_IMP_DATE',
+    ACCEPTANCE_DATE: 'DCL_DATE',
+    EXIT_DATE: 'DOC_EXP_DATE',
+    JOURNEY_ID: 'FLY_NO',
+    LOADING_LOCATION: 'FROM_CODE',
+    // FILE_NO 用原本的特例處理成 DOC_HEAD_DOC_NO
+};
+
+// ===== 項次：XML TAG → 系統 className =====
+const xmlItemNameMap = {
+    'GOODS_BRAND': 'TRADE_MARK',
+    'TAX_RATE_P': 'TAX_RATE',
+    'TAX_METHOD': 'ST_MTD',
+    'SUB_CCC_CODE': 'TARIFF_CODE',
+    'ORIGIN_CERTIFICATE_NO': 'CERT_NO',
+    'ORIGIN_CERTIFICATE_ITEM': 'CERT_NO_ITEM',
+    'org_EXP_DCL_NO': 'ORG_IMP_DCL_NO',
+    'org_EXP_DCL_ITEM': 'ORG_IMP_DCL_NO_ITEM',
+    'BUYER_ITEM_CODE': 'SELLER_ITEM_CODE',
+};
+
+// ===== 項次：系統 className → XML TAG =====
+const itemToXmlNameMap = {
+    TRADE_MARK: 'GOODS_BRAND',
+    TAX_RATE: 'TAX_RATE_P',
+    ST_MTD: 'TAX_METHOD',
+    TARIFF_CODE: 'SUB_CCC_CODE',
+    CERT_NO: 'ORIGIN_CERTIFICATE_NO',
+    CERT_NO_ITEM: 'ORIGIN_CERTIFICATE_ITEM',
+    ORG_IMP_DCL_NO: 'org_EXP_DCL_NO',
+    ORG_IMP_DCL_NO_ITEM: 'org_EXP_DCL_ITEM',
+    SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
+};
