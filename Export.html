@@ -44,12 +44,12 @@
         <div class="header-section">
             <div class="header-group">
                 <label for="FILE_NO" onclick="fillTodayIfEmpty()">文件編號</label>
-                <input type="text" id="FILE_NO" name="FILE_NO" oninput="filterNumbers(this)"
+                <input type="text" id="FILE_NO" name="FILE_NO" oninput="filterNumbers(this)" autocomplete="off"
                 placeholder="⬅ 可點擊標題文字，自動填入前7碼，預設為當天日期">
             </div>
             <div class="header-group">
                 <label for="LOT_NO">運單號</label>
-                <input type="text" id="LOT_NO" name="LOT_NO" oninput="filterSFAndNumbers(this)">
+                <input type="text" id="LOT_NO" name="LOT_NO" oninput="filterSFAndNumbers(this)" autocomplete="off">
             </div>
             <hr>
             <div class="header-group">
@@ -1269,4 +1269,5 @@ Alt + 2 指定項次">攤重</button>
 
 </body>
 </html>
+
 
