@@ -895,42 +895,84 @@ function showPopup(content) {
     popup.style.display = 'block';
 }
 
-function handleCountryCodeInput(inputId, relatedFields, requiredCountry) {
-    // 當輸入特定國家代碼時，調整相關欄位的樣式
-    document.getElementById(inputId).addEventListener('input', function () {
-        let countryCode = this.value.toUpperCase().trim(); // 轉換為大寫並去除空白
-        relatedFields.forEach(field => {
-            updateFieldStyle(field, countryCode === requiredCountry);
+function handleCountryCodeInput(inputId, relatedFields, requiredCountries) {
+    const inputEl = document.getElementById(inputId);
+    if (!inputEl) return;
+
+    inputEl.addEventListener('input', function () {
+        const countryCode = this.value.toUpperCase().trim();
+
+        const isMatch = Array.isArray(requiredCountries)
+            ? requiredCountries.includes(countryCode)
+            : countryCode === requiredCountries;
+
+        relatedFields.forEach(fieldId => {
+            updateFieldStyle(fieldId, isMatch);
         });
     });
 }
 
 function monitorCountryCodeChange() {
-    const countryCodeInput = document.getElementById("CNEE_COUNTRY_CODE");
-    const cneeBanIdInput = document.getElementById("CNEE_BAN_ID");
-    const buyerENameInput = document.getElementById("BUYER_E_NAME");
-    const buyerEAddrInput = document.getElementById("BUYER_E_ADDR");
+  const countryCodeInput = document.getElementById("CNEE_COUNTRY_CODE");
+  const cneeBanIdInput = document.getElementById("CNEE_BAN_ID");
+  const buyerENameInput = document.getElementById("BUYER_E_NAME");
+  const buyerEAddrInput = document.getElementById("BUYER_E_ADDR");
 
-    function updateFieldsVisibility() {
-        const isTW = countryCodeInput.value.trim().toUpperCase() === "TW";
-        const action = isTW ? "remove" : "add";
+  if (!countryCodeInput || !cneeBanIdInput || !buyerENameInput || !buyerEAddrInput) return;
 
-        cneeBanIdInput.closest(".header-group").classList[action]("hidden");
-        buyerENameInput.closest(".header-group").classList[action]("hidden");
-        buyerEAddrInput.closest(".header-group").classList[action]("hidden");
+  const cneeGroup = cneeBanIdInput.closest(".header-group");
+  const buyerNameGroup = buyerENameInput.closest(".header-group");
+  const buyerAddrGroup = buyerEAddrInput.closest(".header-group");
+
+  function setRequired(el, required) {
+    if (!el) return;
+    if (required) {
+      el.setAttribute("required", "required");
+      el.setAttribute("aria-required", "true");
+    } else {
+      el.removeAttribute("required");
+      el.removeAttribute("aria-required");
     }
+  }
 
-    countryCodeInput.addEventListener("input", updateFieldsVisibility);
+  function showGroup(group, show) {
+    if (!group) return;
+    group.classList.toggle("hidden", !show);
+  }
 
-    // 初始化執行一次，以確保正確顯示/隱藏欄位
-    updateFieldsVisibility();
+  function updateFieldsVisibility() {
+    const code = countryCodeInput.value.trim().toUpperCase();
+    const isTW = code === "TW";
+    const isUS = code === "US";
+
+    // ✅ 買方統一編號：永遠顯示
+    showGroup(cneeGroup, true);
+
+    // ✅ 收方名稱 / 地址：只在 TW 顯示
+    showGroup(buyerNameGroup, isTW);
+    showGroup(buyerAddrGroup, isTW);
+
+    // ✅ 必填規則
+    setRequired(cneeBanIdInput, isTW || isUS);
+    setRequired(buyerENameInput, isTW);
+    setRequired(buyerEAddrInput, isTW);
+  }
+
+  countryCodeInput.addEventListener("input", updateFieldsVisibility);
+  countryCodeInput.addEventListener("change", updateFieldsVisibility);
+  countryCodeInput.addEventListener("blur", updateFieldsVisibility);
+
+  // ⭐ 初始化：套用「預設顯示 / 隱藏」狀態
+  updateFieldsVisibility();
 }
 
-// 監聽 DOM 加載後執行
 document.addEventListener("DOMContentLoaded", monitorCountryCodeChange);
 
-// 啟用事件監聽，處理國家代碼的樣式變更
-handleCountryCodeInput('CNEE_COUNTRY_CODE', ['CNEE_BAN_ID', 'BUYER_E_NAME', 'BUYER_E_ADDR'], 'TW');
+// TW 或 US：買方統編（CNEE_BAN_ID）要變色
+handleCountryCodeInput('CNEE_COUNTRY_CODE', ['CNEE_BAN_ID'], ['TW', 'US']);
+
+// 只有 TW：買方英文名/地址要變色
+handleCountryCodeInput('CNEE_COUNTRY_CODE', ['BUYER_E_NAME', 'BUYER_E_ADDR'], 'TW');
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
@@ -1231,4 +1273,62 @@ document.getElementById('TO_CODE').addEventListener('blur', function () {
             timeout: false,
         });
     }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const countryEl = document.getElementById("CNEE_COUNTRY_CODE");
+  const banEl = document.getElementById("CNEE_BAN_ID");
+  const nameEl = document.getElementById("CNEE_E_NAME"); // ✅ 唯一來源
+
+  if (!countryEl || !banEl || !nameEl) return;
+
+  function getEnglishWords(str) {
+    if (!str) return [];
+    const matches = str.match(/[A-Za-z]+/g) || [];
+    return matches
+      .map(w => w.toUpperCase())
+      .filter(w => w !== "INC");
+  }
+
+  function buildBanFromWords(words) {
+    if (words.length === 0) return "";
+    return words
+      .slice(0, 3)
+      .map(w => (w.length === 1 ? w : w[0] + w[w.length - 1]))
+      .join("");
+  }
+
+  function triggerAll(el) {
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.dispatchEvent(new Event("blur", { bubbles: true }));
+  }
+
+  function autoFillCneeBan() {
+    const country = countryEl.value.trim().toUpperCase();
+
+    // ✅ TW 不處理
+    if (country === "TW") return;
+
+    // ✅ 已填就不覆蓋
+    if (banEl.value.trim() !== "") return;
+
+    const sourceName = nameEl.value.trim();
+    if (!sourceName) return;
+
+    const words = getEnglishWords(sourceName);
+    const result = buildBanFromWords(words);
+
+    // ✅ 沒有英文就不補
+    if (!result) return;
+
+    banEl.value = result;
+    triggerAll(banEl);
+  }
+
+  // ⭐ 主要觸發點
+  countryEl.addEventListener("blur", autoFillCneeBan);
+
+  // ⭐ 補強（貼上/查詢/自動帶入）
+  countryEl.addEventListener("change", autoFillCneeBan);
 });
