@@ -1278,7 +1278,7 @@ document.getElementById('TO_CODE').addEventListener('blur', function () {
 document.addEventListener("DOMContentLoaded", () => {
   const countryEl = document.getElementById("CNEE_COUNTRY_CODE");
   const banEl = document.getElementById("CNEE_BAN_ID");
-  const nameEl = document.getElementById("CNEE_E_NAME"); // ✅ 唯一來源
+  const nameEl = document.getElementById("CNEE_E_NAME"); // 買方中/英名稱
 
   if (!countryEl || !banEl || !nameEl) return;
 
@@ -1287,7 +1287,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const matches = str.match(/[A-Za-z]+/g) || [];
     return matches
       .map(w => w.toUpperCase())
-      .filter(w => w !== "INC");
+      .filter(w => w !== "INC"); // 排除 INC
   }
 
   function buildBanFromWords(words) {
@@ -1306,17 +1306,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function autoFillCneeBan() {
     const country = countryEl.value.trim().toUpperCase();
+    const name = nameEl.value.trim();
+    const currentBan = banEl.value.trim();
 
-    // ✅ TW 不處理
-    if (country === "TW") return;
+    // ✅ 必須：名稱有值
+    if (!name) return;
 
-    // ✅ 已填就不覆蓋
-    if (banEl.value.trim() !== "") return;
+    // ✅ 必須：非 TW
+    if (country === "TW" || !country) return;
 
-    const sourceName = nameEl.value.trim();
-    if (!sourceName) return;
+    // ✅ 已有值就不覆蓋
+    if (currentBan !== "") return;
 
-    const words = getEnglishWords(sourceName);
+    const words = getEnglishWords(name);
     const result = buildBanFromWords(words);
 
     // ✅ 沒有英文就不補
@@ -1326,9 +1328,6 @@ document.addEventListener("DOMContentLoaded", () => {
     triggerAll(banEl);
   }
 
-  // ⭐ 主要觸發點
-  countryEl.addEventListener("blur", autoFillCneeBan);
-
-  // ⭐ 補強（貼上/查詢/自動帶入）
-  countryEl.addEventListener("change", autoFillCneeBan);
+  // ⭐ 唯一觸發點：聚焦到買方統一編號欄位
+  banEl.addEventListener("focus", autoFillCneeBan);
 });
