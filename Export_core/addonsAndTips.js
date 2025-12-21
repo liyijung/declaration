@@ -1277,24 +1277,24 @@ document.getElementById('TO_CODE').addEventListener('blur', function () {
 
 document.addEventListener("DOMContentLoaded", () => {
   const countryEl = document.getElementById("CNEE_COUNTRY_CODE");
-  const banEl = document.getElementById("CNEE_BAN_ID");
-  const nameEl = document.getElementById("CNEE_E_NAME"); // 買方中/英名稱
+  const banEl = document.getElementById("CNEE_BAN_ID");      // 買方統一編號
+  const nameEl = document.getElementById("CNEE_E_NAME");     // 買方英文名稱
 
   if (!countryEl || !banEl || !nameEl) return;
 
   function getEnglishWords(str) {
     if (!str) return [];
-    const matches = str.match(/[A-Za-z]+/g) || [];
-    return matches
+    const raw = str.match(/[A-Za-z]+/g) || [];
+    return raw
       .map(w => w.toUpperCase())
-      .filter(w => w !== "INC"); // 排除 INC
+      .map(w => (w === "COMPANY" ? "CO" : w)); // ✅ 例外：Company → CO
   }
 
   function buildBanFromWords(words) {
-    if (words.length === 0) return "";
+    if (!words.length) return "";
     return words
-      .slice(0, 3)
-      .map(w => (w.length === 1 ? w : w[0] + w[w.length - 1]))
+      .slice(0, 3) // ✅ 最多取 3 個，不足就取不足的
+      .map(w => (w.length === 1 ? w : w[0] + w[w.length - 1])) // ✅ 首碼+尾碼
       .join("");
   }
 
@@ -1305,15 +1305,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function autoFillCneeBan() {
-    const country = countryEl.value.trim().toUpperCase();
-    const name = nameEl.value.trim();
-    const currentBan = banEl.value.trim();
+    const country = (countryEl.value || "").trim().toUpperCase();
+    const name = (nameEl.value || "").trim();
+    const currentBan = (banEl.value || "").trim();
 
     // ✅ 必須：名稱有值
     if (!name) return;
 
-    // ✅ 必須：非 TW
-    if (country === "TW" || !country) return;
+    // ✅ 必須：非 TW 才做
+    if (!country || country === "TW") return;
 
     // ✅ 已有值就不覆蓋
     if (currentBan !== "") return;
@@ -1328,6 +1328,9 @@ document.addEventListener("DOMContentLoaded", () => {
     triggerAll(banEl);
   }
 
-  // ⭐ 唯一觸發點：聚焦到買方統一編號欄位
+  // ⭐ 觸發點：聚焦到買方統一編號欄位
   banEl.addEventListener("focus", autoFillCneeBan);
+
+  // （可選補強）有些情況 focus 不明顯，用 click 再補一個
+  banEl.addEventListener("click", autoFillCneeBan);
 });
