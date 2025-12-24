@@ -1015,6 +1015,23 @@ document.addEventListener('DOMContentLoaded', function () {
             fullFileName += "『複查輸出許可號碼及項次內容』";
         }
 
+        // 若有申請報單副本第三/四/五聯（含E化退稅第三聯），在檔名後加對應名稱
+        const copy3eEl = document.getElementById('copy_3_e'); // 申請沖退原料稅（E化退稅）
+        const copy3El  = document.getElementById('copy_3');   // 第三聯
+        const copy4El  = document.getElementById('copy_4');   // 第四聯
+        const copy5El  = document.getElementById('copy_5');   // 第五聯
+
+        const copyTags = [];
+
+        if (copy3eEl?.checked) copyTags.push('申請沖退原料稅(E化退稅)');
+        if (copy3El?.checked)  copyTags.push('申請報單副本第三聯');
+        if (copy4El?.checked)  copyTags.push('申請報單副本第四聯');
+        if (copy5El?.checked)  copyTags.push('申請報單副本第五聯');
+
+        if (copyTags.length > 0) {
+            fullFileName += `【${copyTags.join('、')}】`;
+        }
+
         // 加上副檔名
         fullFileName += ".xml";
 
@@ -1222,4 +1239,5 @@ function runCITESCheck() {
 
     return true;
 }
+
 
