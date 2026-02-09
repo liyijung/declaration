@@ -30,6 +30,13 @@
     'remark_09','remark_10'
   ];
 
+  // ✅ 固定值（只放確認永遠固定的）
+  const HEAD_DEFAULTS = {
+    DCL_COMP_ID: 'B',           // 報關分公司
+    BROKER_BOX_NO: '709',       // 箱號
+    LICENCED_AGENT_NO: '00755'  // 專責代碼
+  };
+  
   // ========== 1) 逃逸 XML ==========
   function escapeXmlLocal(unsafe) {
     return String(unsafe ?? '')
@@ -83,13 +90,24 @@
 
     // (a) 若剛好 ID 同名（少數可能）
     const same = document.getElementById(xmlFieldName);
-    if (same && 'value' in same) return String(same.value ?? '').trim();
+    if (same && 'value' in same) {
+      const v = String(same.value ?? '').trim();
+      if (v) return v;
+    }
 
     // (b) 走反查 map：XML名 -> 系統ID
     const sysId = headRevMap[xmlFieldName];
     if (sysId) {
       const el = document.getElementById(sysId);
-      if (el && 'value' in el) return String(el.value ?? '').trim();
+      if (el && 'value' in el) {
+        const v = String(el.value ?? '').trim();
+        if (v) return v;
+      }
+    }
+
+    // ✅ 如果取不到或取到空值，就用固定值
+    if (HEAD_DEFAULTS[xmlFieldName] != null) {
+      return String(HEAD_DEFAULTS[xmlFieldName]).trim();
     }
 
     return '';
@@ -244,4 +262,5 @@
 
   // 方便在 console 測試
   window.buildImportXmlByPlugin = buildImportXml;
+
 })();
