@@ -35,7 +35,9 @@
     DCL_COMP_ID: 'B',           // 報關分公司
     BROKER_BOX_NO: '709',       // 箱號
     LICENCED_AGENT_NO: '00755', // 專責代碼
-    AIR_SEA: '4'                // 海空運別
+    AIR_SEA: '4',               // 海空運別
+    TRANS_VIA: '41',            // 運輸方式
+    WAREHOUSE: 'C2051',         // 卸存地
   };
   
   // ========== 1) 逃逸 XML ==========
@@ -265,4 +267,5 @@
   window.buildImportXmlByPlugin = buildImportXml;
 
 })();
+
 
