@@ -30,16 +30,6 @@
     'remark_09','remark_10'
   ];
 
-  // ✅ 固定值（只放確認永遠固定的）
-  const HEAD_DEFAULTS = {
-    DCL_COMP_ID: 'B',           // 報關分公司
-    BROKER_BOX_NO: '709',       // 箱號
-    LICENCED_AGENT_NO: '00755', // 專責代碼
-    AIR_SEA: '4',               // 海空運別
-    TRANS_VIA: '41',            // 運輸方式
-    WAREHOUSE: 'C2051',         // 卸存地
-  };
-  
   // ========== 1) 逃逸 XML ==========
   function escapeXmlLocal(unsafe) {
     return String(unsafe ?? '')
@@ -93,24 +83,19 @@
 
     // (a) 若剛好 ID 同名（少數可能）
     const same = document.getElementById(xmlFieldName);
-    if (same && 'value' in same) {
-      const v = String(same.value ?? '').trim();
-      if (v) return v;
-    }
+    if (same && 'value' in same) return String(same.value ?? '').trim();
 
     // (b) 走反查 map：XML名 -> 系統ID
     const sysId = headRevMap[xmlFieldName];
     if (sysId) {
       const el = document.getElementById(sysId);
-      if (el && 'value' in el) {
-        const v = String(el.value ?? '').trim();
-        if (v) return v;
-      }
+      if (el && 'value' in el) return String(el.value ?? '').trim();
     }
 
-    // ✅ 如果取不到或取到空值，就用固定值
-    if (HEAD_DEFAULTS[xmlFieldName] != null) {
-      return String(HEAD_DEFAULTS[xmlFieldName]).trim();
+    // ✅ 若 UI 取不到值，且匯入時有暫存，就用暫存補回
+    const extraHead = window.__IMPORT_XML_EXTRA__?.head;
+    if (extraHead && extraHead[xmlFieldName] != null) {
+      return String(extraHead[xmlFieldName]).trim();
     }
 
     return '';
@@ -188,7 +173,7 @@
     const rows = document.querySelectorAll('#item-container .item-row');
     let seq = 1;
 
-    rows.forEach(row => {
+    rows.forEach((row, idx) => {
       xml += `  <items>\n`;
 
       // ITEM_NO：勾選則 *，否則連號
@@ -202,7 +187,13 @@
 
       for (const f of IMPORT_ITEM_FIELDS) {
         if (f === 'ITEM_NO') continue;
-        const v = getItemValue(row, f, itemRevMap);
+        let v = getItemValue(row, f, itemRevMap);
+
+        // ✅ 若 UI 取不到值，且匯入時有暫存，就用暫存補回
+        const extraItem = window.__IMPORT_XML_EXTRA__?.items?.[idx];
+        if ((!v || v === '') && extraItem && extraItem[f] != null) {
+          v = String(extraItem[f]).trim();
+        }
         xml +=
           `    <fields>\n` +
           `      <field_name>${f}</field_name>\n` +
@@ -265,7 +256,4 @@
 
   // 方便在 console 測試
   window.buildImportXmlByPlugin = buildImportXml;
-
 })();
-
-
