@@ -3,7 +3,8 @@
   const IMPORT_HEAD_FIELDS = [
     'DCL_COMP_ID','BROKER_BOX_NO','LICENCED_AGENT_NO','DOC_HEAD_DOC_NO','BROKER_AEO','AIR_SEA',
     'DCL_DOC_TYPE','DCL_DOC_NO','DOC_YY','DOC5','MAWB','HAWB','TRANS_VIA','FLY_NO','FROM_CODE',
-    'WAREHOUSE','TOT_CTN','DOC_CTN_UM','CTN_DESC','DCL_GW','DCL_NW','DOC_IMP_DATE','DCL_DATE',
+    'WAREHOUSE','TOT_CTN','DOC_CTN_UM','CTN_DESC','DCL_GW','DCL_NW',
+    'NET_WT','FRT_AMT','INS_AMT','ADD_AMT','SUBTRACT_AMT','DOC_MARKS_DESC','DOC_IMP_DATE','DCL_DATE',
     'DOC_EXP_DATE','LOT_NO','PROC_NO','EXAM_TYPE','COPY_NUM','DCL_PASS_METHOD','TERMS_SALES',
     'FOB_AMT','DOC_IMP_CIF_AMT','DOC_IMP_CIF_TWD','MESSAGE_TYPE','CURRENCY','P_DOC_ITEM_FRN',
     'SHPR_BAN_ID','SHPR_CODE','SHPR_C_NAME','SHPR_E_NAME','SHPR_C_ADDR','SHPR_E_ADDR','SHPR_TEL',
@@ -83,15 +84,11 @@
 
   // ========== 4) Head 取值 ==========
   function getHeadValue(xmlFieldName, headRevMap) {
-    // 特例：DOC_HEAD_DOC_NO 直接取 FILE_NO；若空，再走 defaults/extra
+    // 特例：DOC_HEAD_DOC_NO 直接取 FILE_NO（空值則往下走）
     if (xmlFieldName === 'DOC_HEAD_DOC_NO') {
       const el = document.getElementById('FILE_NO');
       const v = el ? String(el.value ?? '').trim() : '';
       if (v) return v;
-      if (HEAD_DEFAULTS[xmlFieldName] != null) return String(HEAD_DEFAULTS[xmlFieldName]).trim();
-      const extraHead = window.__IMPORT_XML_EXTRA__?.head;
-      if (extraHead && extraHead[xmlFieldName] != null) return String(extraHead[xmlFieldName]).trim();
-      return '';
     }
 
     // (a) 若剛好 ID 同名（少數可能）
@@ -111,21 +108,20 @@
       }
     }
 
-    // ✅ 若 UI 取不到值 → 先用固定值
+    // ✅ 若 UI 沒值，且匯入外掛有 extra，就用 extra 補回（round-trip 不掉）
+    const extraHead = window.__IMPORT_XML_EXTRA__?.head;
+    if (extraHead && extraHead[xmlFieldName] != null) {
+      const v = String(extraHead[xmlFieldName] ?? '').trim();
+      if (v) return v;
+    }
+
+    // ✅ 固定值（只在取不到/空值時才補）
     if (HEAD_DEFAULTS[xmlFieldName] != null) {
       return String(HEAD_DEFAULTS[xmlFieldName]).trim();
     }
 
-    // ✅ 再用匯入時暫存補回（避免 UI 沒欄位造成 round-trip 掉值）
-    const extraHead = window.__IMPORT_XML_EXTRA__?.head;
-    if (extraHead && extraHead[xmlFieldName] != null) {
-      return String(extraHead[xmlFieldName]).trim();
-    }
-
     return '';
   }
-
-
   // ========== 5) Item 取值 ==========
   function getItemValue(itemRow, xmlFieldName, itemRevMap) {
     // ITEM_NO：沿用系統「勾選則 *，否則連號」習慣
@@ -214,7 +210,7 @@
         if (f === 'ITEM_NO') continue;
         let v = getItemValue(row, f, itemRevMap);
 
-        // ✅ 若 UI 取不到值，且匯入時有暫存，就用暫存補回
+        // ✅ 若 UI 沒值，改用匯入外掛暫存補回（round-trip 不掉）
         const extraItem = window.__IMPORT_XML_EXTRA__?.items?.[idx];
         if ((!v || v === '') && extraItem && extraItem[f] != null) {
           v = String(extraItem[f]).trim();
