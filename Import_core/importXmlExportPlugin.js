@@ -30,6 +30,14 @@
     'remark_09','remark_10'
   ];
 
+  // ✅ 固定值（只放確認永遠固定的）
+  const HEAD_DEFAULTS = {
+    DCL_COMP_ID: 'B',           // 報關分公司
+    BROKER_BOX_NO: '709',       // 箱號
+    LICENCED_AGENT_NO: '00755'  // 專責代碼
+  };
+
+
   // ========== 1) 逃逸 XML ==========
   function escapeXmlLocal(unsafe) {
     return String(unsafe ?? '')
@@ -75,24 +83,40 @@
 
   // ========== 4) Head 取值 ==========
   function getHeadValue(xmlFieldName, headRevMap) {
-    // 特例：DOC_HEAD_DOC_NO 直接取 FILE_NO
+    // 特例：DOC_HEAD_DOC_NO 直接取 FILE_NO；若空，再走 defaults/extra
     if (xmlFieldName === 'DOC_HEAD_DOC_NO') {
       const el = document.getElementById('FILE_NO');
-      return el ? String(el.value ?? '').trim() : '';
+      const v = el ? String(el.value ?? '').trim() : '';
+      if (v) return v;
+      if (HEAD_DEFAULTS[xmlFieldName] != null) return String(HEAD_DEFAULTS[xmlFieldName]).trim();
+      const extraHead = window.__IMPORT_XML_EXTRA__?.head;
+      if (extraHead && extraHead[xmlFieldName] != null) return String(extraHead[xmlFieldName]).trim();
+      return '';
     }
 
     // (a) 若剛好 ID 同名（少數可能）
     const same = document.getElementById(xmlFieldName);
-    if (same && 'value' in same) return String(same.value ?? '').trim();
+    if (same && 'value' in same) {
+      const v = String(same.value ?? '').trim();
+      if (v) return v;
+    }
 
     // (b) 走反查 map：XML名 -> 系統ID
     const sysId = headRevMap[xmlFieldName];
     if (sysId) {
       const el = document.getElementById(sysId);
-      if (el && 'value' in el) return String(el.value ?? '').trim();
+      if (el && 'value' in el) {
+        const v = String(el.value ?? '').trim();
+        if (v) return v;
+      }
     }
 
-    // ✅ 若 UI 取不到值，且匯入時有暫存，就用暫存補回
+    // ✅ 若 UI 取不到值 → 先用固定值
+    if (HEAD_DEFAULTS[xmlFieldName] != null) {
+      return String(HEAD_DEFAULTS[xmlFieldName]).trim();
+    }
+
+    // ✅ 再用匯入時暫存補回（避免 UI 沒欄位造成 round-trip 掉值）
     const extraHead = window.__IMPORT_XML_EXTRA__?.head;
     if (extraHead && extraHead[xmlFieldName] != null) {
       return String(extraHead[xmlFieldName]).trim();
@@ -100,6 +124,7 @@
 
     return '';
   }
+
 
   // ========== 5) Item 取值 ==========
   function getItemValue(itemRow, xmlFieldName, itemRevMap) {
