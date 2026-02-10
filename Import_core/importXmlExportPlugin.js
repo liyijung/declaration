@@ -90,6 +90,20 @@
       const v = el ? String(el.value ?? '').trim() : '';
       if (v) return v;
     }
+    // === NET_WT 對應（UI 常用欄位名不同的保險）===
+    if (xmlFieldName === 'NET_WT') {
+      const candidates = ['NET_WT', 'DCL_NW', 'DOC_NW', 'NW'];
+      for (const id of candidates) {
+        const el = document.getElementById(id);
+        if (el && 'value' in el) {
+          const v = String(el.value ?? '').trim();
+          if (v) return v;
+        }
+      }
+      const extra = window.__IMPORT_XML_EXTRA__?.head;
+      if (extra && extra.NET_WT != null) return String(extra.NET_WT).trim();
+    }
+
 
     // (a) 若剛好 ID 同名（少數可能）
     const same = document.getElementById(xmlFieldName);
