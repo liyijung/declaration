@@ -10,6 +10,38 @@
           .replace(/&apos;/g, "'")
           .replace(/&amp;/g, '&');
 
+  function dispatchInputAndChange(el) {
+    if (!el) return;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function triggerHeadConversions() {
+    const headIds = [
+      'FILE_NO','REMARK',
+      'SHPR_BAN_ID','SHPR_E_NAME','SHPR_C_NAME',
+      'CNEE_BAN_ID','CNEE_E_NAME','CNEE_C_NAME',
+      'CNEE_COUNTRY_CODE','TERMS_SALES','CURRENCY',
+      'DCL_DOC_TYPE','DOC_CTN_UM',
+      'FRT_AMT','INS_AMT','ADD_AMT','SUBTRACT_AMT',
+      'DOC_MARKS_DESC','NET_WT'
+    ];
+    headIds.forEach(id => dispatchInputAndChange(document.getElementById(id)));
+  }
+
+  function triggerItemConversions() {
+    const rows = document.querySelectorAll('#item-container .item-row');
+    rows.forEach(row => {
+      const selectors = [
+        '.CCC_CODE','.QTY','.DOC_UM','.DOC_UNIT_P','.DOC_TOT_P',
+        '.WIDE','.WIDE_UM','.LENGT_','.LENGTH_UM',
+        '.ST_MTD','.ST_QTY','.ORG_COUNTRY'
+      ];
+      selectors.forEach(sel => dispatchInputAndChange(row.querySelector(sel)));
+    });
+  }
+
+
   
   // ✅ 暫存：匯入時遇到 UI 沒有對應欄位的值，先記起來，匯出再吐回
   window.__IMPORT_XML_EXTRA__ = window.__IMPORT_XML_EXTRA__ || { head: {}, items: [] };
@@ -56,12 +88,12 @@
       const match = file.name.match(/^\d+/);
       const fileNumber = match ? match[0] : '';
       const fileNoEl = document.getElementById('FILE_NO');
-      if (fileNoEl) fileNoEl.value = fileNumber;
+      if (fileNoEl) { fileNoEl.value = fileNumber; dispatchInputAndChange(fileNoEl); }
 
       const matchRemark = file.name.match(/【(.*?)】/);
       const fileRemark = matchRemark ? matchRemark[1] : '';
       const remarkEl = document.getElementById('REMARK');
-      if (remarkEl) remarkEl.value = fileRemark;
+      if (remarkEl) { remarkEl.value = fileRemark; dispatchInputAndChange(remarkEl); }
 
       // ====== (C) 解析表頭 ======
       const headerFields =
@@ -86,10 +118,13 @@
         const el = document.getElementById(mappedName);
         if (el) {
           el.value = fieldValue;
+          dispatchInputAndChange(el);
         } else {
           window.__IMPORT_XML_EXTRA__.head[rawName] = fieldValue;
         }
 });
+
+      triggerHeadConversions();
 
       // 原本匯入後會跑的流程（保留）
       if (typeof window.searchData === 'function') window.searchData(false);
@@ -142,6 +177,15 @@
         if (typeof window.createItemRow === 'function') {
           const itemRow = window.createItemRow(itemData);
           itemContainer.appendChild(itemRow);
+          // ✅ 觸發該列關鍵欄位連動/計算
+          dispatchInputAndChange(itemRow.querySelector('.CCC_CODE'));
+          dispatchInputAndChange(itemRow.querySelector('.QTY'));
+          dispatchInputAndChange(itemRow.querySelector('.DOC_UM'));
+          dispatchInputAndChange(itemRow.querySelector('.DOC_UNIT_P'));
+          dispatchInputAndChange(itemRow.querySelector('.WIDE'));
+          dispatchInputAndChange(itemRow.querySelector('.WIDE_UM'));
+          dispatchInputAndChange(itemRow.querySelector('.LENGT_'));
+          dispatchInputAndChange(itemRow.querySelector('.LENGTH_UM'));
           window.__IMPORT_XML_EXTRA__.items.push(itemExtra);
         }
       });
@@ -151,6 +195,7 @@
       if (typeof window.initializeListeners === 'function') window.initializeListeners();
       if (typeof window.renumberItems === 'function') window.renumberItems();
       if (typeof window.updateRemark1FromImport === 'function') window.updateRemark1FromImport();
+      triggerItemConversions();
     };
 
     reader.readAsText(file, 'UTF-8');
