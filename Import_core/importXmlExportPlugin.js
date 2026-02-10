@@ -42,6 +42,56 @@
     LICENCED_AGENT_NO: '00755'  // 專責代碼
   };
 
+  // ========== 0-1) 強制對接 mapping（避免不同版本 xmlHandler 的 mapping 缺漏/寫法不一致） ==========
+  // Head：XML欄位名 -> 系統欄位ID
+  const HEAD_SYSID_BY_XML = {
+    DOC_HEAD_DOC_NO: 'FILE_NO',
+    P_DOC_ITEM_FRN: 'CAL_IP_TOT_ITEM_AMT',
+    COPY_NUM: 'COPY_QTY',
+    DOC_IMP_DATE: 'ARRIVAL_DATE',
+    DCL_DATE: 'ACCEPTANCE_DATE',
+    DOC_EXP_DATE: 'EXIT_DATE',
+    FLY_NO: 'JOURNEY_ID',
+    FROM_CODE: 'LOADING_LOCATION'
+  };
+
+  // Head：系統欄位ID -> XML欄位名
+  const HEAD_XML_BY_SYSID = {
+    FILE_NO: 'DOC_HEAD_DOC_NO',
+    CAL_IP_TOT_ITEM_AMT: 'P_DOC_ITEM_FRN',
+    COPY_QTY: 'COPY_NUM',
+    ARRIVAL_DATE: 'DOC_IMP_DATE',
+    ACCEPTANCE_DATE: 'DCL_DATE',
+    EXIT_DATE: 'DOC_EXP_DATE',
+    JOURNEY_ID: 'FLY_NO',
+    LOADING_LOCATION: 'FROM_CODE'
+  };
+
+  // Item：XML欄位名 -> 系統 className
+  const ITEM_CLASS_BY_XML = {
+    GOODS_BRAND: 'TRADE_MARK',
+    TAX_RATE_P: 'TAX_RATE',
+    TAX_METHOD: 'ST_MTD',
+    SUB_CCC_CODE: 'TARIFF_CODE',
+    ORIGIN_CERTIFICATE_NO: 'CERT_NO',
+    ORIGIN_CERTIFICATE_ITEM: 'CERT_NO_ITEM',
+    org_EXP_DCL_NO: 'ORG_IMP_DCL_NO',
+    org_EXP_DCL_ITEM: 'ORG_IMP_DCL_NO_ITEM'
+    // 其餘同名欄位（如 SELLER_ITEM_CODE / GOODS_MODEL / GOODS_SPEC ...）不需要寫
+  };
+
+  // Item：系統 className -> XML欄位名
+  const ITEM_XML_BY_CLASS = {
+    TRADE_MARK: 'GOODS_BRAND',
+    TAX_RATE: 'TAX_RATE_P',
+    ST_MTD: 'TAX_METHOD',
+    TARIFF_CODE: 'SUB_CCC_CODE',
+    CERT_NO: 'ORIGIN_CERTIFICATE_NO',
+    CERT_NO_ITEM: 'ORIGIN_CERTIFICATE_ITEM',
+    ORG_IMP_DCL_NO: 'org_EXP_DCL_NO',
+    ORG_IMP_DCL_NO_ITEM: 'org_EXP_DCL_ITEM'
+  };
+
 
   // ========== 1) 逃逸 XML ==========
   function escapeXmlLocal(unsafe) {
@@ -57,12 +107,30 @@
   // ========== 2) 反查：Head XML欄位名 -> 系統欄位ID ==========
   function buildHeadReverseMap() {
     const rev = {};
-    // headerToXmlNameMap：系統ID -> XML名
+
+    // 先套用本檔強制 mapping（優先度最高）
+    Object.keys(HEAD_SYSID_BY_XML).forEach(xmlName => {
+      rev[xmlName] = HEAD_SYSID_BY_XML[xmlName];
+    });
+
+    // 再補：headerToXmlNameMap（系統ID -> XML名）反推
     if (typeof window.headerToXmlNameMap === 'object' && window.headerToXmlNameMap) {
       Object.keys(window.headerToXmlNameMap).forEach(sysId => {
         const xmlName = window.headerToXmlNameMap[sysId];
-        rev[xmlName] = sysId;
+        if (xmlName && !rev[xmlName]) rev[xmlName] = sysId;
       });
+    }
+
+    // 再補：xmlHeaderNameMap（XML名 -> 系統ID）
+    if (typeof window.xmlHeaderNameMap === 'object' && window.xmlHeaderNameMap) {
+      Object.keys(window.xmlHeaderNameMap).forEach(xmlName => {
+        const sysId = window.xmlHeaderNameMap[xmlName];
+        if (sysId) rev[xmlName] = sysId; // 這個屬於直接對應，允許覆蓋
+      });
+    }
+
+    return rev;
+  });
     }
     return rev;
   }
@@ -70,11 +138,36 @@
   // ========== 3) 反查：Item XML欄位名 -> 系統 className ==========
   function buildItemReverseMap() {
     const rev = {};
+
+    // 先套用本檔強制 mapping（優先度最高）
+    Object.keys(ITEM_CLASS_BY_XML).forEach(xmlName => {
+      rev[xmlName] = ITEM_CLASS_BY_XML[xmlName];
+    });
+
     // xmlItemNameMap：XML名 -> 系統class
     if (typeof window.xmlItemNameMap === 'object' && window.xmlItemNameMap) {
       Object.keys(window.xmlItemNameMap).forEach(xmlName => {
-        rev[xmlName] = window.xmlItemNameMap[xmlName];
+        const cls = window.xmlItemNameMap[xmlName];
+        if (cls) rev[xmlName] = cls; // 直接對應，允許覆蓋
       });
+    }
+
+    // itemToXmlNameMap：系統class -> XML名（反推）
+    if (typeof window.itemToXmlNameMap === 'object' && window.itemToXmlNameMap) {
+      Object.keys(window.itemToXmlNameMap).forEach(cls => {
+        const xmlName = window.itemToXmlNameMap[cls];
+        if (xmlName && !rev[xmlName]) rev[xmlName] = cls;
+      });
+    }
+
+    // 再補：本檔 class -> XML 的反推（避免 window.itemToXmlNameMap 缺漏或寫法有問題）
+    Object.keys(ITEM_XML_BY_CLASS).forEach(cls => {
+      const xmlName = ITEM_XML_BY_CLASS[cls];
+      if (xmlName && !rev[xmlName]) rev[xmlName] = cls;
+    });
+
+    return rev;
+  });
     }
     // itemToXmlNameMap：系統class -> XML名（也能反推）
     if (typeof window.itemToXmlNameMap === 'object' && window.itemToXmlNameMap) {
@@ -158,21 +251,6 @@
     // 如果原本有 updateVariables()（xmlHandler_v2 內匯出前會跑），這裡也跑一次
     if (typeof window.updateVariables === 'function') {
       window.updateVariables();
-    }
-
-    // 🔥 修正原本 mapping 的問題：SELLER_ITEM_CODE 不要再被輸出成 BUYER_ITEM_CODE
-    // 不改原檔，只在 runtime 修正
-    if (typeof window.itemToXmlNameMap === 'object' && window.itemToXmlNameMap) {
-      if (window.itemToXmlNameMap.SELLER_ITEM_CODE === 'BUYER_ITEM_CODE') {
-        window.itemToXmlNameMap.SELLER_ITEM_CODE = 'SELLER_ITEM_CODE';
-      }
-    }
-    if (typeof window.xmlItemNameMap === 'object' && window.xmlItemNameMap) {
-      if (window.xmlItemNameMap.BUYER_ITEM_CODE === 'SELLER_ITEM_CODE') {
-        // 保留 BUYER_ITEM_CODE 的反查，不要強行指到 SELLER_ITEM_CODE
-        // 讓 BUYER_ITEM_CODE 沒有對應 class 就自然空值（比較安全）
-        delete window.xmlItemNameMap.BUYER_ITEM_CODE;
-      }
     }
 
     const headRevMap = buildHeadReverseMap();
