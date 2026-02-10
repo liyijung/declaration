@@ -11,69 +11,119 @@
           .replace(/&amp;/g, '&');
 
 
-  // ====== 清除按鈕（右側 X）在匯入期間的顯示控制 ======
-  // 目的：匯入 XML 時會大量 dispatch input/change 觸發清除鈕顯示邏輯，導致 X 常駐。
-  // 做法：匯入期間先「凍結/隱藏」，匯入結束後清除可能被寫入的 inline/class，回到原本「聚焦才顯示」行為。
-  function ensureImportClearBtnStyle() {
-    const styleId = '__import_clearbtn_style__';
-    if (document.getElementById(styleId)) return;
-    const style = document.createElement('style');
-    style.id = styleId;
-    // 匯入期間：強制隱藏所有常見清除鈕 class（不修改你的原 CSS 檔，只由 JS 注入）
-    style.textContent = `
-      html.__importing_xml__ .clear-btn,
-      html.__importing_xml__ .clear-button,
-      html.__importing_xml__ .btn-clear,
-      html.__importing_xml__ .input-clear,
-      html.__importing_xml__ .x-btn,
-      html.__importing_xml__ .x-clear,
-      html.__importing_xml__ button[aria-label="clear"],
-      html.__importing_xml__ button[title*="清除"],
-      html.__importing_xml__ button[title*="Clear"] {
-        opacity: 0 !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-    `;
-    document.head.appendChild(style);
+  // ====== 清除按鈕（右側 X）顯示控制：強制「只在聚焦時」才顯示 ======
+  // 目的：避免匯入時大量 dispatch input/change 導致清除按鈕常駐顯示
+  // 做法：掃描可能的清除按鈕元素，預設一允隱藏；當 input/textarea focus 時才顯示同一容器內的清除按鈕
+  window.__FORCE_CLEARBTN_FOCUS_ONLY__ = true;
+
+  function _isClearButtonCandidate(el) {
+    if (!el || el.nodeType !== 1) return false;
+    const tag = el.tagName;
+    if (!['BUTTON', 'SPAN', 'A', 'DIV', 'I'].includes(tag)) return false;
+
+    const cls = (el.className || '').toString();
+    const txt = (el.textContent || '').trim();
+
+    const looksLikeX = (txt === '×' || txt === '✕' || txt === 'x' || txt === 'X');
+    const looksLikeClearClass = /clear|btn-clear|input-clear|x-btn|x-clear|icon-clear/i.test(cls);
+
+    // 避免把真的文字內容當成清除鈕
+    if (!looksLikeX && !looksLikeClearClass) return false;
+
+    // 必須在某個含 input/textarea 的容器裡
+    const container = el.closest('div,td,th,label,span,section,article') || el.parentElement;
+    if (!container) return false;
+    const hasInput = container.querySelector && container.querySelector('input,textarea');
+    return !!hasInput;
   }
 
-  function cleanupClearButtonsAfterImport() {
-    const selectors = [
-      '.clear-btn',
-      '.clear-button',
-      '.btn-clear',
-      '.input-clear',
-      '.x-btn',
-      '.x-clear',
-      'button[aria-label="clear"]',
-      'button[title*="清除"]',
-      'button[title*="Clear"]'
-    ];
+  function _getFieldContainer(el) {
+    // 找一個包含 input 的最近容器
+    const candidates = el.closest('[data-field],.field-row,.input-row,.form-row,.field,.input-group,.form-group,td,th,div,label,span,section') || el.parentElement;
+    return candidates || null;
+  }
 
-    document.querySelectorAll(selectors.join(',')).forEach(btn => {
-      // 清掉可能被「有值就顯示」邏輯寫入的 inline style
-      btn.style.display = '';
-      btn.style.opacity = '';
-      btn.style.visibility = '';
-      btn.style.pointerEvents = '';
-
-      // 清掉常見強制顯示 class（如果你的專案用其他 class 不會受影響）
-      ['show', 'shown', 'visible', 'active', 'on', 'open', 'is-visible'].forEach(c => btn.classList.remove(c));
+  function _hideClearButtonsIn(container) {
+    if (!container || !container.querySelectorAll) return;
+    container.querySelectorAll('button,span,a,div,i').forEach(btn => {
+      if (_isClearButtonCandidate(btn)) {
+        btn.dataset.__clearManaged = '1';
+        // 用 inline 強制收起（避免被其他 JS/樣式打開）
+        btn.style.opacity = '0';
+        btn.style.pointerEvents = 'none';
+        btn.style.visibility = 'hidden';
+      }
     });
   }
 
-  function setImportingFlag(flag) {
-    window.__IS_IMPORTING__ = !!flag;
-    document.documentElement.classList.toggle('__importing_xml__', !!flag);
-    if (flag) {
-      ensureImportClearBtnStyle();
-      // 開始匯入先把目前畫面上已經亮起的 X 收起來
-      cleanupClearButtonsAfterImport();
-    } else {
-      // 匯入結束：把可能被打開的 X 收回，回到原本 CSS/互動控制
-      cleanupClearButtonsAfterImport();
-    }
+  function _showClearButtonsIn(container) {
+    if (!container || !container.querySelectorAll) return;
+    container.querySelectorAll('button,span,a,div,i').forEach(btn => {
+      if (_isClearButtonCandidate(btn)) {
+        btn.dataset.__clearManaged = '1';
+        btn.style.opacity = '';
+        btn.style.pointerEvents = '';
+        btn.style.visibility = '';
+      }
+    });
+  }
+
+  function _scanAndHideAllClearButtons() {
+    document.querySelectorAll('button,span,a,div,i').forEach(el => {
+      if (_isClearButtonCandidate(el)) {
+        const c = _getFieldContainer(el);
+        _hideClearButtonsIn(c || el.parentElement);
+      }
+    });
+  }
+
+  function setupFocusOnlyClearButtonsController() {
+    if (window.__CLEARBTN_FOCUS_CONTROLLER_READY__) return;
+    window.__CLEARBTN_FOCUS_CONTROLLER_READY__ = true;
+
+    // 初始先全部收起
+    _scanAndHideAllClearButtons();
+
+    // focusin：只顯示目前聚焦欄位的清除鈕
+    document.addEventListener('focusin', (e) => {
+      if (!window.__FORCE_CLEARBTN_FOCUS_ONLY__) return;
+      const t = e.target;
+      if (!t || !(t.matches && t.matches('input,textarea'))) return;
+
+      // 先全部收起，再打開該容器
+      _scanAndHideAllClearButtons();
+      const container = _getFieldContainer(t);
+      if (container) _showClearButtonsIn(container);
+    }, true);
+
+    // focusout：離開後收起（用 setTimeout 避免 focus 移到同容器內另一元素）
+    document.addEventListener('focusout', () => {
+      if (!window.__FORCE_CLEARBTN_FOCUS_ONLY__) return;
+      setTimeout(() => {
+        const ae = document.activeElement;
+        if (!ae || !(ae.matches && ae.matches('input,textarea'))) {
+          _scanAndHideAllClearButtons();
+        }
+      }, 0);
+    }, true);
+
+    // MutationObserver：有人把清除鈕打開時，若不是聚焦狀態就立刻收回
+    const mo = new MutationObserver(() => {
+      if (!window.__FORCE_CLEARBTN_FOCUS_ONLY__) return;
+      const ae = document.activeElement;
+      const focusedContainer = (ae && ae.matches && ae.matches('input,textarea')) ? _getFieldContainer(ae) : null;
+
+      document.querySelectorAll('[data-__clearManaged="1"]').forEach(btn => {
+        const c = _getFieldContainer(btn);
+        const shouldBeVisible = focusedContainer && c === focusedContainer;
+        if (!shouldBeVisible) {
+          btn.style.opacity = '0';
+          btn.style.pointerEvents = 'none';
+          btn.style.visibility = 'hidden';
+        }
+      });
+    });
+    mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
   }
 
   // ====== 判斷是否為「進口最終 XML」(樣板結構) ======
@@ -96,9 +146,6 @@
       return;
     }
 
-    // ✅ 匯入開始：凍結清除按鈕（右側 X）的顯示更新
-    setImportingFlag(true);
-
     const reader = new FileReader();
     reader.onload = function (e) {
       const parser = new DOMParser();
@@ -106,11 +153,16 @@
 
       // 不是進口最終 XML → 回原本 importXML
       if (!isFinalImportXml(xmlDoc)) {
-        // 非進口最終 XML：解除匯入旗標後走原本流程
-        setImportingFlag(false);
         if (typeof window.importXML === 'function') window.importXML(event);
         return;
       }
+
+      // ✅ 匯入期間：避免清除按鈕（右側 X）常駐顯示
+      window.__IS_IMPORTING__ = true;
+      window.__FORCE_CLEARBTN_FOCUS_ONLY__ = true;
+      if (typeof setupFocusOnlyClearButtonsController === 'function') setupFocusOnlyClearButtonsController();
+      // 匯入開始先全部收起一次
+      try { _scanAndHideAllClearButtons(); } catch (_) {}
 
       // ====== (A) 先清空（沿用原本行為） ======
       if (typeof window.clearField === 'function') window.clearField();
@@ -210,15 +262,16 @@
       if (typeof window.renumberItems === 'function') window.renumberItems();
       if (typeof window.updateRemark1FromImport === 'function') window.updateRemark1FromImport();
 
-      // ✅ 匯入完成：解除匯入旗標，讓清除按鈕回到原本「聚焦才顯示」
-      setImportingFlag(false);
-    };
+      // ✅ 匯入完成：恢復為「只有聚焦才顯示」並強制全部收起
+      window.__IS_IMPORTING__ = false;
+      window.__FORCE_CLEARBTN_FOCUS_ONLY__ = true;
+      try {
+        // 匯入後通常沒有聚焦，先收起全部清除鈕
+        _scanAndHideAllClearButtons();
+        // 同時 blur，避免 focus-within 卡住
+        document.activeElement?.blur?.();
+      } catch (_) {}
 
-    reader.onerror = function () {
-      setImportingFlag(false);
-    };
-    reader.onabort = function () {
-      setImportingFlag(false);
     };
 
     reader.readAsText(file, 'UTF-8');
@@ -239,6 +292,14 @@
     window.importXML = original;
 
     newInput.addEventListener('change', importFinalImportXML, false);
+  }
+
+
+  // 啟動清除按鈕聚焦顯示控制
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFocusOnlyClearButtonsController);
+  } else {
+    setupFocusOnlyClearButtonsController();
   }
 
   if (document.readyState === 'loading') {
