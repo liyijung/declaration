@@ -10,42 +10,73 @@
           .replace(/&apos;/g, "'")
           .replace(/&amp;/g, '&');
 
-  function dispatchInputAndChange(el) {
-    if (!el) return;
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
+
+  // ====== 清除按鈕（右側 X）在匯入期間的顯示控制 ======
+  // 目的：匯入 XML 時會大量 dispatch input/change 觸發清除鈕顯示邏輯，導致 X 常駐。
+  // 做法：匯入期間先「凍結/隱藏」，匯入結束後清除可能被寫入的 inline/class，回到原本「聚焦才顯示」行為。
+  function ensureImportClearBtnStyle() {
+    const styleId = '__import_clearbtn_style__';
+    if (document.getElementById(styleId)) return;
+    const style = document.createElement('style');
+    style.id = styleId;
+    // 匯入期間：強制隱藏所有常見清除鈕 class（不修改你的原 CSS 檔，只由 JS 注入）
+    style.textContent = `
+      html.__importing_xml__ .clear-btn,
+      html.__importing_xml__ .clear-button,
+      html.__importing_xml__ .btn-clear,
+      html.__importing_xml__ .input-clear,
+      html.__importing_xml__ .x-btn,
+      html.__importing_xml__ .x-clear,
+      html.__importing_xml__ button[aria-label="clear"],
+      html.__importing_xml__ button[title*="清除"],
+      html.__importing_xml__ button[title*="Clear"] {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+    `;
+    document.head.appendChild(style);
   }
 
-  function triggerHeadConversions() {
-    const headIds = [
-      'FILE_NO','REMARK',
-      'SHPR_BAN_ID','SHPR_E_NAME','SHPR_C_NAME',
-      'CNEE_BAN_ID','CNEE_E_NAME','CNEE_C_NAME',
-      'CNEE_COUNTRY_CODE','TERMS_SALES','CURRENCY',
-      'DCL_DOC_TYPE','DOC_CTN_UM',
-      'FRT_AMT','INS_AMT','ADD_AMT','SUBTRACT_AMT',
-      'DOC_MARKS_DESC','NET_WT'
+  function cleanupClearButtonsAfterImport() {
+    const selectors = [
+      '.clear-btn',
+      '.clear-button',
+      '.btn-clear',
+      '.input-clear',
+      '.x-btn',
+      '.x-clear',
+      'button[aria-label="clear"]',
+      'button[title*="清除"]',
+      'button[title*="Clear"]'
     ];
-    headIds.forEach(id => dispatchInputAndChange(document.getElementById(id)));
-  }
 
-  function triggerItemConversions() {
-    const rows = document.querySelectorAll('#item-container .item-row');
-    rows.forEach(row => {
-      const selectors = [
-        '.CCC_CODE','.QTY','.DOC_UM','.DOC_UNIT_P','.DOC_TOT_P',
-        '.WIDE','.WIDE_UM','.LENGT_','.LENGTH_UM',
-        '.ST_MTD','.ST_QTY','.ORG_COUNTRY'
-      ];
-      selectors.forEach(sel => dispatchInputAndChange(row.querySelector(sel)));
+    document.querySelectorAll(selectors.join(',')).forEach(btn => {
+      // 清掉可能被「有值就顯示」邏輯寫入的 inline style
+      btn.style.display = '';
+      btn.style.opacity = '';
+      btn.style.visibility = '';
+      btn.style.pointerEvents = '';
+
+      // 清掉常見強制顯示 class（如果你的專案用其他 class 不會受影響）
+      ['show', 'shown', 'visible', 'active', 'on', 'open', 'is-visible'].forEach(c => btn.classList.remove(c));
     });
   }
 
+  function setImportingFlag(flag) {
+    window.__IS_IMPORTING__ = !!flag;
+    document.documentElement.classList.toggle('__importing_xml__', !!flag);
+    if (flag) {
+      ensureImportClearBtnStyle();
+      // 開始匯入先把目前畫面上已經亮起的 X 收起來
+      cleanupClearButtonsAfterImport();
+    } else {
+      // 匯入結束：把可能被打開的 X 收回，回到原本 CSS/互動控制
+      cleanupClearButtonsAfterImport();
+    }
+  }
 
-  
-  // ✅ 暫存：匯入時遇到 UI 沒有對應欄位的值，先記起來，匯出再吐回
-  window.__IMPORT_XML_EXTRA__ = window.__IMPORT_XML_EXTRA__ || { head: {}, items: [] };
-// ====== 判斷是否為「進口最終 XML」(樣板結構) ======
+  // ====== 判斷是否為「進口最終 XML」(樣板結構) ======
   function isFinalImportXml(xmlDoc) {
     try {
       const headTable = xmlDoc.getElementsByTagName('head_table_name')?.[0]?.textContent?.trim();
@@ -65,6 +96,9 @@
       return;
     }
 
+    // ✅ 匯入開始：凍結清除按鈕（右側 X）的顯示更新
+    setImportingFlag(true);
+
     const reader = new FileReader();
     reader.onload = function (e) {
       const parser = new DOMParser();
@@ -72,12 +106,11 @@
 
       // 不是進口最終 XML → 回原本 importXML
       if (!isFinalImportXml(xmlDoc)) {
+        // 非進口最終 XML：解除匯入旗標後走原本流程
+        setImportingFlag(false);
         if (typeof window.importXML === 'function') window.importXML(event);
         return;
       }
-
-            // ✅ 重置暫存（避免上一次匯入殘留）
-      window.__IMPORT_XML_EXTRA__ = { head: {}, items: [] };
 
       // ====== (A) 先清空（沿用原本行為） ======
       if (typeof window.clearField === 'function') window.clearField();
@@ -88,12 +121,12 @@
       const match = file.name.match(/^\d+/);
       const fileNumber = match ? match[0] : '';
       const fileNoEl = document.getElementById('FILE_NO');
-      if (fileNoEl) { fileNoEl.value = fileNumber; dispatchInputAndChange(fileNoEl); }
+      if (fileNoEl) fileNoEl.value = fileNumber;
 
       const matchRemark = file.name.match(/【(.*?)】/);
       const fileRemark = matchRemark ? matchRemark[1] : '';
       const remarkEl = document.getElementById('REMARK');
-      if (remarkEl) { remarkEl.value = fileRemark; dispatchInputAndChange(remarkEl); }
+      if (remarkEl) remarkEl.value = fileRemark;
 
       // ====== (C) 解析表頭 ======
       const headerFields =
@@ -116,15 +149,8 @@
 
         const fieldValue = unescapeXmlFn(valueNode.textContent);
         const el = document.getElementById(mappedName);
-        if (el) {
-          el.value = fieldValue;
-          dispatchInputAndChange(el);
-        } else {
-          window.__IMPORT_XML_EXTRA__.head[rawName] = fieldValue;
-        }
-});
-
-      triggerHeadConversions();
+        if (el) el.value = fieldValue;
+      });
 
       // 原本匯入後會跑的流程（保留）
       if (typeof window.searchData === 'function') window.searchData(false);
@@ -154,7 +180,6 @@
 
       Array.from(items).forEach(item => {
         const itemData = {};
-        const itemExtra = {};
         const fields = item.getElementsByTagName('fields');
 
         Array.from(fields).forEach(field => {
@@ -170,23 +195,12 @@
             : '';
 
           itemData[mappedName] = fieldValue;
-          itemExtra[rawName] = fieldValue;
         });
 
         // 沿用原本 createItemRow
         if (typeof window.createItemRow === 'function') {
           const itemRow = window.createItemRow(itemData);
           itemContainer.appendChild(itemRow);
-          // ✅ 觸發該列關鍵欄位連動/計算
-          dispatchInputAndChange(itemRow.querySelector('.CCC_CODE'));
-          dispatchInputAndChange(itemRow.querySelector('.QTY'));
-          dispatchInputAndChange(itemRow.querySelector('.DOC_UM'));
-          dispatchInputAndChange(itemRow.querySelector('.DOC_UNIT_P'));
-          dispatchInputAndChange(itemRow.querySelector('.WIDE'));
-          dispatchInputAndChange(itemRow.querySelector('.WIDE_UM'));
-          dispatchInputAndChange(itemRow.querySelector('.LENGT_'));
-          dispatchInputAndChange(itemRow.querySelector('.LENGTH_UM'));
-          window.__IMPORT_XML_EXTRA__.items.push(itemExtra);
         }
       });
 
@@ -195,7 +209,16 @@
       if (typeof window.initializeListeners === 'function') window.initializeListeners();
       if (typeof window.renumberItems === 'function') window.renumberItems();
       if (typeof window.updateRemark1FromImport === 'function') window.updateRemark1FromImport();
-      triggerItemConversions();
+
+      // ✅ 匯入完成：解除匯入旗標，讓清除按鈕回到原本「聚焦才顯示」
+      setImportingFlag(false);
+    };
+
+    reader.onerror = function () {
+      setImportingFlag(false);
+    };
+    reader.onabort = function () {
+      setImportingFlag(false);
     };
 
     reader.readAsText(file, 'UTF-8');
