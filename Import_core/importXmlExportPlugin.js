@@ -177,10 +177,14 @@
 
   // ✅ 固定值（只放確認永遠固定的）
   const HEAD_DEFAULTS = {
-    DCL_COMP_ID: 'B',           // 報關分公司
-    BROKER_BOX_NO: '709',       // 箱號
-    LICENCED_AGENT_NO: '00755'  // 專責代碼
+      DCL_COMP_ID: 'B',           // 報關分公司
+      BROKER_BOX_NO: '709',       // 箱號
+      LICENCED_AGENT_NO: '00755', // 專責代碼
+      AIR_SEA: '4',               // 海空運別
+      TRANS_VIA: '41',            // 運輸方式
+      WAREHOUSE: 'C2051'          // 卸存地一
   };
+
 
   // ========== 0-1) 強制對接 mapping（避免不同版本 xmlHandler 的 mapping 缺漏/寫法不一致） ==========
   // Head：XML欄位名 -> 系統欄位ID
