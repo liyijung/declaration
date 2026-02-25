@@ -252,12 +252,12 @@
   // ========== 2) 反查：Head XML欄位名 -> 系統欄位ID ==========
   function buildHeadReverseMap() {
     const rev = {};
-
+  
     // 先套用本檔強制 mapping（優先度最高）
     Object.keys(HEAD_SYSID_BY_XML).forEach(xmlName => {
       rev[xmlName] = HEAD_SYSID_BY_XML[xmlName];
     });
-
+  
     // 再補：headerToXmlNameMap（系統ID -> XML名）反推
     if (typeof window.headerToXmlNameMap === 'object' && window.headerToXmlNameMap) {
       Object.keys(window.headerToXmlNameMap).forEach(sysId => {
@@ -265,7 +265,7 @@
         if (xmlName && !rev[xmlName]) rev[xmlName] = sysId;
       });
     }
-
+  
     // 再補：xmlHeaderNameMap（XML名 -> 系統ID）
     if (typeof window.xmlHeaderNameMap === 'object' && window.xmlHeaderNameMap) {
       Object.keys(window.xmlHeaderNameMap).forEach(xmlName => {
@@ -273,10 +273,7 @@
         if (sysId) rev[xmlName] = sysId; // 這個屬於直接對應，允許覆蓋
       });
     }
-
-    return rev;
-  });
-    }
+  
     return rev;
   }
 
