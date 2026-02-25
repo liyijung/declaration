@@ -54,8 +54,9 @@
     document.documentElement.classList.toggle('__importing_xml__', !!flag);
     if (flag) {
       ensureImportClearBtnStyle();
-      cleanupClearButtonsAfterImport();
+      // 匯入開始：不要 cleanup，避免打掉原本 UI 狀態
     } else {
+      // 匯入結束：再恢復
       cleanupClearButtonsAfterImport();
     }
   }
@@ -70,10 +71,14 @@
     }
   }
 
-  function importFinalImportXML(event) {
+  function hasParserError(xmlDoc) {
+    return xmlDoc.getElementsByTagName('parsererror')?.length > 0;
+  }
+
+  function importFinalImportXML(event, originalImport) {
     const file = event?.target?.files?.[0];
     if (!file) {
-      window.importXML?.(event);
+      originalImport?.(event);
       return;
     }
 
@@ -85,8 +90,14 @@
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(e.target.result, 'application/xml');
 
+        if (hasParserError(xmlDoc)) {
+          // 解析失敗：交回原本匯入（或你也可改成 alert）
+          originalImport?.(event);
+          return;
+        }
+
         if (!isFinalImportXml(xmlDoc)) {
-          window.importXML?.(event);
+          originalImport?.(event);
           return;
         }
 
@@ -95,7 +106,8 @@
         if (calcStatus) calcStatus.value = '';
 
         const match = file.name.match(/^\d+/);
-        document.getElementById('FILE_NO')?.value = match ? match[0] : '';
+        const fileNoEl = document.getElementById('FILE_NO');
+        if (fileNoEl) fileNoEl.value = match ? match[0] : '';
 
         const headerFields = xmlDoc.getElementsByTagName('head')[0]?.getElementsByTagName('fields') || [];
         Array.from(headerFields).forEach(field => {
@@ -156,11 +168,14 @@
   function replaceImportHandler() {
     const input = document.getElementById('import-xml');
     if (!input) return;
-    const original = window.importXML;
+
+    // 捕獲「當下」的原始匯入（避免後續被改掉）
+    const originalImport = (typeof window.importXML === 'function') ? window.importXML : null;
+
     const newInput = input.cloneNode(true);
     input.parentNode.replaceChild(newInput, input);
-    window.importXML = original;
-    newInput.addEventListener('change', importFinalImportXML, false);
+
+    newInput.addEventListener('change', (e) => importFinalImportXML(e, originalImport), false);
   }
 
   document.readyState === 'loading'

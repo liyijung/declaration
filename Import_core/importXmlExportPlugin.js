@@ -280,53 +280,44 @@
   // ========== 3) 反查：Item XML欄位名 -> 系統 className ==========
   function buildItemReverseMap() {
     const rev = {};
-  
+
     // 先套用本檔強制 mapping（優先度最高）
     Object.keys(ITEM_CLASS_BY_XML).forEach(xmlName => {
       rev[xmlName] = ITEM_CLASS_BY_XML[xmlName];
     });
-  
-    // xmlItemNameMap：XML名 -> 系統class
+
+    // xmlItemNameMap：XML名 -> 系統class（允許覆蓋）
     if (typeof window.xmlItemNameMap === 'object' && window.xmlItemNameMap) {
       Object.keys(window.xmlItemNameMap).forEach(xmlName => {
         const cls = window.xmlItemNameMap[xmlName];
-        if (cls) rev[xmlName] = cls; // 直接對應，允許覆蓋
+        if (cls) rev[xmlName] = cls;
       });
     }
-  
-    // itemToXmlNameMap：系統class -> XML名（反推）
+
+    // itemToXmlNameMap：系統class -> XML名（反推，不覆蓋已存在）
     if (typeof window.itemToXmlNameMap === 'object' && window.itemToXmlNameMap) {
       Object.keys(window.itemToXmlNameMap).forEach(cls => {
         const xmlName = window.itemToXmlNameMap[cls];
         if (xmlName && !rev[xmlName]) rev[xmlName] = cls;
       });
     }
-  
-    // 再補：本檔 class -> XML 的反推（避免 window.itemToXmlNameMap 缺漏或寫法有問題）
+
+    // 再補：本檔 class -> XML 的反推（不覆蓋已存在）
     Object.keys(ITEM_XML_BY_CLASS).forEach(cls => {
       const xmlName = ITEM_XML_BY_CLASS[cls];
       if (xmlName && !rev[xmlName]) rev[xmlName] = cls;
     });
-  
-    return rev;
-  }
-    // itemToXmlNameMap：系統class -> XML名（也能反推）
-    if (typeof window.itemToXmlNameMap === 'object' && window.itemToXmlNameMap) {
-      Object.keys(window.itemToXmlNameMap).forEach(cls => {
-        const xmlName = window.itemToXmlNameMap[cls];
-        if (!rev[xmlName]) rev[xmlName] = cls;
-      });
-    }
+
     return rev;
   }
 
   // ========== 4) Head 取值 ==========
-  function getHeadValue(xmlFieldName, headRevMap) {
+  function getHeadValue(xmlFieldName, headRevMap = {}) {
     // 特例：DOC_HEAD_DOC_NO 直接取 FILE_NO；若空，再走 defaults/extra
     if (xmlFieldName === 'DOC_HEAD_DOC_NO') {
       const el = document.getElementById('FILE_NO');
       const v = el ? String(el.value ?? '').trim() : '';
-      if (v) return v;
+      if (v !== '') return v;
       if (HEAD_DEFAULTS[xmlFieldName] != null) return String(HEAD_DEFAULTS[xmlFieldName]).trim();
       const extraHead = window.__IMPORT_XML_EXTRA__?.head;
       if (extraHead && extraHead[xmlFieldName] != null) return String(extraHead[xmlFieldName]).trim();
@@ -363,7 +354,6 @@
 
     return '';
   }
-
 
   // ========== 5) Item 取值 ==========
   function getItemValue(itemRow, xmlFieldName, itemRevMap) {
