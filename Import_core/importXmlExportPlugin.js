@@ -340,7 +340,7 @@
     const same = document.getElementById(xmlFieldName);
     if (same && 'value' in same) {
       const v = String(same.value ?? '').trim();
-      if (v) return v;
+      if (v !== '') return v;
     }
 
     // (b) 走反查 map：XML名 -> 系統ID
