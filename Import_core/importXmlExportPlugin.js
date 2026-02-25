@@ -410,7 +410,10 @@
 
     // Head：照樣板順序輸出
     for (const f of IMPORT_HEAD_FIELDS) {
-      const v = getHeadValue(f, headRevMap);
+      const v = (HEAD_DEFAULTS[f] != null)
+        ? String(HEAD_DEFAULTS[f]).trim()    // ✅ 直接用固定值寫進 XML
+        : getHeadValue(f, headRevMap);       // 其他欄位才照原本流程取值
+    
       xml +=
         `  <fields>\n` +
         `    <field_name>${f}</field_name>\n` +
