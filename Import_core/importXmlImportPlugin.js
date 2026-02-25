@@ -91,7 +91,7 @@
         const xmlDoc = parser.parseFromString(e.target.result, 'application/xml');
 
         if (hasParserError(xmlDoc)) {
-          // 解析失敗：交回原本匯入（或你也可改成 alert）
+          // 解析失敗：交回原本匯入（或者也可改成 alert）
           originalImport?.(event);
           return;
         }
