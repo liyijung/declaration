@@ -280,12 +280,12 @@
   // ========== 3) 反查：Item XML欄位名 -> 系統 className ==========
   function buildItemReverseMap() {
     const rev = {};
-
+  
     // 先套用本檔強制 mapping（優先度最高）
     Object.keys(ITEM_CLASS_BY_XML).forEach(xmlName => {
       rev[xmlName] = ITEM_CLASS_BY_XML[xmlName];
     });
-
+  
     // xmlItemNameMap：XML名 -> 系統class
     if (typeof window.xmlItemNameMap === 'object' && window.xmlItemNameMap) {
       Object.keys(window.xmlItemNameMap).forEach(xmlName => {
@@ -293,7 +293,7 @@
         if (cls) rev[xmlName] = cls; // 直接對應，允許覆蓋
       });
     }
-
+  
     // itemToXmlNameMap：系統class -> XML名（反推）
     if (typeof window.itemToXmlNameMap === 'object' && window.itemToXmlNameMap) {
       Object.keys(window.itemToXmlNameMap).forEach(cls => {
@@ -301,16 +301,15 @@
         if (xmlName && !rev[xmlName]) rev[xmlName] = cls;
       });
     }
-
+  
     // 再補：本檔 class -> XML 的反推（避免 window.itemToXmlNameMap 缺漏或寫法有問題）
     Object.keys(ITEM_XML_BY_CLASS).forEach(cls => {
       const xmlName = ITEM_XML_BY_CLASS[cls];
       if (xmlName && !rev[xmlName]) rev[xmlName] = cls;
     });
-
+  
     return rev;
-  });
-    }
+  }
     // itemToXmlNameMap：系統class -> XML名（也能反推）
     if (typeof window.itemToXmlNameMap === 'object' && window.itemToXmlNameMap) {
       Object.keys(window.itemToXmlNameMap).forEach(cls => {
