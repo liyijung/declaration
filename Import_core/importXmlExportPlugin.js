@@ -99,6 +99,7 @@
     'COMM_TAX_RATE',
     'TAX_METHOD',
     'ST_QTY',
+    'ST_UM',
     'ALCOHOL',
     'TAX_AMT_V',
     'AFTER_TAX_QTY',
