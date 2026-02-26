@@ -503,7 +503,8 @@ function applyFieldData() {
     // 檢查是否有更新CERT_NO、CERT_NO_ITEM欄位，若有則對所有更新的欄位執行自動填入稅則附碼為 'PT'
     if (hasUpdatedCertNoOrCertNoItem) {
         items.forEach(item => {
-            checkFields(item)
+            const certInput = item.querySelector('.CERT_NO');
+            if (certInput) checkFields(certInput);
 
             const cccInput = item.querySelector('.CCC_CODE');
             if (cccInput) {
@@ -516,14 +517,10 @@ function applyFieldData() {
     closeSpecifyFieldModal();
 }
 
-// 監聽產證號碼和產證項次的變動
-document.getElementById('CERT_NO').addEventListener('input', checkFields);
-document.getElementById('CERT_NO_ITEM').addEventListener('input', checkFields);
-
-// 監聽所有項次的產證號碼和產證項次變動
+// 監聽所有項次的產證號碼變動
 document.addEventListener('input', function(event) {
-    if (event.target.matches('.CERT_NO, .CERT_NO_ITEM')) {
-        checkFields(event.target); // 只監聽 CERT_NO 或 CERT_NO_ITEM 的變動
+    if (event.target.matches('.CERT_NO')) {
+        checkFields(event.target); // 只監聽 CERT_NO 的變動
     }
 });
 
@@ -542,15 +539,15 @@ function checkFields(inputElement) {
     const itemRow = inputElement.closest('.item-row');  // 獲取對應的項次行
 
     if (!itemRow) {
-        // 若是新增項次的 CERT_NO 和 CERT_NO_ITEM 欄位
+        // 若是新增項次的 CERT_NO 欄位
         const certNo = document.getElementById('CERT_NO').value;
-        const certNoItem = document.getElementById('CERT_NO_ITEM').value;
-        // 如果產證號碼和產證項次都有值，則自動填入稅則附碼為 'PT'
-        if (certNo && certNoItem) {
+
+        // 如果產證號碼有值，則自動填入稅則附碼為 'PT'
+        if (certNo) {
             document.getElementById('TARIFF_CODE').value = 'PT';
             document.getElementById('TAX_RATE').value = '0';
         } else {
-            document.getElementById('TARIFF_CODE').value = ''; // 如果任一欄位沒填寫，清空稅則附碼
+            document.getElementById('TARIFF_CODE').value = ''; // 如果欄位沒填寫，清空稅則附碼
         }
     } else {
         // 若是每個項次的 CERT_NO 和 CERT_NO_ITEM 欄位
@@ -559,8 +556,8 @@ function checkFields(inputElement) {
         const tariffCodeElement = itemRow.querySelector('.TARIFF_CODE'); // 取得該項次的稅則附碼
         const taxRateElement = itemRow.querySelector('.TAX_RATE'); // 取得該項次的 TAX_RATE 欄位
 
-        // 如果產證號碼和產證項次都有值，則自動填入稅則附碼為 'PT'
-        if (certNo && certNoItem) {
+        // 如果產證號碼有值，則自動填入稅則附碼為 'PT'
+        if (certNo) {
             tariffCodeElement.value = 'PT';
             taxRateElement.value = '0'; // 設定 TAX_RATE 為 0%
         } else {
@@ -595,3 +592,4 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
