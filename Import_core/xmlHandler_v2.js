@@ -311,14 +311,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // 如果 DCL_DOC_TYPE 是 B6，還需要檢查 SELLER_ITEM_CODE 和 BOND_NOTE
+        // 如果 DCL_DOC_TYPE 是 B6，還需要檢查 SELLER_ITEM_CODE
         if (['B6'].includes(dclDocType)) {
             itemRequiredFields.push(
                 { className: 'SELLER_ITEM_CODE', name: '買方料號' },
-                { className: 'BOND_NOTE', name: '保稅貨物註記' }
             );
         } else {
-            // 如果 DCL_DOC_TYPE 不是 B6，則 SHPR_BONDED_ID、SELLER_ITEM_CODE 和 BOND_NOTE 不得填列
+            // 如果 DCL_DOC_TYPE 不是 B6，則 SHPR_BONDED_ID、SELLER_ITEM_CODE 不得填列
             let invalidFields = [];
 
             // 檢查 SHPR_BONDED_ID 是否有值
@@ -327,9 +326,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 invalidFields.push('海關監管編號');
             }
 
-            // 遍歷每個項次，檢查 SELLER_ITEM_CODE 和 BOND_NOTE 是否有值
+            // 遍歷每個項次，檢查 SELLER_ITEM_CODE 是否有值
             document.querySelectorAll('.item-row').forEach(item => {
-                ['SELLER_ITEM_CODE', 'BOND_NOTE'].forEach(className => {
+                ['SELLER_ITEM_CODE'].forEach(className => {
                     let element = item.querySelector(`.${className}`);
                     if (element && element.value && element.value.trim()) { // 確保 element 存在且 value 有值
                         invalidFields.push(className === 'SELLER_ITEM_CODE' ? '買方料號' : '保稅貨物註記');
@@ -472,7 +471,6 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'ST_MTD', name: '納稅辦法', validLengths: [2] },
             { className: 'ORG_COUNTRY', name: '生產國別', validLengths: [2] },
             { className: 'ORG_IMP_DCL_NO', name: '原出口報單號碼', validLengths: [14] },
-            { className: 'BOND_NOTE', name: '保稅貨物註記', validLengths: [2] },
             { className: 'CERT_NO', name: '產證號碼', validLengths: [15] },
             { className: 'EXP_NO', name: '輸入許可號碼', validLengths: [14] },
             { className: 'WIDE_UM', name: '寬度單位', validLengths: [3] },
@@ -958,3 +956,4 @@ const itemToXmlNameMap = {
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
 
 };
+
