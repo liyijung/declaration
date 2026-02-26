@@ -218,7 +218,7 @@ function applyFieldData() {
     const items = itemContainer.querySelectorAll('.item-row');
     let hasUpdatedCCCCode = false; // 紀錄是否有更新CCC_CODE欄位
     let hasUpdatedQtyOrUnitPrice = false; // 紀錄是否有更新QTY、DOC_UM、DOC_UNIT_P欄位
-    let hasUpdatedCertNoOrCertNoItem = false; // 紀錄是否有更新CERT_NO、CERT_NO_ITEM欄位
+    let hasUpdatedCertNoOrCertNoItem = false; // 紀錄是否有更新CERT_NO欄位
 
     // 需要強制轉為大寫的欄位
     const upperCaseFields = [
@@ -465,7 +465,7 @@ function applyFieldData() {
                             hasUpdatedQtyOrUnitPrice = true;
                         }
                         // 紀錄是否更新了CERT_NO、CERT_NO_ITEM
-                        if (["CERT_NO", "CERT_NO_ITEM"].includes(fieldName)) {
+                        if (["CERT_NO"].includes(fieldName)) {
                             hasUpdatedCertNoOrCertNoItem = true;
                         }
                     });
