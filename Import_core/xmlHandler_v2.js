@@ -859,6 +859,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.removeChild(link);
     }
 
+    window.exportToXML = exportToXML; // ✅ 這行很關鍵
+    
     // 為輸出XML按鈕添加事件監聽器
     document.getElementById('export-to-xml').addEventListener('click', exportToXML);
 });
@@ -943,4 +945,3 @@ const itemToXmlNameMap = {
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
 
 };
-
