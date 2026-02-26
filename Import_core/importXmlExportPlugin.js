@@ -470,48 +470,46 @@
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
   
+    // ✅ 防止這個函式被重複呼叫後，多綁一次
+    if (newBtn.dataset.importXmlExportBound === '1') return;
+    newBtn.dataset.importXmlExportBound = '1';
+  
     newBtn.addEventListener('click', async (e) => {
       e.preventDefault();
+  
+      // ✅ 最關鍵：阻止同一顆按鈕上的其他 click listener 繼續執行
+      e.stopImmediatePropagation();
       e.stopPropagation();
   
+      // ✅ 一次點擊鎖：同一次點擊（或極短時間內）只允許跑一次
+      const now = Date.now();
+      const last = Number(newBtn.dataset.lastClickTs || 0);
+      if (now - last < 800) return; // 800ms 內視為同一次/連續觸發
+      newBtn.dataset.lastClickTs = String(now);
+  
       try {
+        // ----（以下維持原本邏輯即可）----
   
+        // 先跑原本系統檢查：若有 alert → 中止
         if (typeof window.exportToXML === 'function') {
-  
           let blocked = false;
-  
           const originalAlert = window.alert;
-          const originalCreateElement = document.createElement;
   
-          // 攔截 alert
           window.alert = function (msg) {
             blocked = true;
             originalAlert(msg);
-          };
-  
-          // ⛔ 攔截原本的下載動作
-          document.createElement = function (tag) {
-            if (tag === 'a') {
-              return {
-                click: () => {},
-                set href(v) {},
-                set download(v) {}
-              };
-            }
-            return originalCreateElement.call(document, tag);
           };
   
           try {
             await window.exportToXML();
           } finally {
             window.alert = originalAlert;
-            document.createElement = originalCreateElement;
           }
   
           if (blocked) return;
         }
   
-        // ✅ 外掛匯出
+        // 檢查通過 → 外掛匯出
         const xml = buildImportXml();
   
         const fileNo = (document.getElementById('FILE_NO')?.value || '').trim();
@@ -523,7 +521,6 @@
         console.error(err);
         alert('外掛匯出進口XML失敗，請開啟 Console 查看錯誤。');
       }
-  
     }, true);
   }
 
