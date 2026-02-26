@@ -859,10 +859,23 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.removeChild(link);
     }
 
-    window.exportToXML = exportToXML; // ✅ 這行很關鍵
+    window.exportToXML = exportToXML; // ✅ 這行很關鍵，先把函式掛到全域
+
+    const btn = document.getElementById('export-to-xml');
+    if (!btn) {
+      console.warn('#export-to-xml not found on DOMContentLoaded');
+    } else {
+      // 避免重複綁定
+      if (btn.dataset.boundExport !== '1') {
+        btn.dataset.boundExport = '1';
     
-    // 為輸出XML按鈕添加事件監聽器
-    document.getElementById('export-to-xml').addEventListener('click', exportToXML);
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.exportToXML();
+        }, true);
+      }
+    }
+    
 });
 
 // 轉義 XML 保留字符的函數
