@@ -389,7 +389,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 // 成對欄位檢查
-                let expNoAlreadyChecked = false;
                 const pairedFields = [
                     { fields: ['ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM'], names: ['原出口報單號碼', '原出口報單項次'] },
                     { fields: ['CERT_NO', 'TARIFF_CODE'], names: ['產證號碼', '稅則附碼'] },
@@ -407,11 +406,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     if ((firstElement && firstElement.value.trim() && !secondElement.value.trim()) ||
                         (secondElement && secondElement.value.trim() && !firstElement.value.trim())) {
                         itemMissingFields.push(`${pair.names[0]} 和 ${pair.names[1]} 必須同時有值`);
-
-                        // 如果是 'EXP_NO' 和 'EXP_SEQ_NO'，設置旗標變數
-                        if (pair.fields.includes('EXP_NO') && pair.fields.includes('EXP_SEQ_NO')) {
-                            expNoAlreadyChecked = true;
-                        }
                     }
                 });
 
@@ -523,7 +517,6 @@ document.addEventListener('DOMContentLoaded', function () {
             [
                 { className: 'ORG_IMP_DCL_NO_ITEM', name: '原出口報單項次' },
                 { className: 'CERT_NO_ITEM', name: '產證項次' },
-                { className: 'EXP_SEQ_NO', name: '輸入許可項次' }
             ].forEach(field => {
                 let element = item.querySelector(`.${field.className}`);
                 if (element && element.value.trim() && !isInteger(element.value.trim())) {
@@ -955,6 +948,7 @@ const itemToXmlNameMap = {
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
 
 };
+
 
 
 
