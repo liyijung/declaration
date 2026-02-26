@@ -476,13 +476,12 @@
   
       try {
   
-        // ✅ 先跑原本系統的檢查流程
         if (typeof window.exportToXML === 'function') {
   
-          // 用來判斷檢查是否被 alert 擋下
           let blocked = false;
   
           const originalAlert = window.alert;
+          const originalCreateElement = document.createElement;
   
           // 攔截 alert
           window.alert = function (msg) {
@@ -490,16 +489,29 @@
             originalAlert(msg);
           };
   
+          // ⛔ 攔截原本的下載動作
+          document.createElement = function (tag) {
+            if (tag === 'a') {
+              return {
+                click: () => {},
+                set href(v) {},
+                set download(v) {}
+              };
+            }
+            return originalCreateElement.call(document, tag);
+          };
+  
           try {
-            await window.exportToXML(); // ← 只讓它跑檢查
+            await window.exportToXML();
           } finally {
-            window.alert = originalAlert; // 還原 alert
+            window.alert = originalAlert;
+            document.createElement = originalCreateElement;
           }
   
-          if (blocked) return; // ❌ 有錯誤 → 中止外掛匯出
+          if (blocked) return;
         }
   
-        // ✅ 檢查通過才走外掛匯出
+        // ✅ 外掛匯出
         const xml = buildImportXml();
   
         const fileNo = (document.getElementById('FILE_NO')?.value || '').trim();
