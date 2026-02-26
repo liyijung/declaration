@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 let expNoAlreadyChecked = false;
                 const pairedFields = [
                     { fields: ['ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM'], names: ['原出口報單號碼', '原出口報單項次'] },
-                    { fields: ['CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE'], names: ['產證號碼', '稅則附碼'] },
+                    { fields: ['CERT_NO', 'TARIFF_CODE'], names: ['產證號碼', '稅則附碼'] },
                     { fields: ['WIDE', 'WIDE_UM'], names: ['寬度(幅寬)', '寬度單位'] },
                     { fields: ['LENGT_', 'LENGTH_UM'], names: ['長度(幅長)', '長度單位'] },
                     { fields: ['ST_QTY', 'ST_UM'], names: ['統計數量', '統計單位'] },
@@ -955,6 +955,7 @@ const itemToXmlNameMap = {
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
 
 };
+
 
 
 
