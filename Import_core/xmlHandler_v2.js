@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'ORG_COUNTRY', name: '生產國別', validLengths: [2] },
             { className: 'ORG_IMP_DCL_NO', name: '原出口報單號碼', validLengths: [14] },
             { className: 'BOND_NOTE', name: '保稅貨物註記', validLengths: [2] },
-            { className: 'CERT_NO', name: '產證號碼', validLengths: [11] },
+            { className: 'CERT_NO', name: '產證號碼', validLengths: [15] },
             { className: 'EXP_NO', name: '輸入許可號碼', validLengths: [14] },
             { className: 'WIDE_UM', name: '寬度單位', validLengths: [3] },
             { className: 'LENGTH_UM', name: '長度單位', validLengths: [3] },
@@ -941,4 +941,5 @@ const itemToXmlNameMap = {
     ORG_IMP_DCL_NO: 'org_EXP_DCL_NO',
     ORG_IMP_DCL_NO_ITEM: 'org_EXP_DCL_ITEM',
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
+
 };
