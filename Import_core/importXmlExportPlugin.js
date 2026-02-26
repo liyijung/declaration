@@ -466,26 +466,52 @@
   function replaceExportHandler() {
     const btn = document.getElementById('export-to-xml');
     if (!btn) return;
-
-    const newBtn = btn.cloneNode(true); // clone 會移除所有舊 addEventListener
+  
+    const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
-
+  
     newBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-
+  
       try {
+  
+        // ✅ 先跑原本系統的檢查流程
+        if (typeof window.exportToXML === 'function') {
+  
+          // 用來判斷檢查是否被 alert 擋下
+          let blocked = false;
+  
+          const originalAlert = window.alert;
+  
+          // 攔截 alert
+          window.alert = function (msg) {
+            blocked = true;
+            originalAlert(msg);
+          };
+  
+          try {
+            await window.exportToXML(); // ← 只讓它跑檢查
+          } finally {
+            window.alert = originalAlert; // 還原 alert
+          }
+  
+          if (blocked) return; // ❌ 有錯誤 → 中止外掛匯出
+        }
+  
+        // ✅ 檢查通過才走外掛匯出
         const xml = buildImportXml();
-
-        // 檔名：沿用 FILE_NO（有就用），沒有就 fallback
+  
         const fileNo = (document.getElementById('FILE_NO')?.value || '').trim();
         const filename = fileNo ? `${fileNo}.xml` : `import.xml`;
-
+  
         downloadText(filename, xml);
+  
       } catch (err) {
         console.error(err);
         alert('外掛匯出進口XML失敗，請開啟 Console 查看錯誤。');
       }
+  
     }, true);
   }
 
