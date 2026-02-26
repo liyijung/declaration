@@ -396,7 +396,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     { fields: ['WIDE', 'WIDE_UM'], names: ['寬度(幅寬)', '寬度單位'] },
                     { fields: ['LENGT_', 'LENGTH_UM'], names: ['長度(幅長)', '長度單位'] },
                     { fields: ['ST_QTY', 'ST_UM'], names: ['統計數量', '統計單位'] },
-                    { fields: ['EXP_NO', 'EXP_SEQ_NO'], names: ['輸入許可號碼', '輸入許可項次'] }
                 ];
 
                 // 檢查成對欄位是否同時有值
@@ -956,4 +955,5 @@ const itemToXmlNameMap = {
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
 
 };
+
 
