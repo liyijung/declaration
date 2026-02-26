@@ -347,17 +347,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let itemNoCheckedCount = 0; // 用來計算連續勾選大品名註記的次數
 
         for (let item of itemContainer) {
-
-            /* ⭐ 產證號碼長度硬性攔截 — 放最前面 */
-            const certEl = item.querySelector(".CERT_NO");
-            if (certEl && certEl.value.trim()) {
-                const cert = certEl.value.trim();
-                if (cert.length !== 15) {
-                    alert(`產證號碼碼數錯誤：${cert}（目前 ${cert.length} 碼，應為 15 碼）`);
-                    return;
-                }
-            }
-            
             let itemNoChecked = item.querySelector('.ITEM_NO').checked;
 
             if (itemNoChecked) { // 若 ITEM_NO 已勾選
@@ -954,3 +943,4 @@ const itemToXmlNameMap = {
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
 
 };
+
