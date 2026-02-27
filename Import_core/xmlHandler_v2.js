@@ -487,6 +487,10 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'ORG_IMP_DCL_NO', name: '原出口報單號碼', validLengths: [14] },
             { className: 'CERT_NO', name: '產證號碼', validLengths: [15] },
             { className: 'EXP_NO', name: '輸入許可號碼', validLengths: [14] },
+            { className: 'EXP_NO2', name: '輸入許可號碼2', validLengths: [14] },
+            { className: 'EXP_NO3', name: '輸入許可號碼3', validLengths: [14] },
+            { className: 'EXP_NO4', name: '輸入許可號碼4', validLengths: [14] },
+            { className: 'EXP_NO5', name: '輸入許可號碼5', validLengths: [14] },
             { className: 'WIDE_UM', name: '寬度單位', validLengths: [3] },
             { className: 'LENGTH_UM', name: '長度單位', validLengths: [3] },
             { className: 'ST_UM', name: '統計單位', validLengths: [3] }
@@ -648,7 +652,8 @@ document.addEventListener('DOMContentLoaded', function () {
             'CCC_CODE', 'TAX_RATE', 'ST_MTD', 'ISCALC_WT', 'NET_WT', 'ORG_COUNTRY',
             'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC',
             'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
-            'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_SEQ_NO',
+            'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 
+            'EXP_NO', 'EXP_NO2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'EXP_SEQ_NO',
             'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM',
         ];
 
@@ -1005,4 +1010,5 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
 
