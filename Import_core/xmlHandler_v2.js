@@ -942,7 +942,7 @@ function showTermsSalesHints() {
 
     if (terms === 'EXW') {
         if (!frt) hints.push('EXW：建議填列「運費」');
-        if (!add) hints.push('EXW：建議填列「其他應加費用」');
+        if (!add) hints.push('EXW：建議填列「應加費用」');
     }
 
     if (hints.length > 0) {
@@ -1005,3 +1005,4 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
