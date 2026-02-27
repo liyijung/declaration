@@ -650,7 +650,7 @@ function handleTradeTerms(inputId) {
         } else if (currentPage.includes("Import")) {
             fieldActions = {
                 'EXW': { freight: true, insurance: false, add: true, subtract: false },
-                'FOB': { freight: false, insurance: false, add: false, subtract: false },
+                'FOB': { freight: true, insurance: false, add: false, subtract: false },
                 'CFR': { freight: true, insurance: false, add: false, subtract: false },
                 'C&I': { freight: false, insurance: true, add: false, subtract: false },
                 'CIF': { freight: true, insurance: true, add: false, subtract: false },
@@ -907,3 +907,4 @@ function resetCountryFilters() {
     // 觸發查詢
     filterCountryTable();
 }
+
