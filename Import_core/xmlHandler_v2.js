@@ -1,5 +1,7 @@
 // 匯入XML的功能
 function importXML(event) {
+    termsSalesHintShown = false;   // ⭐ 新資料 → 可以再提示貿易條件
+    
     clearField(); // 清空輸入框內容
 
     // 清空 calculation-status
@@ -50,7 +52,7 @@ function importXML(event) {
 
             // 執行必填與不得填列欄位的檢查邏輯
             document.getElementById('CNEE_COUNTRY_CODE').dispatchEvent(new Event('input'));
-            document.getElementById('TERMS_SALES').dispatchEvent(new Event('input'));
+            document.getElementById('TERMS_SALES').dispatchEvent(new Event('change'));
 
             // 解析項次資料
             const items = xmlDoc.getElementsByTagName("detail")[0].getElementsByTagName("items");
@@ -101,10 +103,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     const termsEl = document.getElementById('TERMS_SALES');
+    
     if (termsEl && termsEl.dataset.boundTermsHint !== '1') {
+    
         termsEl.dataset.boundTermsHint = '1';
-        termsEl.addEventListener('input', showTermsSalesHints);
-        termsEl.addEventListener('change', showTermsSalesHints);
+    
+        termsEl.addEventListener('change', () => {
+    
+            termsSalesHintShown = false;   // ⭐ 使用者改了貿易條件 → 允許重新提示
+    
+            showTermsSalesHints();
+    
+        });
+    
     }
 
     function updateVariables() {
@@ -910,23 +921,19 @@ function unescapeXml(escaped) {
 // ===== 貿易條件提示（不擋匯出）=====
 function showTermsSalesHints() {
 
-    const terms = document.getElementById('TERMS_SALES')?.value.trim().toUpperCase() || '';
+    if (termsSalesHintShown) return;   // ⭐ 已提示過就不再跳
 
+    const terms = document.getElementById('TERMS_SALES')?.value.trim().toUpperCase();
     if (!terms) return;
 
-    const frt = document.getElementById('FRT_AMT')?.value.trim() || '';
-    const ins = document.getElementById('INS_AMT')?.value.trim() || '';
-    const add = document.getElementById('ADD_AMT')?.value.trim() || '';
+    const frt = document.getElementById('FRT_AMT')?.value.trim();
+    const ins = document.getElementById('INS_AMT')?.value.trim();
+    const add = document.getElementById('ADD_AMT')?.value.trim();
 
     const hints = [];
 
-    if (terms === 'FOB' && !frt) {
-        hints.push('FOB：建議填列「運費」');
-    }
-
-    if (terms === 'CFR' && !frt) {
-        hints.push('CFR：建議填列「運費」');
-    }
+    if (terms === 'FOB' && !frt) hints.push('FOB：建議填列「運費」');
+    if (terms === 'CFR' && !frt) hints.push('CFR：建議填列「運費」');
 
     if (terms === 'CIF') {
         if (!frt) hints.push('CIF：建議填列「運費」');
@@ -940,6 +947,7 @@ function showTermsSalesHints() {
 
     if (hints.length > 0) {
         alert(`貿易條件提示（不影響匯出）：\n${hints.join('\n')}\n\n※ 若目前沒有數值，可暫時不填`);
+        termsSalesHintShown = true;   // ⭐ 設為已提示
     }
 }
 
@@ -995,9 +1003,5 @@ const itemToXmlNameMap = {
 
 };
 
-
-
-
-
-
-
+// 全域變數 記錄是否提示過貿易條件
+let termsSalesHintShown = false;
