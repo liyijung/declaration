@@ -147,13 +147,13 @@ function calculateAmounts() {
     if (isEqual) {
         calculationAlerts =
             `【金額核算：項次金額加總比對表頭總金額】\n` +
-            `各項次金額加總為：${currency} ${a.toFixed(decimalPlaces)}\n` +
+            `各項次金額的加總為：${currency} ${a.toFixed(decimalPlaces)}\n` +
             `----------------------------------------------------\n` +
             `報單表頭的總金額為：${currency} ${b.toFixed(decimalPlaces)}【正確】\n`;
     } else {
         calculationAlerts =
             `【金額核算：項次金額加總比對表頭總金額】\n` +
-            `各項次金額加總為：${currency} ${a.toFixed(decimalPlaces)}\n` +
+            `各項次金額的加總為：${currency} ${a.toFixed(decimalPlaces)}\n` +
             `----------------------------------------------------\n` +
             `報單表頭的總金額為：${currency} ${b.toFixed(decimalPlaces)}【錯誤！】\n`;
     }
@@ -261,3 +261,4 @@ function calculate() {
     const statusEl = document.getElementById("calculation-status");
     if (statusEl) statusEl.value = "已執行";
 }
+
