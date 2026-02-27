@@ -99,6 +99,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.QTY, .DOC_UNIT_P').forEach(function (element) {
         element.addEventListener('input', calculateAmount);
     });
+    
+    const termsEl = document.getElementById('TERMS_SALES');
+    if (termsEl && termsEl.dataset.boundTermsHint !== '1') {
+        termsEl.dataset.boundTermsHint = '1';
+        termsEl.addEventListener('input', showTermsSalesHints);
+        termsEl.addEventListener('change', showTermsSalesHints);
+    }
 
     function updateVariables() {
         const appDutyRefund = document.getElementById('APP_DUTY_REFUND');
@@ -230,30 +237,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // 檢查貿易條件
-        let termsSalesValue = document.getElementById('TERMS_SALES')?.value.trim().toUpperCase();
+        showTermsSalesHints();   // 檢查貿易條件(只提示，不擋匯出)
         
-        if (termsSalesValue === 'EXW') {
-        
-            let frtAmt = document.getElementById('FRT_AMT');
-            let addAmt = document.getElementById('ADD_AMT');
-        
-            let emptyFields = [];
-        
-            if (!frtAmt || !frtAmt.value.trim()) {
-                emptyFields.push('運費');
-            }
-        
-            if (!addAmt || !addAmt.value.trim()) {
-                emptyFields.push('應加費用');
-            }
-        
-            if (emptyFields.length > 0) {
-                alert(`當貿易條件為 EXW 時，下列欄位不可為空：\n${emptyFields.join('、')}`);
-                return; // 中止匯出過程
-            }
-        }
-
         const itemRequiredFields = [
             { className: 'DESCRIPTION', name: '品名' },
             { className: 'QTY', name: '數量' },
@@ -922,6 +907,42 @@ function unescapeXml(escaped) {
     });
 }
 
+// ===== 貿易條件提示（不擋匯出）=====
+function showTermsSalesHints() {
+
+    const terms = document.getElementById('TERMS_SALES')?.value.trim().toUpperCase() || '';
+
+    if (!terms) return;
+
+    const frt = document.getElementById('FRT_AMT')?.value.trim() || '';
+    const ins = document.getElementById('INS_AMT')?.value.trim() || '';
+    const add = document.getElementById('ADD_AMT')?.value.trim() || '';
+
+    const hints = [];
+
+    if (terms === 'FOB' && !frt) {
+        hints.push('FOB：建議填列「運費」');
+    }
+
+    if (terms === 'CFR' && !frt) {
+        hints.push('CFR：建議填列「運費」');
+    }
+
+    if (terms === 'CIF') {
+        if (!frt) hints.push('CIF：建議填列「運費」');
+        if (!ins) hints.push('CIF：建議填列「保險費」');
+    }
+
+    if (terms === 'EXW') {
+        if (!frt) hints.push('EXW：建議填列「運費」');
+        if (!add) hints.push('EXW：建議填列「其他應加費用」');
+    }
+
+    if (hints.length > 0) {
+        alert(`貿易條件提示（不影響匯出）：\n${hints.join('\n')}\n\n※ 若目前沒有數值，可暫時不填`);
+    }
+}
+
 // ===== 表頭：XML TAG → 系統欄位 ID =====
 const xmlHeaderNameMap = {
     'DOC_HEAD_DOC_NO': 'FILE_NO',
@@ -973,6 +994,7 @@ const itemToXmlNameMap = {
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
 
 };
+
 
 
 
