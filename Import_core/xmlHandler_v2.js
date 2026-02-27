@@ -232,57 +232,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 檢查貿易條件
         let termsSalesValue = document.getElementById('TERMS_SALES')?.value.trim().toUpperCase();
-
+        
         if (termsSalesValue === 'EXW') {
-            // EXW: FRT_AMT, INS_AMT, SUBTRACT_AMT 不得填列，ADD_AMT 不可為空
-            let invalidFields = [];
-            ['FRT_AMT', 'INS_AMT', 'SUBTRACT_AMT'].forEach(className => {
-                let element = document.getElementById(className);
-                if (element && element.value.trim()) {
-                    invalidFields.push(className === 'FRT_AMT' ? '運費' : className === 'INS_AMT' ? '保險費' : '應減費用');
-                }
-            });
-            if (invalidFields.length > 0) {
-                alert(`當貿易條件為 EXW 時，下列欄位不得填列：\n${invalidFields.join('、')}`);
-                return; // 中止匯出過程
+        
+            let frtAmt = document.getElementById('FRT_AMT');
+            let addAmt = document.getElementById('ADD_AMT');
+        
+            let emptyFields = [];
+        
+            if (!frtAmt || !frtAmt.value.trim()) {
+                emptyFields.push('運費');
             }
-
-            let addAmtElement = document.getElementById('ADD_AMT');
-            if (!addAmtElement || !addAmtElement.value.trim()) {
-                alert('當貿易條件為 EXW 時，應加費用 不可為空');
-                return; // 中止匯出過程
+        
+            if (!addAmt || !addAmt.value.trim()) {
+                emptyFields.push('應加費用');
             }
-        }
-
-        if (termsSalesValue === 'CFR') {
-            // CFR: FRT_AMT 不可為空
-            let frtAmtElement = document.getElementById('FRT_AMT');
-            if (!frtAmtElement || !frtAmtElement.value.trim()) {
-                alert('當貿易條件為 CFR 時，運費 不可為空');
-                return; // 中止匯出過程
-            }
-        }
-
-        if (termsSalesValue === 'C&I') {
-            // C&I: INS_AMT 不可為空
-            let insAmtElement = document.getElementById('INS_AMT');
-            if (!insAmtElement || !insAmtElement.value.trim()) {
-                alert('當貿易條件為 C&I 時，保險費 不可為空');
-                return; // 中止匯出過程
-            }
-        }
-
-        if (termsSalesValue === 'CIF') {
-            // CIF: FRT_AMT, INS_AMT 不可為空
-            let missingFields = [];
-            ['FRT_AMT', 'INS_AMT'].forEach(className => {
-                let element = document.getElementById(className);
-                if (!element || !element.value.trim()) {
-                    missingFields.push(className === 'FRT_AMT' ? '運費' : '保險費');
-                }
-            });
-            if (missingFields.length > 0) {
-                alert(`當貿易條件為 CIF 時，下列欄位不可為空：\n${missingFields.join('、')}`);
+        
+            if (emptyFields.length > 0) {
+                alert(`當貿易條件為 EXW 時，下列欄位不可為空：\n${emptyFields.join('、')}`);
                 return; // 中止匯出過程
             }
         }
@@ -428,6 +395,64 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        // ✅ 檢查：項次金額加總是否等於總金額 CAL_IP_TOT_ITEM_AMT
+        function parseMoney(val) {
+            // 允許空白；去千分位逗號；轉數字
+            const s = String(val ?? '').trim().replace(/,/g, '');
+            if (!s) return 0;
+            const n = parseFloat(s);
+            return isNaN(n) ? NaN : n;
+        }
+        
+        function round2(n) {
+            return Math.round((n + Number.EPSILON) * 100) / 100;
+        }
+        
+        // 取得總金額（表頭）
+        const headerTotal = parseMoney(document.getElementById('CAL_IP_TOT_ITEM_AMT')?.value);
+        
+        // 逐項加總 DOC_TOT_P（忽略大品名註記 ITEM_NO = * 的列）
+        let sumItems = 0;
+        let hasNaN = false;
+        
+        document.querySelectorAll("#item-container .item-row").forEach(item => {
+            const isBigDesc = item.querySelector('.ITEM_NO')?.checked; // 勾選代表 ITEM_NO = *
+            if (isBigDesc) return;
+        
+            const v = parseMoney(item.querySelector('.DOC_TOT_P')?.value);
+            if (isNaN(v)) {
+                hasNaN = true;
+                return;
+            }
+            sumItems += v;
+        });
+        
+        if (hasNaN) {
+            alert('項次金額(金額/DOC_TOT_P) 含有非數字，請確認後再匯出');
+            return; // 中止匯出過程
+        }
+        
+        if (isNaN(headerTotal)) {
+            alert('總金額(CAL_IP_TOT_ITEM_AMT) 含有非數字，請確認後再匯出');
+            return; // 中止匯出過程
+        }
+        
+        // 以「小數兩位」比對（避免浮點誤差）
+        const headerTotal2 = round2(headerTotal);
+        const sumItems2 = round2(sumItems);
+        
+        // 容忍 0.01 的差（你若要更嚴格可改成 0）
+        const diff = round2(sumItems2 - headerTotal2);
+        if (Math.abs(diff) > 0.01) {
+            alert(
+                `項次金額加總與總金額不一致，請確認：\n` +
+                `項次加總(金額) = ${sumItems2}\n` +
+                `總金額 = ${headerTotal2}\n` +
+                `差額(項次-總額) = ${diff}`
+            );
+            return; // 中止匯出過程
+        }
+        
         // 欄位碼數檢查設定
         const fieldLengthChecks = [
             { id: 'FILE_NO', name: '文件編號', validLengths: [10, 11] },
@@ -948,6 +973,7 @@ const itemToXmlNameMap = {
     SELLER_ITEM_CODE: 'BUYER_ITEM_CODE',
 
 };
+
 
 
 
