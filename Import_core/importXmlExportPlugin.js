@@ -313,6 +313,49 @@
 
   // ========== 4) Head 取值 ==========
   function getHeadValue(xmlFieldName, headRevMap = {}) {
+    // ✅ 一對二：HAWB 取 LOT_NO（若 HAWB 本身有值就優先用 HAWB）
+    if (xmlFieldName === 'HAWB') {
+    
+      // 若你的 UI 真的有 HAWB 欄位且有值，先尊重它
+      const hawbEl = document.getElementById('HAWB');
+      const hawbVal = hawbEl ? String(hawbEl.value ?? '').trim() : '';
+      if (hawbVal) return hawbVal;
+    
+      // 否則一律用 LOT_NO 的值
+      const lotEl = document.getElementById('LOT_NO');
+      const lotVal = lotEl ? String(lotEl.value ?? '').trim() : '';
+    
+      if (lotVal !== '') return lotVal;
+    
+      // 最後才補：匯入暫存（避免 round-trip 掉值）
+      const extraHead = window.__IMPORT_XML_EXTRA__?.head;
+      if (extraHead && extraHead.HAWB != null) return String(extraHead.HAWB).trim();
+    
+      return '';
+    }
+
+    // ✅ 一對二：SHPR_CODE 取 SHPR_BAN_ID（若 SHPR_CODE 本身有值就優先用）
+    if (xmlFieldName === 'SHPR_CODE') {
+    
+      // 若 UI 上真的有 SHPR_CODE 且有值 → 優先用
+      const codeEl = document.getElementById('SHPR_CODE');
+      const codeVal = codeEl ? String(codeEl.value ?? '').trim() : '';
+      if (codeVal) return codeVal;
+    
+      // 否則用 SHPR_BAN_ID
+      const banEl = document.getElementById('SHPR_BAN_ID');
+      const banVal = banEl ? String(banEl.value ?? '').trim() : '';
+      if (banVal) return banVal;
+    
+      // 最後補匯入暫存
+      const extraHead = window.__IMPORT_XML_EXTRA__?.head;
+      if (extraHead && extraHead.SHPR_CODE != null) {
+        return String(extraHead.SHPR_CODE).trim();
+      }
+    
+      return '';
+    }
+    
     // 特例：DOC_HEAD_DOC_NO 直接取 FILE_NO；若空，再走 defaults/extra
     if (xmlFieldName === 'DOC_HEAD_DOC_NO') {
       const el = document.getElementById('FILE_NO');
