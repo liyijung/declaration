@@ -187,7 +187,7 @@ function calculateAmounts() {
             }
         });
 
-        // 沒有命中關鍵字才做你原本的行內計算（如果你有這支函式）
+        // 沒有命中關鍵字才做原本的行內計算（如果有這支函式）
         if (matchedKeywords.length === 0 && typeof calculateAmountsForRow === 'function') {
             calculateAmountsForRow(row, decimalPlaces);
         }
@@ -261,4 +261,5 @@ function calculate() {
     const statusEl = document.getElementById("calculation-status");
     if (statusEl) statusEl.value = "已執行";
 }
+
 
