@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const headerTotal2 = round2(headerTotal);
         const sumItems2 = round2(sumItems);
         
-        // 容忍 0.01 的差（你若要更嚴格可改成 0）
+        // 容忍 0.01 的差（若要更嚴格可改成 0）
         const diff = round2(sumItems2 - headerTotal2);
         if (Math.abs(diff) > 0.01) {
             alert(
@@ -1010,6 +1010,7 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
 
 
 
