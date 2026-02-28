@@ -312,7 +312,7 @@
     // ✅ 一對二：HAWB 取 LOT_NO（若 HAWB 本身有值就優先用 HAWB）
     if (xmlFieldName === 'HAWB') {
     
-      // 若你的 UI 真的有 HAWB 欄位且有值，先尊重它
+      // 若 UI 真的有 HAWB 欄位且有值，先尊重它
       const hawbEl = document.getElementById('HAWB');
       const hawbVal = hawbEl ? String(hawbEl.value ?? '').trim() : '';
       if (hawbVal) return hawbVal;
@@ -527,33 +527,97 @@
       newBtn.dataset.lastClickTs = String(now);
   
       try {
-        // ----（以下維持原本邏輯即可）----
-  
-        // 先跑原本系統檢查：若有 alert → 中止
+        // 先跑原本系統檢查：若有 alert → 中止（但要阻止它真的下載）
         if (typeof window.exportToXML === 'function') {
           let blocked = false;
+
+          // 1) 攔 alert：有 alert 代表檢查沒過
           const originalAlert = window.alert;
-  
           window.alert = function (msg) {
             blocked = true;
             originalAlert(msg);
           };
-  
+
+          // 2) 暫時封鎖「原本匯出」所有常見下載途徑
+          const originalDownloadText = window.downloadText;
+          const originalSaveAs = window.saveAs;
+          window.downloadText = function () {};
+          window.saveAs = function () {};
+
+          // 3) 封鎖 <a download> 的 click（很多版本就是這樣下載）
+          const originalAnchorClick = HTMLAnchorElement.prototype.click;
+          HTMLAnchorElement.prototype.click = function () {
+            try {
+              // 只封鎖「下載型」的 click：有 download 屬性或 blob URL
+              const href = String(this.getAttribute('href') || this.href || '');
+              const hasDownload = this.hasAttribute('download') || !!this.download;
+              const isBlob = href.startsWith('blob:') || href.startsWith('data:application/xml');
+
+              if (hasDownload || isBlob) {
+                // 直接阻止下載
+                return;
+              }
+            } catch (e) {}
+            return originalAnchorClick.apply(this, arguments);
+          };
+
           try {
             await window.exportToXML();
+          } catch (err) {
+            console.warn('[importXmlExportPlugin] 原 exportToXML 例外，已略過原下載，改用外掛匯出：', err);
+            // 例外不擋外掛
           } finally {
+            // 還原
             window.alert = originalAlert;
+            window.downloadText = originalDownloadText;
+            window.saveAs = originalSaveAs;
+            HTMLAnchorElement.prototype.click = originalAnchorClick;
           }
-  
+
+          // 原系統檢查沒過 → 外掛也中止
           if (blocked) return;
         }
   
         // 檢查通過 → 外掛匯出
         const xml = buildImportXml();
   
-        const fileNo = (document.getElementById('FILE_NO')?.value || '').trim();
-        const filename = fileNo ? `${fileNo}.xml` : `import.xml`;
-  
+        // ===== 檔名：HAWB + SHPR_CODE + SHPR_C_NAME =====
+        const headRevMapForName = buildHeadReverseMap();
+
+        // 依你既有邏輯取值（UI → 一對二 → extra）
+        const hawb = (
+          document.getElementById('HAWB')?.value ||
+          getHeadValue('HAWB', headRevMapForName) ||
+          ''
+        ).trim();
+
+        const shprCode = (
+          document.getElementById('SHPR_CODE')?.value ||
+          getHeadValue('SHPR_CODE', headRevMapForName) ||
+          ''
+        ).trim();
+
+        const shprCName = (
+          document.getElementById('SHPR_C_NAME')?.value ||
+          getHeadValue('SHPR_C_NAME', headRevMapForName) ||
+          ''
+        ).trim();
+
+        // 檔名安全化
+        const safe = (s) => String(s || '')
+          .replace(/[\\/:*?"<>|]/g, '-')  // Windows 禁用字元
+          .replace(/\s+/g, '')           // 移除空白（若想保留改成 '_'）
+          .replace(/[　]/g, '')          // 全形空白
+          .slice(0, 50);                 // 每段長度限制
+
+        const baseName = [
+          safe(hawb),
+          safe(shprCode),
+          safe(shprCName)
+        ].filter(Boolean).join('_') || 'import';
+
+        const filename = `${baseName}.xml`;
+
         downloadText(filename, xml);
   
       } catch (err) {
