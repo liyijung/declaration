@@ -26,11 +26,15 @@ function openItemModal() {
     document.getElementById('CERT_NO_ITEM').value = savedItemData.CERT_NO_ITEM || '';
     document.getElementById('TARIFF_CODE').value = savedItemData.TARIFF_CODE || '';
     document.getElementById('EXP_NO').value = savedItemData.EXP_NO || '';
-    document.getElementById('EXP_NO2').value = savedItemData.EXP_NO2 || '';
-    document.getElementById('EXP_NO3').value = savedItemData.EXP_NO3 || '';
-    document.getElementById('EXP_NO4').value = savedItemData.EXP_NO4 || '';
-    document.getElementById('EXP_NO5').value = savedItemData.EXP_NO5 || '';
     document.getElementById('EXP_SEQ_NO').value = savedItemData.EXP_SEQ_NO || '';
+    document.getElementById('EXP_NO2').value = savedItemData.EXP_NO2 || '';
+    document.getElementById('EXP_SEQ_NO2').value = savedItemData.EXP_SEQ_NO2 || '';
+    document.getElementById('EXP_NO3').value = savedItemData.EXP_NO3 || '';
+    document.getElementById('EXP_SEQ_NO3').value = savedItemData.EXP_SEQ_NO3 || '';
+    document.getElementById('EXP_NO4').value = savedItemData.EXP_NO4 || '';
+    document.getElementById('EXP_SEQ_NO4').value = savedItemData.EXP_SEQ_NO4 || '';
+    document.getElementById('EXP_NO5').value = savedItemData.EXP_NO5 || '';
+    document.getElementById('EXP_SEQ_NO5').value = savedItemData.EXP_SEQ_NO5 || '';
     document.getElementById('WIDE').value = savedItemData.WIDE || '';
     document.getElementById('WIDE_UM').value = savedItemData.WIDE_UM || '';
     document.getElementById('LENGT_').value = savedItemData.LENGT_ || '';
@@ -128,7 +132,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'ST_MTD', 'NET_WT', 'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
             'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM',
             'SELLER_ITEM_CODE', 'BOND_NOTE', 'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE',
-            'EXP_NO', 'EXP_NO2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'EXP_SEQ_NO', 
+            'EXP_NO', 'EXP_SEQ_NO', 'EXP_NO2', 'EXP_SEQ_NO2', 'EXP_NO3', 'EXP_SEQ_NO3', 
+            'EXP_NO4', 'EXP_SEQ_NO4', 'EXP_NO5', 'EXP_SEQ_NO5', 
             'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_UM' // 'ST_QTY'不複製
         ];
 
@@ -204,11 +209,15 @@ function rememberItemModalData() {
         CERT_NO_ITEM: document.getElementById('CERT_NO_ITEM').value,
         TARIFF_CODE: document.getElementById('TARIFF_CODE').value,
         EXP_NO: document.getElementById('EXP_NO').value,
-        EXP_NO2: document.getElementById('EXP_NO2').value,
-        EXP_NO3: document.getElementById('EXP_NO3').value,
-        EXP_NO4: document.getElementById('EXP_NO4').value,
-        EXP_NO5: document.getElementById('EXP_NO5').value,
         EXP_SEQ_NO: document.getElementById('EXP_SEQ_NO').value,
+        EXP_NO2: document.getElementById('EXP_NO2').value,
+        EXP_SEQ_NO2: document.getElementById('EXP_SEQ_NO2').value,
+        EXP_NO3: document.getElementById('EXP_NO3').value,
+        EXP_SEQ_NO3: document.getElementById('EXP_SEQ_NO3').value,
+        EXP_NO4: document.getElementById('EXP_NO4').value,
+        EXP_SEQ_NO4: document.getElementById('EXP_SEQ_NO4').value,
+        EXP_NO5: document.getElementById('EXP_NO5').value,
+        EXP_SEQ_NO5: document.getElementById('EXP_SEQ_NO5').value,
         WIDE: document.getElementById('WIDE').value,
         WIDE_UM: document.getElementById('WIDE_UM').value,
         LENGT_: document.getElementById('LENGT_').value,
@@ -244,11 +253,15 @@ function clearAllFields() {
     document.getElementById('CERT_NO_ITEM').value = '';
     document.getElementById('TARIFF_CODE').value = '';
     document.getElementById('EXP_NO').value = '';
-    document.getElementById('EXP_NO2').value = '';
-    document.getElementById('EXP_NO3').value = '';
-    document.getElementById('EXP_NO4').value = '';
-    document.getElementById('EXP_NO5').value = '';
     document.getElementById('EXP_SEQ_NO').value = '';
+    document.getElementById('EXP_NO2').value = '';
+    document.getElementById('EXP_SEQ_NO2').value = '';
+    document.getElementById('EXP_NO3').value = '';
+    document.getElementById('EXP_SEQ_NO3').value = '';
+    document.getElementById('EXP_NO4').value = '';
+    document.getElementById('EXP_SEQ_NO4').value = '';
+    document.getElementById('EXP_NO5').value = '';
+    document.getElementById('EXP_SEQ_NO5').value = '';
     document.getElementById('WIDE').value = '';
     document.getElementById('WIDE_UM').value = '';
     document.getElementById('LENGT_').value = '';
@@ -316,11 +329,15 @@ function saveItem() {
         CERT_NO_ITEM: document.getElementById('CERT_NO_ITEM').value.trim(),
         TARIFF_CODE: document.getElementById('TARIFF_CODE').value.trim(),
         EXP_NO: document.getElementById('EXP_NO').value.trim(),
-        EXP_NO2: document.getElementById('EXP_NO2').value.trim(),
-        EXP_NO3: document.getElementById('EXP_NO3').value.trim(),
-        EXP_NO4: document.getElementById('EXP_NO4').value.trim(),
-        EXP_NO5: document.getElementById('EXP_NO5').value.trim(),
         EXP_SEQ_NO: document.getElementById('EXP_SEQ_NO').value.trim(),
+        EXP_NO2: document.getElementById('EXP_NO2').value.trim(),
+        EXP_SEQ_NO2: document.getElementById('EXP_SEQ_NO2').value.trim(),
+        EXP_NO3: document.getElementById('EXP_NO3').value.trim(),
+        EXP_SEQ_NO3: document.getElementById('EXP_SEQ_NO3').value.trim(),
+        EXP_NO4: document.getElementById('EXP_NO4').value.trim(),
+        EXP_SEQ_NO4: document.getElementById('EXP_SEQ_NO4').value.trim(),
+        EXP_NO5: document.getElementById('EXP_NO5').value.trim(),
+        EXP_SEQ_NO5: document.getElementById('EXP_SEQ_NO5').value.trim(),
         WIDE: document.getElementById('WIDE').value.trim(),
         WIDE_UM: document.getElementById('WIDE_UM').value.trim(),
         LENGT_: document.getElementById('LENGT_').value.trim(),
@@ -381,7 +398,8 @@ function applyToggleFieldsToRow(row) {
         'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
         'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
         'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 
-        'EXP_NO', 'EXP_N2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'EXP_SEQ_NO', 
+        'EXP_NO', 'EXP_SEQ_NO', 'EXP_NO2', 'EXP_SEQ_NO2', 'EXP_NO3', 'EXP_SEQ_NO3', 'EXP_NO4', 
+        'EXP_SEQ_NO4', 'EXP_NO5', 'EXP_SEQ_NO5', 
         'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM'
     ];
 

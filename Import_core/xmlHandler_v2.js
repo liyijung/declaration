@@ -534,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return /^\d+$/.test(value);
         }
 
-        // 檢查 ORG_IMP_DCL_NO_ITEM、CERT_NO_ITEM、EXP_SEQ_NO 是否為整數
+        // 檢查 ORG_IMP_DCL_NO_ITEM、CERT_NO_ITEM 是否為整數
         for (let item of document.querySelectorAll("#item-container .item-row")) {
             let invalidItemFields = [];
 
@@ -653,7 +653,8 @@ document.addEventListener('DOMContentLoaded', function () {
             'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC',
             'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
             'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 
-            'EXP_NO', 'EXP_NO2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'EXP_SEQ_NO',
+            'EXP_NO', 'EXP_SEQ_NO','EXP_NO2', 'EXP_SEQ_NO2','EXP_NO3', 'EXP_SEQ_NO3',
+            'EXP_NO4', 'EXP_SEQ_NO4','EXP_NO5', 'EXP_SEQ_NO5',
             'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM',
         ];
 
@@ -1010,7 +1011,6 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
-
 
 
 

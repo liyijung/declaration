@@ -218,11 +218,15 @@ function importToExcel(event) {
             '產證項次': 'CERT_NO_ITEM',
             '稅則附碼': 'TARIFF_CODE',
             '輸入許可號碼': 'EXP_NO',
-            '輸入許可號碼2': 'EXP_NO2',
-            '輸入許可號碼3': 'EXP_NO3',
-            '輸入許可號碼4': 'EXP_NO4',
-            '輸入許可號碼5': 'EXP_NO5',
             '輸入許可項次': 'EXP_SEQ_NO',
+            '輸入許可號碼2': 'EXP_NO2',
+            '輸入許可項次2': 'EXP_SEQ_NO2',
+            '輸入許可號碼3': 'EXP_NO3',
+            '輸入許可項次3': 'EXP_SEQ_NO3',
+            '輸入許可號碼4': 'EXP_NO4',
+            '輸入許可項次4': 'EXP_SEQ_NO4',
+            '輸入許可號碼5': 'EXP_NO5',
+            '輸入許可項次5': 'EXP_SEQ_NO5',
             '寬度(幅寬)': 'WIDE',
             '寬度單位': 'WIDE_UM',
             '長度(幅長)': 'LENGT_',
@@ -300,11 +304,15 @@ function importToExcel(event) {
                     CERT_NO_ITEM: removeThousandsSeparator(String(getValue(row, 'CERT_NO_ITEM') || '')),
                     TARIFF_CODE: String(getValue(row, 'TARIFF_CODE') || '').toUpperCase(),
                     EXP_NO: String(getValue(row, 'EXP_NO') || '').toUpperCase(),
-                    EXP_NO2: String(getValue(row, 'EXP_NO2') || '').toUpperCase(),
-                    EXP_NO3: String(getValue(row, 'EXP_NO3') || '').toUpperCase(),
-                    EXP_NO4: String(getValue(row, 'EXP_NO4') || '').toUpperCase(),
-                    EXP_NO5: String(getValue(row, 'EXP_NO5') || '').toUpperCase(),
                     EXP_SEQ_NO: removeThousandsSeparator(String(getValue(row, 'EXP_SEQ_NO') || '')),
+                    EXP_NO2: String(getValue(row, 'EXP_NO2') || '').toUpperCase(),
+                    EXP_SEQ_NO2: removeThousandsSeparator(String(getValue(row, 'EXP_SEQ_NO2') || '')),
+                    EXP_NO3: String(getValue(row, 'EXP_NO3') || '').toUpperCase(),
+                    EXP_SEQ_NO3: removeThousandsSeparator(String(getValue(row, 'EXP_SEQ_NO3') || '')),
+                    EXP_NO4: String(getValue(row, 'EXP_NO4') || '').toUpperCase(),
+                    EXP_SEQ_NO4: removeThousandsSeparator(String(getValue(row, 'EXP_SEQ_NO4') || '')),
+                    EXP_NO5: String(getValue(row, 'EXP_NO5') || '').toUpperCase(),
+                    EXP_SEQ_NO5: removeThousandsSeparator(String(getValue(row, 'EXP_SEQ_NO5') || '')),
                     WIDE: removeThousandsSeparator(String(getValue(row, 'WIDE') || '')),
                     WIDE_UM: String(getValue(row, 'WIDE_UM') || ''),
                     LENGT_: removeThousandsSeparator(String(getValue(row, 'LENGT_') || '')),
@@ -422,7 +430,8 @@ function exportToExcel() {
         '稅則', '稅率', '納稅辦法', '淨重', '生產國別', '商標', '型號', '規格', 
         '原出口報單號碼', '原出口報單項次', 
         '買方料號', '保稅貨物註記', '產證號碼', '產證項次', '稅則附碼',
-        '輸入許可號碼', '輸入許可號碼2', '輸入許可號碼3', '輸入許可號碼4', '輸入許可號碼5',
+        '輸入許可號碼', '輸入許可項次', '輸入許可號碼2', '輸入許可項次2', '輸入許可號碼3', '輸入許可項次3', 
+        '輸入許可號碼4', '輸入許可項次4', '輸入許可號碼5', '輸入許可項次5', 
         '寬度(幅寬)', '寬度單位', '長度(幅長)', '長度單位', '統計數量', '統計單位']
     ];
 
@@ -485,11 +494,15 @@ function exportToExcel() {
             item.querySelector('.CERT_NO_ITEM').value || '', // 產證項次
             item.querySelector('.TARIFF_CODE').value || '', // '稅則附碼'
             item.querySelector('.EXP_NO').value || '', // 輸入許可號碼
-            item.querySelector('.EXP_NO2').value || '', // 輸入許可號碼2
-            item.querySelector('.EXP_NO3').value || '', // 輸入許可號碼3
-            item.querySelector('.EXP_NO4').value || '', // 輸入許可號碼4
-            item.querySelector('.EXP_NO5').value || '', // 輸入許可號碼5
             item.querySelector('.EXP_SEQ_NO').value || '', // 輸入許可項次
+            item.querySelector('.EXP_NO2').value || '', // 輸入許可號碼2
+            item.querySelector('.EXP_SEQ_NO2').value || '', // 輸入許可項次2
+            item.querySelector('.EXP_NO3').value || '', // 輸入許可號碼3
+            item.querySelector('.EXP_SEQ_NO3').value || '', // 輸入許可項次3
+            item.querySelector('.EXP_NO4').value || '', // 輸入許可號碼4
+            item.querySelector('.EXP_SEQ_NO4').value || '', // 輸入許可項次4
+            item.querySelector('.EXP_NO5').value || '', // 輸入許可號碼5
+            item.querySelector('.EXP_SEQ_NO5').value || '', // 輸入許可項次5
             item.querySelector('.WIDE').value || '', // 寬度
             replaceValue('WIDE_UM', item.querySelector('.WIDE_UM').value || ''), // 寬度單位
             item.querySelector('.LENGT_').value || '', // 長度

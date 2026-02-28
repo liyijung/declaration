@@ -267,11 +267,15 @@ function createItemRow(data) {
         ${createInputField('CERT_NO_ITEM', data.CERT_NO_ITEM, fieldsToShow.CERT_NO_ITEM)}
         ${createInputField('TARIFF_CODE', data.TARIFF_CODE, fieldsToShow.TARIFF_CODE)}
         ${createInputField('EXP_NO', data.EXP_NO, fieldsToShow.EXP_NO)}
-        ${createInputField('EXP_NO2', data.EXP_NO2, fieldsToShow.EXP_NO2)}
-        ${createInputField('EXP_NO3', data.EXP_NO3, fieldsToShow.EXP_NO3)}
-        ${createInputField('EXP_NO4', data.EXP_NO4, fieldsToShow.EXP_NO4)}
-        ${createInputField('EXP_NO5', data.EXP_NO5, fieldsToShow.EXP_NO5)}
         ${createInputField('EXP_SEQ_NO', data.EXP_SEQ_NO, fieldsToShow.EXP_SEQ_NO)}
+        ${createInputField('EXP_NO2', data.EXP_NO2, fieldsToShow.EXP_NO2)}
+        ${createInputField('EXP_SEQ_NO2', data.EXP_SEQ_NO2, fieldsToShow.EXP_SEQ_NO2)}
+        ${createInputField('EXP_NO3', data.EXP_NO3, fieldsToShow.EXP_NO3)}
+        ${createInputField('EXP_SEQ_NO3', data.EXP_SEQ_NO3, fieldsToShow.EXP_SEQ_NO3)}
+        ${createInputField('EXP_NO4', data.EXP_NO4, fieldsToShow.EXP_NO4)}
+        ${createInputField('EXP_SEQ_NO4', data.EXP_SEQ_NO4, fieldsToShow.EXP_SEQ_NO4)}
+        ${createInputField('EXP_NO5', data.EXP_NO5, fieldsToShow.EXP_NO5)}
+        ${createInputField('EXP_SEQ_NO5', data.EXP_SEQ_NO5, fieldsToShow.EXP_SEQ_NO5)}
         ${createInputField('WIDE', data.WIDE, fieldsToShow.WIDE)}
         ${createInputField('WIDE_UM', replaceValue('WIDE_UM', data.WIDE_UM), fieldsToShow.WIDE_UM)}
         ${createInputField('LENGT_', data.LENGT_, fieldsToShow.LENGT_)}
@@ -360,7 +364,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
     let originalValue = value; // 儲存原始值，確保在錯誤時可讀取
     try {
         const visibilityClass = isVisible ? '' : 'hidden';
-        const numberFields = ['QTY', 'DOC_UNIT_P', 'DOC_TOT_P', 'NET_WT', 'ORG_IMP_DCL_NO_ITEM', 'CERT_NO_ITEM', 'EXP_SEQ_NO', 'WIDE', 'LENGT_', 'ST_QTY'];
+        const numberFields = ['QTY', 'DOC_UNIT_P', 'DOC_TOT_P', 'NET_WT', 'ORG_IMP_DCL_NO_ITEM', 'CERT_NO_ITEM', 'EXP_SEQ_NO', 'EXP_SEQ_NO2', 'EXP_SEQ_NO3', 'EXP_SEQ_NO4', 'EXP_SEQ_NO5', 'WIDE', 'LENGT_', 'ST_QTY'];
         const upperCaseFields = ['LOT_NO', 'SHPR_BONDED_ID', 'CNEE_COUNTRY_CODE', 'DOC_CTN_UM', 'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'DOC_UM', 'ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 'BOND_NOTE', 'CERT_NO', 'EXP_NO', 'EXP_NO2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'WIDE_UM', 'LENGTH_UM', 'ST_UM'];
         const inputType = numberFields.includes(name) ? 'number' : 'text';
         const onInputAttribute = numberFields.includes(name) ? 'oninput="calculateAmount(event); validateNumberInput(event)"' : '';
@@ -425,7 +429,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
                     ${inputField}
                 </div>
             `;
-        } else if (['ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO_ITEM', 'BOND_NOTE', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_SEQ_NO'].includes(name)) {
+        } else if (['ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO_ITEM', 'BOND_NOTE', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_SEQ_NO', 'EXP_SEQ_NO2', 'EXP_SEQ_NO3', 'EXP_SEQ_NO4', 'EXP_SEQ_NO5'].includes(name)) {
             return `
                 <div class="form-group ${visibilityClass}" style="width: 30%;">
                     ${inputField}
@@ -479,11 +483,15 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
             CERT_NO_ITEM: "產證項次",
             TARIFF_CODE: "稅則附碼",
             EXP_NO: "輸入許可號碼",
-            EXP_NO2: "輸入許可號碼2",
-            EXP_NO3: "輸入許可號碼3",
-            EXP_NO4: "輸入許可號碼4",
-            EXP_NO5: "輸入許可號碼5",
             EXP_SEQ_NO: "輸入許可項次",
+            EXP_NO2: "輸入許可號碼2",
+            EXP_SEQ_NO2: "輸入許可項次2",
+            EXP_NO3: "輸入許可號碼3",
+            EXP_SEQ_NO3: "輸入許可項次3",
+            EXP_NO4: "輸入許可號碼4",
+            EXP_SEQ_NO4: "輸入許可項次4",
+            EXP_NO5: "輸入許可號碼5",
+            EXP_SEQ_NO5: "輸入許可項次5",
             WIDE: "寬度(幅寬)",
             WIDE_UM: "寬度單位",
             LENGT_: "長度(幅長)",

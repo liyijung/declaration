@@ -39,7 +39,8 @@ function applyToggleFields() {
         'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'TAX_RATE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
         'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
         'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE', 
-        'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_NO2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'EXP_SEQ_NO', 
+        'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_SEQ_NO', 'EXP_NO2', 'EXP_SEQ_NO2', 
+        'EXP_NO3', 'EXP_SEQ_NO3', 'EXP_NO4', 'EXP_SEQ_NO4', 'EXP_NO5', 'EXP_SEQ_NO5', 
         'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM'
     ];
 
@@ -85,7 +86,8 @@ function initializeFieldVisibility() {
         'DESCRIPTION', 'QTY', 'DOC_UM', 'DOC_UNIT_P', 'DOC_TOT_P', 'CCC_CODE', 'TAX_RATE', 'ST_MTD', 'ISCALC_WT', 'NET_WT',
         'ORG_COUNTRY', 'TRADE_MARK', 'GOODS_MODEL', 'GOODS_SPEC', 
         'ORG_IMP_DCL_NO', 'ORG_IMP_DCL_NO_ITEM', 'SELLER_ITEM_CODE', 'BOND_NOTE',
-        'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_NO2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'EXP_SEQ_NO', 
+        'CERT_NO', 'CERT_NO_ITEM', 'TARIFF_CODE', 'EXP_NO', 'EXP_SEQ_NO', 'EXP_NO2', 'EXP_SEQ_NO2', 
+        'EXP_NO3', 'EXP_SEQ_NO3', 'EXP_NO4', 'EXP_SEQ_NO4', 'EXP_NO5', 'EXP_SEQ_NO5', 
         'WIDE', 'WIDE_UM', 'LENGT_', 'LENGTH_UM', 'ST_QTY', 'ST_UM'
     ];
 
@@ -201,6 +203,14 @@ const fieldsToShow = {
     TARIFF_CODE: false,
     EXP_NO: false,
     EXP_SEQ_NO: false,
+    EXP_NO2: false,
+    EXP_SEQ_NO2: false,
+    EXP_NO3: false,
+    EXP_SEQ_NO3: false,
+    EXP_NO4: false,
+    EXP_SEQ_NO4: false,
+    EXP_NO5: false,
+    EXP_SEQ_NO5: false,
     WIDE: false,
     WIDE_UM: false,
     LENGT_: false,
