@@ -221,8 +221,9 @@
     ORIGIN_CERTIFICATE_NO: 'CERT_NO',
     ORIGIN_CERTIFICATE_ITEM: 'CERT_NO_ITEM',
     org_EXP_DCL_NO: 'ORG_IMP_DCL_NO',
-    org_EXP_DCL_ITEM: 'ORG_IMP_DCL_NO_ITEM'
-    // 其餘同名欄位（如 SELLER_ITEM_CODE / GOODS_MODEL / GOODS_SPEC ...）不需要寫
+    org_EXP_DCL_ITEM: 'ORG_IMP_DCL_NO_ITEM',
+    BUYER_ITEM_CODE: 'SELLER_ITEM_CODE'
+    // 其餘同名欄位（如 GOODS_MODEL / GOODS_SPEC ...）不需要寫
   };
 
   // Item：系統 className -> XML欄位名
