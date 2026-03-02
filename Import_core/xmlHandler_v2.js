@@ -451,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // 欄位碼數檢查設定
         const fieldLengthChecks = [
-            { id: 'FILE_NO', name: '文件編號', validLengths: [10, 11] },
+            { id: 'FILE_NO', name: '文件編號', validLengths: [12] },
             { id: 'SHPR_BONDED_ID', name: '海關監管編號', validLengths: [5] },
             { id: 'CNEE_COUNTRY_CODE', name: '賣方國家代碼', validLengths: [2] },
             { id: 'DOC_CTN_UM', name: '總件數單位', validLengths: [3] },
@@ -699,20 +699,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // 對 FILE_NO 欄位進行處理
                 if (id === 'FILE_NO') {
-                    // 改節點名稱為 DOC_HEAD_DOC_NO
                     let tagName = 'DOC_HEAD_DOC_NO';
-
-                    // 取出原始值並去除空白
                     let fileNo = value.trim();
-
-                    // 若為11碼且第8碼為0，則改為前7碼 + 後3碼
-                    if (fileNo.length === 11 && fileNo.charAt(7) === '0') {
-                        fileNo = fileNo.substring(0, 7) + fileNo.substring(8, 11);
-                    }
-
-                    // 將處理後的值加到 XML
-                    xmlContent += `  <fields>\n    <field_name>${tagName}</field_name>\n    <field_value>${fileNo}</field_value>\n  </fields>\n`;
-                    return; // 已處理完 FILE_NO，不再走通用流程
+                
+                    xmlContent += `  <fields>
+                    <field_name>${tagName}</field_name>
+                    <field_value>${fileNo}</field_value>
+                  </fields>\n`;
+                    return;
                 }
 
                 // 對 LOT_NO 欄位進行處理
@@ -1011,6 +1005,7 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
 
 
 
