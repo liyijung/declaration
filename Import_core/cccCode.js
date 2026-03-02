@@ -613,7 +613,9 @@ function updateFields(inputElement, item) {
         if (stum) stum.value = '';
     }
 
-    initializeDimensionListeners(itemRow);
+    if (itemRow) {
+      initializeDimensionListeners(itemRow);
+    }
 }
 
 // 清空 QTY、DOC_UM、ST_QTY 和 ST_UM 欄位
@@ -787,3 +789,4 @@ function hideTooltip() {
         tooltip.style.display = 'none';
     }
 }
+
