@@ -87,7 +87,6 @@
     'PER',
     'DOC_TOT_P',
     'BUYER_ITEM_CODE',
-    'SELLER_ITEM_CODE',
     'GOODS_BRAND',
     'GOODS_MODEL',
     'GOODS_SPEC',
