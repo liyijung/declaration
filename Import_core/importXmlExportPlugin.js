@@ -177,12 +177,18 @@
 
   // ✅ 固定值（只放確認永遠固定的）
   const HEAD_DEFAULTS = {
-      DCL_COMP_ID: 'B',           // 報關分公司
-      BROKER_BOX_NO: '709',       // 箱號
-      LICENCED_AGENT_NO: '00755', // 專責代碼
-      AIR_SEA: '4',               // 海空運別
-      TRANS_VIA: '41',            // 運輸方式
-      WAREHOUSE: 'C2051'          // 卸存地一
+      DCL_COMP_ID: 'B',              // 報關分公司
+      BROKER_BOX_NO: '709',          // 箱號
+      LICENCED_AGENT_NO: '00755',    // 專責代碼
+      AIR_SEA: '4',                  // 海空運別
+      TRANS_VIA: '41',               // 運輸方式
+      WAREHOUSE: 'C2051',            // 卸存地一
+      CO_PACKING_NOTE: 'N',          // 合成註記
+      APP_PERMIT: 'N',               // 已否簽證
+      STOCK_IN_CTN: '0',             // 本批來倉件數
+      DOC_RELATIONS: '135',          // 特殊關係
+      MESSAGE_TYPE: '9',             // 異動別
+      DCL_DOC_NO: 'CX/  /15/709/',   // 報單號碼(當年度)
   };
 
 
