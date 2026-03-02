@@ -3,6 +3,7 @@ function handleCCCCodeEnter(event, inputElement) {
     if (!inputElement || !inputElement.value.trim()) return; // 確保 inputElement 存在且有值
     if (event.key === 'Enter') {
         event.preventDefault();
+        
         openTaxModal(inputElement); // 打開彈跳框
         searchTariff(inputElement, true); // 查詢稅則數據
 
@@ -119,6 +120,7 @@ function searchTariff(inputElement, isModal = true) {
     hint.style.color = '#0000b7'; // 自定義提示訊息顏色
     resultsDiv.appendChild(hint);
 
+    if (!Array.isArray(window.taxData)) return;
     const results = window.taxData.filter(item => {
         const cleanedItemCode = item['貨品分類號列'].toString().toLowerCase().replace(/[.\-\s]/g, '');
         return cleanedItemCode.startsWith(keyword) ||
@@ -477,7 +479,8 @@ function updateTariff(inputElement, keyword = '') {
         clearFields(inputElement); // 如果 keyword 不是 11 位，清空相關欄位
         return;
     }
-
+    
+    if (!Array.isArray(window.taxData)) return;
     const results = window.taxData.filter(item => {
         const cleanedItemCode = item['貨品分類號列'].toString().toLowerCase().replace(/[.\-\s]/g, '');
         return cleanedItemCode.startsWith(keyword);
@@ -504,7 +507,10 @@ function updateTariff(inputElement, keyword = '') {
         if (tariffCode && certNoVal && certNoItemVal) {
             tariffCode.value = 'PT';
         }
-        
+
+        const hasImportReg = String(item['輸入規定'] ?? '').trim().length > 0;
+        inputElement.classList.toggle('highlight-ccc', hasImportReg);
+
         updateFields(inputElement, item); // 更新欄位
     } else {
         clearFields(inputElement); // 若無匹配結果，清空相關欄位
@@ -645,6 +651,7 @@ function initializeCCCCodeInputs() {
     inputs.forEach(input => {
         input.addEventListener('input', (event) => handleCCCCodeInput(event, input));
         input.addEventListener('change', (event) => handleCCCCodeInput(event, input));
+        input.addEventListener('keydown', (event) => handleCCCCodeEnter(event, input));
     });
 }
 
