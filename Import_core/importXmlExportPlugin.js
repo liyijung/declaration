@@ -133,6 +133,7 @@
     'P_QTY',
     'P_UM',
     'ISCALC_WT',
+    'SALES_TAX',
     'NET_WT',
     'INN',
     'IND',
@@ -409,6 +410,31 @@
     // ITEM_NO：沿用系統「勾選則 *，否則連號」習慣
     if (xmlFieldName === 'ITEM_NO') return null; // 外面統一處理
 
+    // ✅ 特例：SALES_TAX 由「報單類別(DCL_DOC_TYPE) + 納稅辦法(ST_MTD)」判斷覆寫
+    if (xmlFieldName === 'SALES_TAX') {
+      // 報單類別（Head）
+      const docType = String(getHeadValue('DCL_DOC_TYPE', buildHeadReverseMap()) || '')
+        .trim()
+        .toUpperCase();
+
+      // 納稅辦法（Item：TAX_METHOD -> ST_MTD）
+      const stMtd = String(itemRow.querySelector('.ST_MTD')?.value || '')
+        .trim()
+        .toUpperCase();
+
+      const key = `${docType}-${stMtd}`;
+      const ok = (
+        key === 'G7-55' ||
+        key === 'G7-99' ||
+        key === 'B6-56' ||
+        key === 'B6-58' ||
+        key === 'B6-5C' ||
+        key === 'B6-5Y'
+      );
+
+      return ok ? 'T' : 'F';
+    }
+
     // (a) 如果 class 同名
     let input = itemRow.querySelector(`.${xmlFieldName}`);
 
@@ -541,12 +567,24 @@
         if (typeof window.exportToXML === 'function') {
           let blocked = false;
 
-          // 1) 攔 alert：有 alert 代表檢查沒過
-          const originalAlert = window.alert;
-          window.alert = function (msg) {
-            blocked = true;
-            originalAlert(msg);
-          };
+        // 1) 攔 alert：只有真正錯誤才中止匯出
+        const originalAlert = window.alert;
+        window.alert = function (msg) {
+
+          const text = String(msg ?? '');
+
+          // 如果是「提示（不中止匯出）」就放行
+          const isHint =
+            text.includes('不中止匯出') ||
+            text.includes('提示（不中止匯出）') ||
+            text.includes('提示 (不中止匯出)');
+
+          if (!isHint) {
+            blocked = true;   // 只有真正錯誤才阻擋
+          }
+
+          originalAlert(msg);
+        };
 
           // 2) 暫時封鎖「原本匯出」所有常見下載途徑
           const originalDownloadText = window.downloadText;
