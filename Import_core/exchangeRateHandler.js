@@ -200,7 +200,8 @@ async function calculateInsurance() {
     }
 
     if (!isNaN(totalAmount)) {
-        let insurance = totalAmount * 0.0011;
+        const INS_RATE = 0.0011; // 保險費率
+        let insurance = totalAmount * INS_RATE / (1 + INS_RATE);
         const usdRate = parseFloat(document.getElementById('usd-exchange-rate').value);
         const minimumUSD = 15;
         const minimumInsurance = (minimumUSD * usdRate) / currencyRate; // 換算成當地幣別的最低保費
@@ -471,3 +472,4 @@ function makeModalDraggable(modalId, handleId) {
         document.body.style.userSelect = '';
     }
 }
+
