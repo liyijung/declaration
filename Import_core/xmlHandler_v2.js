@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const copy3 = document.getElementById('copy_3');
         const copy5 = document.getElementById('copy_5');
 
+        /*
         // 更新 APP_DUTY_REFUND 和 MARK_TOT_LINES
         appDutyRefund.value = (copy3.checked) ? 'Y' : 'N';
         markTotLines.value = (copy3.checked) ? 'Y' : 'N';
@@ -140,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
             examType.value = '';
             copyQty.value = '0';
         }
+        */
 
         // 用於顯示變數值的控制台日誌
         console.log("APP_DUTY_REFUND: " + appDutyRefund.value);
@@ -1006,6 +1008,7 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
 
 
 
