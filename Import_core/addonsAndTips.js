@@ -174,7 +174,7 @@ function parseCustomDate(dateString) {
     const fullYear = parseInt(year, 10) + 1911;
     return new Date(`${fullYear}-${month}-${day}`);
 }
-
+/*
 function handleCheck() {
     const SHPR_BAN_ID = document.getElementById('SHPR_BAN_ID').value.trim();
     const docOtrDesc = document.getElementById('DOC_OTR_DESC');
@@ -212,6 +212,7 @@ function handleCheck() {
         }        
     });
 };
+*/
 
 // 綁定輸入框事件
 document.getElementById('SHPR_BAN_ID').addEventListener('input', handleCheck);
@@ -756,3 +757,4 @@ $(function () {
         return `${rocYear}/${month}/${day}`;
     }
 });
+
