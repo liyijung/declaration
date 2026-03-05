@@ -667,7 +667,10 @@ Alt + 2 指定項次">攤重</button>
                 </div>
                 <div class="form-group LENGTH_UM hidden" style="width: 40%;">
                     <label>長度單位</label>
-                </div>     
+                </div>
+                <div class="form-group GOV_ASGN_NO hidden" style="width: 40%;">
+                    <label>主管機關指定代號</label>
+                </div>
                 <div class="form-group ST_QTY hidden" style="width: 60%;">
                     <label>統計數量</label>
                 </div>  
@@ -877,7 +880,14 @@ Alt + 2 指定項次">攤重</button>
                 <label for="LENGTH_UM">長度單位</label>
                 <input type="text" id="LENGTH_UM" class="LENGTH_UM"
                 placeholder="範例：INC、YRD、MTR(英文代碼)">
-            </div> 
+            </div>
+            <hr>
+            <div class="header-group">主管機關指定代碼(容器類)</div>
+            <div class="header-group">
+                <label for="GOV_ASGN_NO">主管機關</label>
+                <input type="text" id="GOV_ASGN_NO" class="GOV_ASGN_NO"
+                placeholder="範例：Z00(共三碼)">
+            </div>            
             <hr>
             <div class="header-group">與數量單位不同另外填列</div>
             <div class="header-group">
@@ -978,6 +988,8 @@ Alt + 2 指定項次">攤重</button>
                         <option value="WIDE_UM">寬度單位</option>
                         <option value="LENGT_">長度(幅長)</option>
                         <option value="LENGTH_UM">長度單位</option>
+                        <option class="separator" disabled>主管機關指定代碼(容器類)</option>
+                        <option value="GOV_ASGN_NO">主管機關指定代號</option>
                         <option class="separator" disabled>與數量單位不同另外填列</option>
                         <option value="ST_QTY">統計數量</option>
                     </select>
@@ -1042,6 +1054,8 @@ Alt + 2 指定項次">攤重</button>
                         <option value="WIDE_UM">寬度單位</option>
                         <option value="LENGT_">長度(幅長)</option>
                         <option value="LENGTH_UM">長度單位</option>
+                        <option class="separator" disabled>主管機關指定代碼(容器類)</option>
+                        <option value="GOV_ASGN_NO">主管機關指定代號</option>
                         <option class="separator" disabled>與數量單位不同另外填列</option>
                         <option value="ST_QTY">統計數量</option>
                     </select>
@@ -1106,6 +1120,8 @@ Alt + 2 指定項次">攤重</button>
                     <option value="WIDE_UM">寬度單位</option>
                     <option value="LENGT_">長度(幅長)</option>
                     <option value="LENGTH_UM">長度單位</option>
+                    <option class="separator" disabled>主管機關指定代碼(容器類)</option>
+                    <option value="GOV_ASGN_NO">主管機關指定代號</option>
                     <option class="separator" disabled>與數量單位不同另外填列</option>
                     <option value="ST_QTY">統計數量</option>
                     <option value="ST_UM">統計單位</option>
@@ -1186,6 +1202,8 @@ Alt + 2 指定項次">攤重</button>
                     <option value="WIDE_UM">寬度單位</option>
                     <option value="LENGT_">長度(幅長)</option>
                     <option value="LENGTH_UM">長度單位</option>
+                    <option class="separator" disabled>主管機關指定代碼(容器類)</option>
+                    <option value="GOV_ASGN_NO">主管機關指定代號</option>
                     <option class="separator" disabled>與數量單位不同另外填列</option>
                     <option value="ST_QTY">統計數量</option>
                     <option value="ST_UM">統計單位</option>
