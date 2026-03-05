@@ -222,8 +222,8 @@ function applyFieldData() {
 
     // 需要強制轉為大寫的欄位
     const upperCaseFields = [
-        "DOC_UM", "ST_MTD", "ORG_COUNTRY", "ORG_IMP_DCL_NO", "BOND_NOTE", 
-        "CERT_NO", "EXP_NO", "EXP_NO2", "EXP_NO3", "EXP_NO4", "EXP_NO5", "WIDE_UM", "LENGTH_UM"
+        "DOC_UM", "ST_MTD", "ORG_COUNTRY", "ORG_IMP_DCL_NO", "BOND_NOTE", "CERT_NO", 
+        "EXP_NO", "EXP_NO2", "EXP_NO3", "EXP_NO4", "EXP_NO5", "WIDE_UM", "LENGTH_UM", 'GOV_ASGN_NO',
     ];
 
     if (mode === 'custom') {

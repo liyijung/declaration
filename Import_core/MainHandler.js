@@ -112,7 +112,7 @@ const fieldIds = [
     "LOT_NO", "SHPR_BAN_ID", "SHPR_BONDED_ID", "CNEE_COUNTRY_CODE", "LOADING_LOCATION", "DOC_CTN_UM",
     "DCL_DOC_TYPE", "TERMS_SALES", "CURRENCY", "DOC_UM", "ST_MTD", "ORG_COUNTRY",
     "ORG_IMP_DCL_NO", "BOND_NOTE", "CERT_NO", "EXP_NO", "EXP_NO2", "EXP_NO3", "EXP_NO4", "EXP_NO5", 
-    "WIDE_UM", "LENGTH_UM", "ST_UM"
+    "WIDE_UM", "LENGTH_UM", "GOV_ASGN_NO", "ST_UM"
 ];
 
 // 對每個欄位設置自動轉換為大寫的功能
@@ -280,6 +280,7 @@ function createItemRow(data) {
         ${createInputField('WIDE_UM', replaceValue('WIDE_UM', data.WIDE_UM), fieldsToShow.WIDE_UM)}
         ${createInputField('LENGT_', data.LENGT_, fieldsToShow.LENGT_)}
         ${createInputField('LENGTH_UM', replaceValue('LENGTH_UM', data.LENGTH_UM), fieldsToShow.LENGTH_UM)}
+        ${createInputField('GOV_ASGN_NO', replaceValue('GOV_ASGN_NO', data.GOV_ASGN_NO), fieldsToShow.GOV_ASGN_NO)}
         ${createInputField('ST_QTY', data.ST_QTY, fieldsToShow.ST_QTY)}
         ${createInputField('ST_UM', replaceValue('ST_UM', data.ST_UM), fieldsToShow.ST_UM)}
         <div class="form-group fix">
@@ -365,7 +366,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
     try {
         const visibilityClass = isVisible ? '' : 'hidden';
         const numberFields = ['QTY', 'DOC_UNIT_P', 'DOC_TOT_P', 'NET_WT', 'ORG_IMP_DCL_NO_ITEM', 'CERT_NO_ITEM', 'EXP_SEQ_NO', 'EXP_SEQ_NO2', 'EXP_SEQ_NO3', 'EXP_SEQ_NO4', 'EXP_SEQ_NO5', 'WIDE', 'LENGT_', 'ST_QTY'];
-        const upperCaseFields = ['LOT_NO', 'SHPR_BONDED_ID', 'CNEE_COUNTRY_CODE', 'DOC_CTN_UM', 'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'DOC_UM', 'ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 'BOND_NOTE', 'CERT_NO', 'EXP_NO', 'EXP_NO2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'WIDE_UM', 'LENGTH_UM', 'ST_UM'];
+        const upperCaseFields = ['LOT_NO', 'SHPR_BONDED_ID', 'CNEE_COUNTRY_CODE', 'DOC_CTN_UM', 'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'DOC_UM', 'ST_MTD', 'ORG_COUNTRY', 'ORG_IMP_DCL_NO', 'BOND_NOTE', 'CERT_NO', 'EXP_NO', 'EXP_NO2', 'EXP_NO3', 'EXP_NO4', 'EXP_NO5', 'WIDE_UM', 'LENGTH_UM', 'GOV_ASGN_NO', 'ST_UM'];
         const inputType = numberFields.includes(name) ? 'number' : 'text';
         const onInputAttribute = numberFields.includes(name) ? 'oninput="calculateAmount(event); validateNumberInput(event)"' : '';
         const minAttribute = numberFields.includes(name) ? 'min="0"' : '';
@@ -423,7 +424,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
                     ${inputField}
                 </div>
             `;
-        } else if (['DOC_UM', 'WIDE_UM', 'LENGTH_UM', 'ST_UM'].includes(name)) {
+        } else if (['DOC_UM', 'WIDE_UM', 'LENGTH_UM', 'GOV_ASGN_NO', 'ST_UM'].includes(name)) {
             return `
                 <div class="form-group ${visibilityClass}" style="width: 40%;">
                     ${inputField}
@@ -496,6 +497,7 @@ function createInputField(name, value, isVisible, iscalcWtValue) {
             WIDE_UM: "寬度單位",
             LENGT_: "長度(幅長)",
             LENGTH_UM: "長度單位",
+            GOV_ASGN_NO: "主管機關指定代號",
             ST_QTY: "統計數量",
             ST_UM: "統計單位"
         };
@@ -862,7 +864,7 @@ Papa.parse(csvUrl, {
 });
 
 function replaceValue(className, value) {
-    if (className === 'DOC_UM' || className === 'WIDE_UM' || className === 'LENGTH_UM' || className === 'ST_UM' || className === 'CCC_CODE') {
+    if (className === 'DOC_UM' || className === 'WIDE_UM' || className === 'LENGTH_UM' || className === 'GOV_ASGN_NO' || className === 'ST_UM' || className === 'CCC_CODE') {
         // 確保值是字串
         if (typeof value !== 'string') {
             value = String(value);

@@ -231,6 +231,7 @@ function importToExcel(event) {
             '寬度單位': 'WIDE_UM',
             '長度(幅長)': 'LENGT_',
             '長度單位': 'LENGTH_UM',
+            '主管機關指定代號': 'GOV_ASGN_NO',
             '統計數量': 'ST_QTY',
             '統計單位': 'ST_UM'
         };
@@ -317,6 +318,7 @@ function importToExcel(event) {
                     WIDE_UM: String(getValue(row, 'WIDE_UM') || ''),
                     LENGT_: removeThousandsSeparator(String(getValue(row, 'LENGT_') || '')),
                     LENGTH_UM: String(getValue(row, 'LENGTH_UM') || ''),
+                    GOV_ASGN_NO: String(getValue(row, 'GOV_ASGN_NO') || ''),
                     ST_QTY: removeThousandsSeparator(String(getValue(row, 'ST_QTY') || '')),
                     ST_UM: String(getValue(row, 'ST_UM') || '')
                 });
@@ -432,7 +434,7 @@ function exportToExcel() {
         '買方料號', '保稅貨物註記', '產證號碼', '產證項次', '稅則附碼',
         '輸入許可號碼', '輸入許可項次', '輸入許可號碼2', '輸入許可項次2', '輸入許可號碼3', '輸入許可項次3', 
         '輸入許可號碼4', '輸入許可項次4', '輸入許可號碼5', '輸入許可項次5', 
-        '寬度(幅寬)', '寬度單位', '長度(幅長)', '長度單位', '統計數量', '統計單位']
+        '寬度(幅寬)', '寬度單位', '長度(幅長)', '長度單位', '主管機關指定代號', '統計數量', '統計單位']
     ];
 
     let itemNoCounter = 0; // 計算有效的 ITEM_NO
@@ -507,6 +509,7 @@ function exportToExcel() {
             replaceValue('WIDE_UM', item.querySelector('.WIDE_UM').value || ''), // 寬度單位
             item.querySelector('.LENGT_').value || '', // 長度
             replaceValue('LENGTH_UM', item.querySelector('.LENGTH_UM').value || ''), // 長度單位
+            item.querySelector('.GOV_ASGN_NO').value || '', // '主管機關指定代號'
             item.querySelector('.ST_QTY').value || '', // 統計數量
             replaceValue('ST_UM', item.querySelector('.ST_UM').value || ''), // 統計單位
         ]);
