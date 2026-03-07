@@ -143702,9 +143702,22 @@
         "輸出規定": ""
     },
     {
-        "貨品分類號列": "85176200005",
-        "中文貨名": "接收、轉換及傳輸或再生聲音、圖像或其他資料之機器，包括交換器及路由器",
-        "英文貨名": "Machines for the reception, conversion and transmission or regeneration of voice, images or other data, including switching and routing apparatus",
+        "貨品分類號列": "85176200103",
+        "中文貨名": "網路電話交換機（ＩＰ－ＰＢＸ）、網路電話閘道器（ＶｏＩＰ－Ｇａｔｅｗａｙ），屬電信終端設備者",
+        "英文貨名": "Internet Protocol Private Branch Exchange(IP-PBX) and Voice over Internet Protocol Gateway(VoIP-Gateway) both of which are telecommunications terminal equipment",
+        "第一欄稅率": "0%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,NZ,SG,MH)",
+        "第三欄稅率": "5%",
+        "統計數量單位": "SET",
+        "統計重量單位": "KGM",
+        "稽徵規定": "Z ",
+        "輸入規定": "643 ",
+        "輸出規定": ""
+    },
+    {
+        "貨品分類號列": "85176200906",
+        "中文貨名": "其他接收、轉換及傳輸或再生聲音、圖像或其他資料之機器，包括交換器及路由器",
+        "英文貨名": "Other machines for the reception, conversion and transmission or regeneration of voice, images or other data, including switching and routing apparatus",
         "第一欄稅率": "0%",
         "第二欄稅率": "0% (PA,GT,NI,SV,HN,NZ,SG,MH)",
         "第三欄稅率": "5%",
