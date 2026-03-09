@@ -122,12 +122,6 @@ function validateDclDocType() {
         }
     });
 
-    // 如果全部都是 TW，但報單類別不是 G7，則錯誤
-    if (totalValidRows > 0 && allOrgCountryTW && dclDocType !== "G7") {
-        validationErrors.add("全部項次生產國別皆為 TW，報單類別應為 G7");
-        setError(document.getElementById("DCL_DOC_TYPE"), "應為 G7（國貨復進口）");
-    }
-
     // 提示與警告
     if (validationErrors.size > 0 || validationWarnings.size > 0) {
         const messages = [];
@@ -757,5 +751,6 @@ $(function () {
         return `${rocYear}/${month}/${day}`;
     }
 });
+
 
 
