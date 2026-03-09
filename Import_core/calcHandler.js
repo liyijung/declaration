@@ -230,36 +230,33 @@ function calculateWeight() {
 // =====================
 // 核算
 // =====================
+// 核算
 function calculate() {
-    let messages = [];
+    let messages = []; // 用來儲存提示訊息
 
+    // 數量核算
     const items = document.querySelectorAll('#item-container .item-row');
     if (items.length === 0) {
-        messages.push('請先新增至少一個項次。');
-    }
-
-    const totalNetWeight = parseFloat(document.getElementById('DCL_NW')?.value);
-    if (isNaN(totalNetWeight) || totalNetWeight <= 0) {
-        messages.push('請先填寫有效的總淨重。');
-    }
-
-    if (messages.length > 0) {
-        alert(messages.join('\n'));
+        alert('請先新增至少一個項次。');
         return;
     }
 
-    calculateQuantities(); // 數量核算
-    calculateAmounts();    // 金額核算（改後版本）
-    calculateWeight();     // 重量核算
-
-    // 更新欄位顯示狀態
-    if (typeof initializeFieldVisibility === 'function') {
-        initializeFieldVisibility();
+    // 總淨重檢查：改成只提示，不終止
+    const totalNetWeight = parseFloat(document.getElementById('DCL_NW').value);
+    if (isNaN(totalNetWeight) || totalNetWeight <= 0) {
+        messages.push('請填寫有效的總淨重。');
     }
 
+    // 先顯示提示，但不中止
+    if (messages.length > 0) {
+        alert(messages.join('\n'));
+    }
+
+    calculateQuantities(); // 數量核算
+    calculateAmounts(); // 金額核算
+    calculateWeight(); // 重量核算（若總淨重無效，函式內會自動略過）
+    initializeFieldVisibility(); // 更新欄位顯示狀態
+
     // 更新核算狀態
-    const statusEl = document.getElementById("calculation-status");
-    if (statusEl) statusEl.value = "已執行";
+    document.getElementById("calculation-status").value = "已執行";
 }
-
-
