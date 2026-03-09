@@ -165,10 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 'SHPR_C_ADDR', name: '進口人中文地址' },
             { id: 'CNEE_E_ADDR', name: '賣方中/英地址' },
             { id: 'CNEE_COUNTRY_CODE', name: '賣方國家代碼' },
-            { id: 'TOT_CTN', name: '總件數' },
             { id: 'DOC_CTN_UM', name: '總件數單位' },
-            { id: 'DCL_GW', name: '總毛重' },
-            { id: 'DCL_NW', name: '總淨重' },
             { id: 'DCL_DOC_TYPE', name: '報單類別' },
             { id: 'TERMS_SALES', name: '貿易條件' },
             { id: 'CURRENCY', name: '幣別' },
@@ -233,13 +230,28 @@ document.addEventListener('DOMContentLoaded', function () {
             return; // 中止匯出過程
         }
 
-        // 檢查總毛重是否大於總淨重
-        let dclGw = parseFloat(document.getElementById('DCL_GW')?.value.trim());
-        let dclNw = parseFloat(document.getElementById('DCL_NW')?.value.trim());
+        // 檢查總毛重是否大於總淨重（允許空值，只有兩者都有填時才檢查）
+        let dclGwRaw = document.getElementById('DCL_GW')?.value.trim() || '';
+        let dclNwRaw = document.getElementById('DCL_NW')?.value.trim() || '';
 
-        if (!isNaN(dclGw) && !isNaN(dclNw) && dclGw <= dclNw) {
+        let dclGw = dclGwRaw === '' ? null : parseFloat(dclGwRaw);
+        let dclNw = dclNwRaw === '' ? null : parseFloat(dclNwRaw);
+
+        // 若有填但不是數字，仍提示
+        if (dclGwRaw !== '' && isNaN(dclGw)) {
+            alert('總毛重格式錯誤，請確認後再匯出');
+            return;
+        }
+
+        if (dclNwRaw !== '' && isNaN(dclNw)) {
+            alert('總淨重格式錯誤，請確認後再匯出');
+            return;
+        }
+
+        // 只有兩者都有值時才檢查大小
+        if (dclGw !== null && dclNw !== null && dclGw <= dclNw) {
             alert('總毛重必須大於總淨重，請確認後再匯出');
-            return; // 中止匯出過程
+            return;
         }
 
         // 檢查進口報單類別
