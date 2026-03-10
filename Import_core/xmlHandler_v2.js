@@ -461,8 +461,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('匯率尚未取得，請重新查詢匯率');
                 return;
             }
-        
-            const diffTWD = round2(diff * exchangeRate);
+            
+            // 台幣差額取整數
+            const diffTWD = Math.round(diff * exchangeRate);
         
             // 若差額換算台幣 >= 20，才擋下
             if (diffTWD >= 20) {
@@ -471,12 +472,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     `項次加總(金額) = ${sumItems2}\n` +
                     `總金額 = ${headerTotal2}\n` +
                     `差額(總額-項次) = ${diff}\n` +
-                    `差額(台幣) ≈ ${diffTWD}`
+                    `差額(台幣) = ${diffTWD}`
                 );
                 return;
             }
+            
         } else if (sumItems2 > headerTotal2) {
-            // 項次大於總額，直接擋
+        
             const diff = round2(sumItems2 - headerTotal2);
         
             alert(
@@ -1045,6 +1047,7 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
 
 
 
