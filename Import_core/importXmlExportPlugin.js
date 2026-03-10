@@ -6,6 +6,7 @@
     'LICENCED_AGENT_NO',
     'DOC_HEAD_DOC_NO',
     'BROKER_AEO',
+    'COMBINE_DECLAR',
     'AIR_SEA',
     'DCL_DOC_TYPE',
     'DCL_DOC_NO',
@@ -181,6 +182,7 @@
       DCL_COMP_ID: 'B',              // 報關分公司
       BROKER_BOX_NO: '709',          // 箱號
       LICENCED_AGENT_NO: '00755',    // 專責代碼
+      COMBINE_DECLAR: 'N',           // 單證合一註記節點
       AIR_SEA: '4',                  // 海空運別
       TRANS_VIA: '41',               // 運輸方式
       WAREHOUSE: 'C2051',            // 卸存地一
@@ -189,7 +191,7 @@
       STOCK_IN_CTN: '0',             // 本批來倉件數
       DOC_RELATIONS: '135',          // 特殊關係
       MESSAGE_TYPE: '9',             // 異動別
-      DCL_DOC_NO: 'CX/  /15/709/',   // 報單號碼(當年度)
+      DCL_DOC_NO: 'CX/  /15/709 /',   // 報單號碼(當年度)
   };
 
 
