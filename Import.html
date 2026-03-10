@@ -49,6 +49,10 @@
                 <input type="text" id="LOT_NO" name="LOT_NO" oninput="filterSFAndNumbers(this)" autocomplete="off">
             </div>
             <hr>
+            <a href="https://fbfh.trade.gov.tw/fb/web/queryBasicf.do" target="_blank" rel="noopener noreferrer" 
+                style="padding-left: 4px; padding-top: 4px; font-weight: normal; color: #005feec5;" tabindex="-1">
+                廠商基本資料查詢
+            </a>
             <div class="header-group">
                 <label for="SHPR_BAN_ID">進口人統一編號</label>
                 <input type="text" id="SHPR_BAN_ID" name="SHPR_BAN_ID" oninput="filterAlphanumeric(this)"
@@ -56,10 +60,6 @@
                 <span id="longTermLabel" class="long-term-label" style="right: 80px;">長委</span>
                 <span id="noDataMessage" class="input-error" style="right: 80px;">查無資料</span>
                 <button type="button" title="進口備註" onclick="searchData()" tabindex="-1">搜尋</button>
-                <a href="https://fbfh.trade.gov.tw/fb/web/queryBasicf.do" target="_blank" rel="noopener noreferrer" 
-                    style="padding-left: 4px; padding-top: 4px; font-weight: normal; color: #005feec5;" tabindex="-1">
-                    廠商基本資料查詢
-                </a>
             </div>
             <div class="header-group hidden">
                 <label for="DCL_DOC_EXAM">驗證號碼</label>
