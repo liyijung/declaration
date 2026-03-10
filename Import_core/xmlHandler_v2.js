@@ -451,16 +451,30 @@ document.addEventListener('DOMContentLoaded', function () {
         const headerTotal2 = round2(headerTotal);
         const sumItems2 = round2(sumItems);
         
-        // 容忍 0.01 的差（若要更嚴格可改成 0）
         const diff = round2(sumItems2 - headerTotal2);
-        if (Math.abs(diff) > 0.01) {
+        
+        // 取得當旬匯率
+        const exchangeRate = parseFloat(document.getElementById('usd-exchange-rate')?.value || 0);
+        
+        // 計算差額台幣
+        const diffTWD = Math.abs(diff) * exchangeRate;
+        
+        // 新規則判斷
+        const allowTolerance =
+            sumItems2 < headerTotal2 &&   // 項次小於總額
+            diffTWD < 20;                 // 差額換算台幣小於20
+        
+        if (!allowTolerance && Math.abs(diff) > 0.01) {
+        
             alert(
                 `項次金額加總與總金額不一致，請確認：\n` +
                 `項次加總(金額) = ${sumItems2}\n` +
                 `總金額 = ${headerTotal2}\n` +
-                `差額(項次-總額) = ${diff}`
+                `差額(項次-總額) = ${diff}\n` +
+                `差額(台幣) ≈ ${diffTWD.toFixed(2)}`
             );
-            return; // 中止匯出過程
+        
+            return; // 中止匯出
         }
         
         // 欄位碼數檢查設定
@@ -1020,6 +1034,7 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
 
 
 
