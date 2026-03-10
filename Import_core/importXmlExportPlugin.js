@@ -71,6 +71,7 @@
     'EX_TAX_AMT_1',
     'DOC_MARKS_DESC',
     'DOC_OTR_DESC',
+    'MEMO2',
     'REMARK1',
     'DELIVER_TO',
     'MEMO2',

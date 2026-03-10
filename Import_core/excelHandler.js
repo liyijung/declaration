@@ -63,6 +63,7 @@ function importToExcel(event) {
                 '應減費用': 'SUBTRACT_AMT',
                 '標記及貨櫃號碼': 'DOC_MARKS_DESC',
                 '其它申報事項': 'DOC_OTR_DESC',
+                '連絡事項': 'MEMO2',
                 'REMARKS': 'REMARK1',
                 '保稅廠統一編號': 'FAC_BAN_ID_EX',
                 '保稅廠監管編號': 'FAC_BONDED_ID_EX',
@@ -108,6 +109,7 @@ function importToExcel(event) {
                 '應減費用': 'SUBTRACT_AMT',
                 '標記及貨櫃號碼': 'DOC_MARKS_DESC',
                 '其它申報事項': 'DOC_OTR_DESC',
+                '連絡事項': 'MEMO2',
                 'REMARKS': 'REMARK1',
             };
         } else {
@@ -423,6 +425,7 @@ function exportToExcel() {
         ['應減費用', document.getElementById('SUBTRACT_AMT').value],
         ['標記及貨櫃號碼', document.getElementById('DOC_MARKS_DESC').value],
         ['其它申報事項', document.getElementById('DOC_OTR_DESC').value],
+        ['連絡事項', document.getElementById('MEMO2').value],
         ['REMARKS', document.getElementById('REMARK1').value],
     ];
 

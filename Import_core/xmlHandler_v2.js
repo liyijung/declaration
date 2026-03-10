@@ -683,7 +683,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'TOT_CTN', 'DOC_CTN_UM', 'CTN_DESC', 'DCL_GW', 'DCL_NW',
             'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'CAL_IP_TOT_ITEM_AMT',
             'FRT_AMT', 'INS_AMT', 'ADD_AMT', 'SUBTRACT_AMT',
-            'DOC_MARKS_DESC', 'DOC_OTR_DESC', 'REMARK1',
+            'DOC_MARKS_DESC', 'DOC_OTR_DESC', 'MEMO2', 'REMARK1',
             'FAC_BAN_ID_EX', 'FAC_BONDED_ID_EX',
             'FAC_BAN_ID', 'FAC_BONDED_ID', 'IN_BONDED_BAN', 'IN_BONDED_CODE',
             'APP_DUTY_REFUND', 'MARK_TOT_LINES', 'EXAM_TYPE', 'COPY_QTY',
