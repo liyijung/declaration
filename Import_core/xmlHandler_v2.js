@@ -451,30 +451,41 @@ document.addEventListener('DOMContentLoaded', function () {
         const headerTotal2 = round2(headerTotal);
         const sumItems2 = round2(sumItems);
         
-        const diff = round2(sumItems2 - headerTotal2);
+        // 先判斷是否為項次小於總額
+        if (sumItems2 < headerTotal2) {
+            const diff = round2(headerTotal2 - sumItems2); // 總額 - 項次加總
         
-        // 取得當旬匯率
-        const exchangeRate = parseFloat(document.getElementById('usd-exchange-rate')?.value || 0);
+            const exchangeRate = parseFloat(document.getElementById('usd-exchange-rate')?.value || 0);
         
-        // 計算差額台幣
-        const diffTWD = Math.abs(diff) * exchangeRate;
+            if (!exchangeRate || isNaN(exchangeRate)) {
+                alert('匯率尚未取得，請重新查詢匯率');
+                return;
+            }
         
-        // 新規則判斷
-        const allowTolerance =
-            sumItems2 < headerTotal2 &&   // 項次小於總額
-            diffTWD < 20;                 // 差額換算台幣小於20
+            const diffTWD = round2(diff * exchangeRate);
         
-        if (!allowTolerance && Math.abs(diff) > 0.01) {
+            // 若差額換算台幣 >= 20，才擋下
+            if (diffTWD >= 20) {
+                alert(
+                    `項次金額加總與總金額不一致，請確認：\n` +
+                    `項次加總(金額) = ${sumItems2}\n` +
+                    `總金額 = ${headerTotal2}\n` +
+                    `差額(總額-項次) = ${diff}\n` +
+                    `差額(台幣) ≈ ${diffTWD}`
+                );
+                return;
+            }
+        } else if (sumItems2 > headerTotal2) {
+            // 項次大於總額，直接擋
+            const diff = round2(sumItems2 - headerTotal2);
         
             alert(
                 `項次金額加總與總金額不一致，請確認：\n` +
                 `項次加總(金額) = ${sumItems2}\n` +
                 `總金額 = ${headerTotal2}\n` +
-                `差額(項次-總額) = ${diff}\n` +
-                `差額(台幣) ≈ ${diffTWD.toFixed(2)}`
+                `差額(項次-總額) = ${diff}`
             );
-        
-            return; // 中止匯出
+            return;
         }
         
         // 欄位碼數檢查設定
@@ -1034,6 +1045,7 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
 
 
 
