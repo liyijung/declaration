@@ -56,6 +56,10 @@
                 <span id="longTermLabel" class="long-term-label" style="right: 80px;">長委</span>
                 <span id="noDataMessage" class="input-error" style="right: 80px;">查無資料</span>
                 <button type="button" title="進口備註" onclick="searchData()" tabindex="-1">搜尋</button>
+                <a href="https://fbfh.trade.gov.tw/fb/web/queryBasicf.do" target="_blank" rel="noopener noreferrer" 
+                    style="padding-left: 4px; padding-top: 4px; font-weight: normal; color: #005feec5;" tabindex="-1">
+                    廠商基本資料查詢
+                </a>
             </div>
             <div class="header-group hidden">
                 <label for="DCL_DOC_EXAM">驗證號碼</label>
@@ -145,10 +149,6 @@
                 <label for="CNEE_BAN_ID" style="background: #ffffff00;">賣方統一編號</label>
                 <input type="text" id="CNEE_BAN_ID" name="CNEE_BAN_ID" oninput="filterAlphanumeric(this)"
                 placeholder="(賣方國家代碼為TW，此欄需填列)">
-                <a href="https://fbfh.trade.gov.tw/fb/web/queryBasicf.do" target="_blank" rel="noopener noreferrer" 
-                style="padding-left: 4px; padding-top: 4px; font-weight: normal; color: #005feec5;" tabindex="-1">
-                    廠商基本資料查詢
-                </a>
             </div>
         </div>
         
@@ -352,6 +352,14 @@
                 <label for="REMARK1">REMARKS</label>
                 <textarea id="REMARK1" name="REMARK1" rows="5"></textarea>
                 <button type="button" class="vertical-text" onclick="toggleRows('REMARK1', this)" tabindex="-1">展開</button>
+            </div>
+        </div>
+
+        <!--連絡事項-->
+        <div class="header-section">
+            <div class="header-group">
+                <label for="MEMO2" style="background: #ffffff00;">連絡事項</label>
+                <input type="text" id="MEMO2" name="MEMO2">
             </div>
         </div>
 
