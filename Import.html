@@ -356,20 +356,23 @@
 
         <!--連絡事項-->
         <div class="header-section">
-            <div class="header-group">
-                <label for="MEMO2" style="background: #ffffff00;">連絡事項</label>
-                <input type="text" id="MEMO2" name="MEMO2" list="memo2-options">
-                
-                <datalist id="memo2-options">
-                    <option value="稅金已匯款">
-                    <option value="稅金及報關服務費已匯款">
-                    <option value="稅金開現金票">
-                    <option value="稅金及報關服務費開現金票">
-                    <option value="稅金寄付">
-                    <option value="報關服務費寄付">
-                    <option value="稅金及報關服務費寄付">
-                    <option value="免收報關服務費">
-                </datalist>
+            <div class="header-group memo-wrapper">
+
+                <label for="MEMO2" style="background:#ffffff00;font-size:18px;">連絡事項</label>
+
+                <input type="text" id="MEMO2" name="MEMO2" autocomplete="off">
+
+                <div class="memo-dropdown" id="memoDropdown">
+                    <div class="memo-item">稅金已匯款</div>
+                    <div class="memo-item">稅金及報關服務費已匯款</div>
+                    <div class="memo-item">稅金開現金票</div>
+                    <div class="memo-item">稅金及報關服務費開現金票</div>
+                    <div class="memo-item">稅金寄付</div>
+                    <div class="memo-item">報關服務費寄付</div>
+                    <div class="memo-item">稅金及報關服務費寄付</div>
+                    <div class="memo-item">免收報關服務費</div>
+                </div>
+
             </div>
         </div>
 
@@ -1285,5 +1288,6 @@ Alt + 2 指定項次">攤重</button>
     
 </body>
 </html>
+
 
 
