@@ -752,5 +752,26 @@ $(function () {
     }
 });
 
+// 進口報單連絡事項
+const memoInput = document.getElementById("MEMO2");
+const memoDropdown = document.getElementById("memoDropdown");
 
+// 點擊輸入框顯示
+memoInput.addEventListener("focus", () => {
+    memoDropdown.style.display = "block";
+});
 
+// 離開輸入框隱藏
+memoInput.addEventListener("blur", () => {
+    setTimeout(() => {
+        memoDropdown.style.display = "none";
+    }, 150);
+});
+
+// 點選項目填入
+document.querySelectorAll(".memo-item").forEach(item => {
+    item.addEventListener("mousedown", () => {
+        memoInput.value = item.innerText;
+        memoDropdown.style.display = "none";
+    });
+});
