@@ -1,7 +1,7 @@
 let govAsgnTariffSet = null;
 let govAsgnTariffLoadingPromise = null;
 
-const GOV_ASGN_DEFAULT_XLSX_PATH = './環保署容器代碼鎖檔稅則(113年版)-zoo.xlsx';
+const GOV_ASGN_DEFAULT_XLSX_PATH = './Import_format/環保署容器代碼鎖檔稅則(113年版)-zoo.xlsx';
 const GOV_ASGN_CODE_REGEX = /^[A-Z][0-9]{2}$/;
 
 function normalizeCccCode(value) {
