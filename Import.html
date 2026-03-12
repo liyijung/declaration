@@ -358,7 +358,18 @@
         <div class="header-section">
             <div class="header-group">
                 <label for="MEMO2" style="background: #ffffff00;">連絡事項</label>
-                <input type="text" id="MEMO2" name="MEMO2">
+                <input type="text" id="MEMO2" name="MEMO2" list="memo2-options">
+                
+                <datalist id="memo2-options">
+                    <option value="稅金已匯款">
+                    <option value="稅金及報關服務費已匯款">
+                    <option value="稅金開現金票">
+                    <option value="稅金及報關服務費開現金票">
+                    <option value="稅金寄付">
+                    <option value="報關服務費寄付">
+                    <option value="稅金及報關服務費寄付">
+                    <option value="免收報關服務費">
+                </datalist>
             </div>
         </div>
 
@@ -1274,16 +1285,3 @@ Alt + 2 指定項次">攤重</button>
     
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
