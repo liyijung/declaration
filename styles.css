@@ -1137,3 +1137,30 @@ button {
     visibility: visible;
     opacity: 1;
 }
+
+/* 進口報單連絡事項 */
+.memo-wrapper{
+    position:relative;
+}
+
+.memo-dropdown{
+    position:absolute;
+    top:40px;
+    left:0;
+    width:100%;
+    background:white;
+    border:1px solid #ccc;
+    border-radius:6px;
+    display:none;
+    z-index:999;
+}
+
+.memo-item{
+    padding:8px 12px;
+    font-size:18px; /* 字體可以自由改 */
+    cursor:pointer;
+}
+
+.memo-item:hover{
+    background:#f0f0f0;
+}
