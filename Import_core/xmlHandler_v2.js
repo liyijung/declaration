@@ -156,25 +156,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     async function exportToXML() {
-        // ===== 容器主管機關指定代號檢查 =====
-        for (let item of document.querySelectorAll("#item-container .item-row")) {
-    
-            const ccc = item.querySelector('.CCC_CODE')?.value
-                .replace(/[.\-\s]/g,'')
-                .trim();
-    
-            const gov = item.querySelector('.GOV_ASGN_NO')?.value.trim();
-    
-            if (window.govAsgnTariffSet && window.govAsgnTariffSet.has(ccc)) {
-    
-                if (!gov) {
-                    alert(`稅則 ${ccc} 需填列「主管機關指定代號」`);
-                    return;
-                }
-    
-            }
-        }
-        
         updateVariables(); // 在匯出XML之前更新變數
 
         const requiredFields = [
@@ -1066,6 +1047,7 @@ const itemToXmlNameMap = {
 
 // 全域變數 記錄是否提示過貿易條件
 let termsSalesHintShown = false;
+
 
 
 
