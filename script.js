@@ -42,6 +42,8 @@ setInterval(pingServer, CONFIG.PING_INTERVAL);
 
 document.addEventListener("DOMContentLoaded", async () => {
     await detectAPI();  // 等待 API_URL 設定好
+    console.log("目前 API_URL =", CONFIG.API_URL);
+    
     pingServer();       // OK：開始 ping
     checkLoginStatus(); // OK：確認登入狀態
 
@@ -240,3 +242,4 @@ document.getElementById('close-btn').addEventListener('click', () => {
     document.getElementById('announcement-box').style.bottom = '-100%';
 });
 */
+
