@@ -41,6 +41,21 @@ function pingServer() {
 setInterval(pingServer, CONFIG.PING_INTERVAL);
 
 document.addEventListener("DOMContentLoaded", async () => {
+
+    if (!CONFIG.AUTH_ENABLED) {
+        console.warn("⚠️ 登入系統暫時關閉，直接進入系統");
+
+        localStorage.setItem("token", "bypass-mode");
+        localStorage.setItem("loggedInUser", "Admin");
+        localStorage.setItem("username", "Admin");
+        localStorage.setItem("userRoles", JSON.stringify(["export","import"]));
+
+        sessionStorage.setItem("loggedInUser", "Admin");
+        sessionStorage.setItem("userRoles", JSON.stringify(["export","import"]));
+
+        showUserInfo("Admin");
+        return;
+    }
     await detectAPI();  // 等待 API_URL 設定好
     console.log("目前 API_URL =", CONFIG.API_URL);
     
@@ -197,6 +212,12 @@ function showUserInfo(username) {
 
 // 🔐 驗證點擊報單權限
 window.checkLogin = function(event, page) {
+
+    if (!CONFIG.AUTH_ENABLED) {
+        window.location.href = page;
+        return;
+    }
+    
     const token = localStorage.getItem("token");
     if (!token) {
         event.preventDefault();
@@ -242,4 +263,5 @@ document.getElementById('close-btn').addEventListener('click', () => {
     document.getElementById('announcement-box').style.bottom = '-100%';
 });
 */
+
 
