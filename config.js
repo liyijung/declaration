@@ -11,6 +11,11 @@ const BACKUP_API  = "https://declaration-production.up.railway.app"; // Railway
 
 // ✅ 動態偵測可用 API
 export async function detectAPI() {
+
+    console.log("CONFIG 版本：2026-03-13-A");
+    console.log("PRIMARY_API =", PRIMARY_API);
+    console.log("BACKUP_API =", BACKUP_API);
+    
     // 👉 本機環境
     if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
         CONFIG.API_URL = "http://127.0.0.1:5000";
@@ -33,3 +38,4 @@ export async function detectAPI() {
         console.warn("⚠️ 使用備援（Railway）API，原因：", e.message);
     }
 }
+
