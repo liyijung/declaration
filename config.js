@@ -3,6 +3,8 @@ export const CONFIG = {
     TOKEN_CHECK_INTERVAL: 43200000, // 12 小時 (毫秒)
     PING_INTERVAL: 600000,         // 10 分鐘 (毫秒)
     ACTIVE_HOURS: { start: 0, end: 24 }, // 活躍時段 00:00 - 23:59
+
+    AUTH_ENABLED: true   // ⭐ true = 正常登入 / false = 關閉帳密驗證
 };
 
 // ✅ 主機與備援網址
@@ -38,4 +40,5 @@ export async function detectAPI() {
         console.warn("⚠️ 使用備援（Railway）API，原因：", e.message);
     }
 }
+
 
