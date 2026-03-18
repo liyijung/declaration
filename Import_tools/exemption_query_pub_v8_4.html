@@ -1,0 +1,411 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<title>適用免驗辦法條件查詢</title>
+<meta charset="utf-8">
+<style>
+input,select{
+    margin:5px;
+}
+fieldset{
+    border:2px solid RoyalBlue;
+    margin:5px auto;
+    width:80%;
+}
+legend {
+  padding: 0.2em 0.5em;
+  color: MidnightBlue;
+  font-size:100%;
+  font-weight: bold;
+  text-align:left;
+  position: relative;
+}
+</style>
+<script>
+function getData() {
+  var result="";
+  var choiceSet2 = document.getElementsByName('category')[0].value;
+  var choiceSet3 = document.getElementsByName('restriction');
+  // var reapply = document.getElementsByName('six-months');
+  var msg1 = "申請"+"<strong>"+"<font color=royalblue>"+"專案免驗"+"</font>"+"</strong>"+
+             "［填寫專案免驗申請書，並檢附相關文件後郵寄至經濟部標準檢驗局(臺北市中正區濟南路1段4號)］，"+
+             "有疑義可洽02-23431700轉專案免驗承辦同仁。"+"<br>"+
+             "如獲同意，再至本局或所屬分局報驗發證櫃檯，申辦"+"<strong>"+"<font color=seagreen>"+
+			 "免驗通關號碼"+"</font>"+"</strong>"+"(每案繳規費新臺幣200元，每一進口報單為一案)後辦理進口事宜。";
+  var msg2 = "至本局或所屬分局報驗發證櫃檯，申辦"+"<strong>"+"<font color=seagreen>"+"免驗通關號碼"+
+             "</font>"+"</strong>"+"(每案繳規費新臺幣200元，每一進口報單為一案)，"+"<br>"+
+             "有疑義可洽詢本局或所屬分局各報驗發證櫃檯。";
+  var msg3 = "原則上不准予免驗；惟屬供國家重大建設或研發測試用者，請檢具相關政府機關證明文件或研發測試計畫書"+
+             "及相關文件向本局申請"+"<strong>"+"<font color=royalblue>"+"專案免驗"+"</font>"+"</strong>"+
+             "［填寫專案免驗申請書，並檢附相關文件後郵寄至經濟部標準檢驗局(臺北市中正區濟南路1段4號)］，"+
+             "有疑義可洽02-23431700轉專案免驗承辦同仁。"+"<br>"+
+             "如獲同意，再至本局或所屬分局報驗發證櫃檯，申辦"+"<strong>"+"<font color=seagreen>"+"免驗通關號碼"+
+			 "</font>"+"</strong>"+"(每案繳規費新臺幣200元，每一進口報單為一案)後辦理進口事宜。";
+  var msg4 = "原則上不准予免驗；惟屬經核定之重大投資案所需、供國家重大建設或尖端學術研究計畫使用者，"+
+             "請檢具相關政府機關證明文件向本局申請"+"<strong>"+"<font color=royalblue>"+"專案免驗"+"</font>"+"</strong>"+
+             "［填寫專案免驗申請書，並檢附相關文件後郵寄至經濟部標準檢驗局"+
+             "(臺北市中正區濟南路1段4號)］，有疑義可洽02-23431700轉專案免驗承辦同仁。"+"<br>"+
+             "如獲同意，再至本局或所屬分局報驗發證櫃檯，申辦"+"<strong>"+"<font color=seagreen>"+"免驗通關號碼"+
+			 "</font>"+"</strong>"+"(每案繳規費新臺幣200元，每一進口報單為一案)後辦理進口事宜。";
+  var msg5 = "<strong>"+"<font color=red>"+"自用品、商業樣品及展覽品6個月內不得重複輸入"+"</font>"+"</strong>"+
+             "；研發測試用物品重複輸入時須申請"+"<strong>"+"<font color=royalblue>"+"專案免驗"+"</font>"+"</strong>"+
+             "［填寫專案免驗申請書，並檢附相關文件後郵寄至經濟部標準檢驗局(臺北市中正區濟南路1段4號)］，"+
+             "有疑義可洽02-23431700轉專案免驗承辦同仁。"+"如獲同意，再至本局或所屬分局報驗發證櫃檯，申辦"+
+			 "<strong>"+"<font color=seagreen>"+"免驗通關號碼"+"</font>"+"</strong>"+
+			 "(每案繳規費新臺幣200元，每一進口報單為一案)後辦理進口事宜。";
+  var doc1 = "<strong>"+"<u>"+"申請"+"<strong>"+"<font color=royalblue>"+"專案免驗"+"</font>"+"</strong>"+
+             "所需文件："+"</u>"+"</strong>"+"<br>"+"<br>"+"1.專案免驗申請書及切結書。"+"<br>"+
+             "2.自然人身分證明文件、公司登記、商業登記證明文件或其他相當證明文件影本；委任他人代理者，應檢附委任書及代理人身分證明文件。"+"<br>"+
+             "3.商品照片或型錄。無商品照片或型錄者，得以品質說明書代替之。"+"<br>"+
+             "4.商品控管機制或最終處理方式說明。"+"<br>"+
+             "5.研發測試用商品，應檢附研發測試計畫書。"+"<br>"+
+             "6.因檢驗標準、設備、場地或其他特殊情形之說明。";
+  var doc2 = "<strong>"+"<u>"+"申辦"+"<strong>"+"<font color=seagreen>"+"免驗通關號碼"+"</font>"+"</strong>"+"所需文件："+"</u>"+"</strong>"+"<br>"+"<br>"+
+             "1.應施檢驗商品免驗申請書。"+"<br>"+
+             "2.進口報單相關文件。"+"<br>"+
+             "3.自然人身分證明文件、公司登記、商業登記證明文件或其他相當證明文件影本；委任他人代理者，應檢附委任書及代理人身分證明文件。"+"<br>"+
+             "4.商品照片或型錄。無商品照片或型錄者，得以品質說明書代替之。"+"<br>"+
+             "5.輸入供型式試驗用商品者，應檢附由標準檢驗局指定試驗室提供之相關文件。"+"<br>"+
+             "6.輸入供藥物臨床試驗用器材者，應檢附衛生福利部、其所屬機關或其委託機構核發之公函或證明。"+"<br>"+
+             "7.經專案同意者，應檢附標準檢驗局核發之同意函。";
+  if (document.getElementsByName('six-months')[0].checked==false){
+      var check_flag=0;
+      for(var j=0;j<choiceSet3.length;j++){
+        if(choiceSet3[j].checked){check_flag=1;break;}
+        }
+      if(check_flag==0){
+          switch(choiceSet2) {
+            case "ctg1":
+            case "ctg2":
+            case "ctg3":
+            case "ctg4":
+            case "ctg5":
+            case "ctg6":
+            case "ctg7":
+            case "ctg8":
+            case "ctg9":
+            case "ctg10":
+            case "ctg15":
+			case "ctg16":
+              alert("請依輸入商品之金額及數量選擇適當的條件!!");
+              break;
+          }
+      }
+      switch(choiceSet2) {
+          case "ctg1":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000005";
+            }
+            break;
+          case "ctg2":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000006";
+            }
+            break;
+          case "ctg3":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000007";
+            }
+            break;
+          case "ctg4":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000008";
+            }
+            break;
+          case "ctg5":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000009";
+            }
+            break;
+          case "ctg6":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000010";
+            }
+            break;
+          case "ctg7":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else if (choiceSet3[j].value=="r1") {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000002";
+            } else {
+              result=msg2+"<br>"+"<br>"+doc2;
+            }
+            break;
+          case "ctg8":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else if (choiceSet3[j].value=="r1") {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000002";
+            } else {
+              result=msg2+"<br>"+"<br>"+doc2;
+            }
+            break;
+          case "ctg9":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else if (choiceSet3[j].value=="r1") {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000002";
+            } else {
+              result=msg2+"<br>"+"<br>"+doc2;
+            }
+            break;
+          case "ctg10":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else if (choiceSet3[j].value=="r1") {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000002";
+            } else {
+              result=msg2+"<br>"+"<br>"+doc2;
+            }
+            break;
+          case "ctg11":
+          case "ctg12":
+            result=msg3+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            break;
+          case "ctg13":
+            result=msg4+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            break;
+		  case "ctg14":
+            result=msg3+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            break;	
+          case "ctg15":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else if (choiceSet3[j].value=="r1") {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000002";
+            } else {
+              result=msg2+"<br>"+"<br>"+doc2;
+            }
+            break;
+          case "ctg16":
+            if (choiceSet3[j].value=="r3") {
+              result=msg1+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+            } else if (choiceSet3[j].value=="r1") {
+              result="於進口報單輸入許可證號碼欄，自行填報免驗通關代碼 CI000000000002";
+            } else {
+              result=msg2+"<br>"+"<br>"+doc2;
+            }
+            break;
+          case "ctg17":
+          case "ctg18":
+		    result="倘數量、總價符合各項商品規定，則選擇適當條件查詢後，逕填免驗通關代碼，"+"<br>"+
+                   "無法使用免驗通關代碼者，請至本局或所屬分局報驗發證櫃檯，申辦"+"<strong>"+"<font color=seagreen>"+"免驗通關號碼"+"</font>"+"</strong>"+"(每案繳規費新臺幣200元，每一進口報單為一案)，"+"<br>"+
+                   "有疑義可洽詢本局或所屬分局各報驗發證櫃檯。"+"<br>"+"<br>"+doc2;
+            break;
+          default:
+          // code block
+         }
+     document.getElementById('result').innerHTML= result;
+   } else if ((choiceSet2=="ctg17")||(choiceSet2=="ctg18")){
+     result=msg2+"<br>"+"<br>"+doc2;
+     } else if ((choiceSet2=="ctg11")||(choiceSet2=="ctg12")||(choiceSet2=="ctg14")){
+       result=msg3+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+       } else if (choiceSet2=="ctg13"){
+         result=msg4+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;
+         } else if (choiceSet2=="ctg15"){
+           result="<strong>"+"<font color=red>"+"自用品、商業樣品及展覽品6個月內不得重複輸入。"+"</font>"+"</strong>";
+           } else {
+              result = msg5+"<br>"+"<br>"+doc1+"<br>"+"<br>"+doc2;         
+              }
+     document.getElementById('result').innerHTML= result;
+}
+function getData2() {
+    var result="";
+    var restr1="";
+    var restr2="";
+    var ccc_code="";
+    var CI09="嬰幼兒用品（兒童雨衣、玩具及紡織品除外）"+"<br>"+
+             "94013000001、94015210002、94015290005、94015310001、94015390004、94015910005、94015990008、"+
+	         "94016110001、94016190004、94016910003、94016990006、94017100001、94017900003、"+
+	         "87150000000、94037000000、95030011001、87120010109、87120010207、87120010902、94018000000、"+
+	         "39269090908、44219900906、73269090906、94032000001、94035010002、94035090005、94036010000、"+
+		     "94036090003、94038210004、94038290007、94038310003、94038390006、94038910007、"+
+			 "94038920005、94038990000、63079090108、63079090304、63079090901、39221010005、39221090008、94014000009"+"<br>"+
+             "（包含：兒童用高腳椅、手推嬰幼兒車、嬰兒學步車、螃蟹車、兒童自行車、汽車安全座椅、兒童用床邊護欄、嬰兒床、嬰兒揹帶、嬰兒用浴盆、床邊嬰兒床、嬰兒用沐浴椅、家用嬰兒搖床/搖籃、椅上架高座、斜躺搖籃等商品）";
+    var CI10="資訊設備商品"+"<br>"+
+             "84433100002、84433200001、84433900905、84713000008、84714100005、84714900007、84715000003、"+
+	         "84716010009、84719010003、84716090100、84716090208、84716090903、84719010003、84719090006、"+
+	         "84729050003、84729070107、84729070205、85044092006、85044093005、85258190101、85258190904、"+
+             "85258290100、85258290903、85258390109、85258390902、85258990103、85258990906、85269190000、"+
+			 "85284200007、85285200004、88062100005、88062200102、88069100000、88069200107、90171010009、90172010007";
+    var choiceSet = document.getElementsByName('category')[0].value;
+    // document.getElementsByName('condition')[0].checked=true;
+    // document.getElementsByName('six-months').disabled=false;
+    // document.getElementsByName('restriction')[0].checked=true;
+    document.getElementById('result').innerHTML= result;
+    for(var k=0;k<=2;k++){
+           document.getElementsByName('restriction')[k].disabled=false;
+           document.getElementsByName('restriction')[k].checked=false;
+         }
+    switch(choiceSet) {
+      case "ctg1":
+         restr1="<font color=red>5</font>件<br>(同一型式規格)";
+         restr2="<font color=red>1</font>件<br>(同一型式規格)";
+	     break;     
+      case "ctg2":
+         restr1="<font color=red>4</font>頂<br>(同一型式規格)";
+         restr2="<font color=red>2</font>頂<br>(同一型式規格)";
+         break;
+      case "ctg3":
+         restr1="<font color=red>20</font>件<br>(同一型式規格)";
+         restr2="不限<br>(同一型式規格)";
+         document.getElementsByName('restriction')[1].disabled=true;
+         break;     
+      case "ctg4":
+         restr1="<font color=red>10</font>件<br>(同一型式規格)";
+         restr2="不限<br>(同一型式規格)";
+         document.getElementsByName('restriction')[1].disabled=true;
+         break;
+      case "ctg5":
+         restr1="<font color=red>2</font>件<br>(同一貨品分類號列)";
+         restr2="<font color=red>2</font>件<br>(同一貨品分類號列)";
+		 ccc_code=CI09;
+         break;     
+      case "ctg6":
+         restr1="不限<br>(同一型式規格)";
+         restr2="<font color=red>5</font>件<br>(同一型式規格)";
+		 ccc_code=CI10;
+         break;              
+      case "ctg7":
+         restr1="不限<br>(同一型式規格)";
+         restr2="<font color=red>8</font>只<br>(同一型式規格)";
+         break;     
+      case "ctg8":
+         restr1="不限<br>(同一型式規格)";
+         restr2="<font color=red>5</font>個<br>(同一型式規格)";
+         break;              
+      case "ctg9":
+         restr1="不限<br>(同一型式規格)";
+         restr2="<font color=red>5</font>只<br>(同一型式規格)";
+         break;     
+      case "ctg10":
+         restr1="不限<br>(同一型式規格)";
+         restr2="<font color=red>3</font>組<br>(同一型式規格)";
+         break;
+      case "ctg11":
+      case "ctg12":
+      case "ctg13":
+	  case "ctg14":
+         // document.getElementsByName('six-months').disabled=true;
+         for(var k=0;k<=2;k++){
+           document.getElementsByName('restriction')[k].disabled=true;
+         }
+         for(var k=0;k<=2;k++){
+           document.getElementsByName('restriction')[k].checked=false;
+         }
+         break;                            
+      case "ctg15":
+         restr1="不限<br>(同一型式規格)";
+         restr2="<font color=red>2</font>件<br>(同一型式規格)";
+         break;     
+      case "ctg16":
+         restr1="不限<br>(同一型式規格)";
+         restr2="<font color=red>5</font>件<br>(同一型式規格)";
+         break;              
+      case "ctg17":
+      case "ctg18":
+         restr1="不限<br>(同一型式規格)";
+         restr2="不限<br>(同一型式規格)";
+         for(var k=0;k<=2;k++){
+           document.getElementsByName('restriction')[k].disabled=true;
+         }
+         for(var k=0;k<=2;k++){
+           document.getElementsByName('restriction')[k].checked=false;
+         }
+         break;            
+      default:
+         // code block
+    } 
+    document.getElementById('restriction1').innerHTML= restr1;
+    document.getElementById('restriction2').innerHTML= restr2;
+	document.getElementById('ccc').innerHTML= ccc_code;
+}        
+</script>
+</head>
+<body>
+<form>
+  <table style="font-size:22px;width:100% "><th height="80"><font color=MidnightBlue>應施檢驗商品免驗辦理方式查詢<br>(輸入非銷售之自用品、商業樣品、展覽品或研發測試用物品)</font><br></th></table>
+  <fieldset style="margin:0px auto;width:81%; border:0px">  
+	<table style="border:2px royalblue solid;font-size:18px;width:100% " cellpadding="0" cellspacing="0";>
+        <tr height="70">
+           <th bgcolor=	lightblue style="border-top: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">種類</th>
+           <th bgcolor=lightyellow style="border-top: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">商品總價在美金1000元以下<br>數量限制<label id="restriction1"><font color=red>5</font>件<br>(同一型式規格)</label></th> 
+           <th bgcolor=lightyellow style="border-top: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">商品總價超過美金1000元<br>數量限制<label id="restriction2"><font color=red>1</font>件<br>(同一型式規格)</label></th>
+           <th bgcolor=lightyellow style="border-top: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">商品之金額數量<br>超過左列規定</th> 
+           <th bgcolor=orange style="border-top: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">6個月內有重複輸入情形</th> 
+           <th></th> 
+        </tr>
+        <tr height="40">
+           <th bgcolor=lightblue style="border-bottom: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">
+               <select name="category" style="font-size:16px" onChange="getData2()">
+                 <option value="ctg1" selected>玩具</option>
+                 <option value="ctg2">防護頭盔</option>
+                 <option value="ctg3">拋棄式及簡易型打火機</option>
+                 <option value="ctg4">文具</option>
+                 <option value="ctg5">嬰幼兒用品(兒童雨衣、玩具及紡織品除外)</option>
+                 <option value="ctg6">資訊設備商品</option>
+                 <option value="ctg7">液化石油氣汽車燃氣系統零組件</option>
+                 <option value="ctg8">輪胎</option>
+                 <option value="ctg9">汽車用輕合金盤型輪圈</option>
+                 <option value="ctg10">建築用防火門</option>
+                 <option value="ctg11">鋼索</option>
+                 <option value="ctg12">吊鉤及鉤環</option>
+                 <option value="ctg13">大型電腦(額定功率≧30kVA)</option>
+				 <option value="ctg14">可攜式雷射指示器(功率>1mW或超過class 2)</option>
+                 <option value="ctg15">其他商品(自用品)</option>
+                 <option value="ctg16">其他商品(商業樣品、展覽品或研發測試用物品)</option>
+                 <option value="ctg17">輸入供藥物臨床試驗用器材</option>
+                 <option value="ctg18">型式試驗用商品</option>
+                </select><br> 
+           </th>
+           <th bgcolor=lightyellow style="border-bottom: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">
+             <input type="radio" name="restriction" value="r1">
+           </th> 
+           <th bgcolor=lightyellow style="border-bottom: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">
+             <input type="radio" name="restriction" value="r2">
+           </th>
+           <th bgcolor=lightyellow style="border-bottom: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">
+             <input type="radio" name="restriction" value="r3">
+           </th>
+           <th bgcolor=orange style="border-bottom: 1px solid black;border-right: 1px solid black;border-left: 1px solid black">
+             <input type="checkbox" name="six-months">
+           </th>
+        </tr>
+    </table>
+    <table style="border-bottom: 2px solid royalblue;border-right: 2px solid royalblue;border-left: 2px solid royalblue;width:100% " cellpadding="1" cellspacing="0";>
+       <tr> <td><br><font color=MidnightBlue><strong><u>辦理方式：</u></strong></font><br><br></td></tr>
+	   <tr> <td><label id="result"><br></label></td></tr>
+    </table>
+    <table style="width:100% " ><tr><th>    
+    <input type="button" style="font-size: 16px; width: 100px" onclick="getData()" value="查詢">
+    <input type="button" style="font-size: 16px; width: 100px" onclick="window.location.href=window.location.href" value="重新輸入">
+    </th></tr></table>
+  </fieldset>	
+  <fieldset>
+    <legend>操作說明</legend>    
+    <table style="border:0px;width:100% " ><tr><td> 
+      <p>請選擇欲輸入之商品，並依輸入商品之金額及數量選擇適當的條件，確認6個月內是否有重複輸入的情形後，按下查詢鍵，即可顯示適合的辦理方式；<br>若條件選擇按鈕無法點選，表示無該項限制規定，請逕按下查詢鍵；<br>如須再次查詢，請按下重新輸入鍵，輸入條件後再次按下查詢鍵。<br>若有其他相關問題，請洽經濟部標準檢驗局，電話02-23431700轉專案免驗承辦同仁。</p>   
+    </td></tr></table> 
+  </fieldset>
+  <fieldset>
+    <legend>參考貨品分類號列</legend> 
+	<table style="border:2px;width:100% " ><tr><td> 
+      <label id="ccc"></label>   
+    </td></tr></table>
+    <p><label id="ccc"></label></p>	
+  </fieldset>  
+</form> 
+</body>
+</html>
