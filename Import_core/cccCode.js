@@ -870,7 +870,7 @@ function checkGovAsgnNoHint(inputElement) {
 
         iziToast.warning({
             title: '注意',
-            message: '主管機關指定代碼(容器類)',
+            message: '需填列主管機關指定代碼(容器類)',
             position: 'topRight',
             timeout: 10000,
             close: true,
