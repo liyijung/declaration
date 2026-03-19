@@ -18,7 +18,7 @@ function handleCCCCodeEnter(event, inputElement) {
                         title: "注意",
                         message: "請查看稅則輸入規定",
                         position: "topRight",
-                        timeout: false,
+                        timeout: 10000,
                         backgroundColor: '#ffeb3b',
                         onClosing: function() {
                             isWarningToastVisible = false; // 當 `iziToast` 關閉時，允許新的 `iziToast`
@@ -450,7 +450,7 @@ function handleCCCCodeInput(event, inputElement) {
         updateTariff(inputElement, keyword); // 查詢稅則數據並即時更新
 
         if (keyword.length === 11) { // 確保輸入完整
-            // 檢查輸出規定，決定是否顯示警告
+            // 檢查輸入規定，決定是否顯示警告
             setTimeout(() => {
                 if (inputElement.classList.contains("highlight-ccc") && !isWarningToastVisible) {
                     isWarningToastVisible = true; // 標記為正在顯示
@@ -459,7 +459,7 @@ function handleCCCCodeInput(event, inputElement) {
                         title: "注意",
                         message: "請查看稅則輸入規定",
                         position: "topRight",
-                        timeout: false,
+                        timeout: 10000,
                         backgroundColor: '#ffeb3b',
                         onClosing: function() {
                             isWarningToastVisible = false; // 當 `iziToast` 關閉時，允許新的 `iziToast`
@@ -467,6 +467,10 @@ function handleCCCCodeInput(event, inputElement) {
                     });
                 }
             }, 100); // 延遲確保 `highlight-ccc` 樣式已經套用
+
+            setTimeout(() => {
+                checkGovAsgnNoHint(inputElement);
+            }, 120);
         }
     } else {
         clearFields(inputElement); // 當輸入為空時清空欄位
@@ -520,8 +524,8 @@ function updateTariff(inputElement, keyword = '') {
 // 更新 QTY、DOC_UM、ST_QTY 和 ST_UM 欄位
 function updateFields(inputElement, item) {
     const formattedCode = formatCode(item['貨品分類號列'].toString());
-    inputElement.value = formattedCode; // 填入關鍵字欄位
-
+    inputElement.value = formattedCode;
+    
     // 將 item['統計數量單位'] 和 QTY 的值填入同一項次的 ST_QTY 和 ST_UM 欄位
     const itemRow = inputElement.closest('.item-row');
 
@@ -641,6 +645,8 @@ function clearFields(inputElement) {
     if (stum) stum.value = '';
     if (taxRate) taxRate.value = '';
 
+    inputElement.classList.remove('highlight-ccc');
+
     // 移除 '.'、'-' 以及所有的空格
     inputElement.value = inputElement.value.replace(/[.\-\s]/g, '');
 }
@@ -654,8 +660,6 @@ function initializeCCCCodeInputs() {
         input.addEventListener('keydown', (event) => handleCCCCodeEnter(event, input));
     });
 }
-
-document.addEventListener('DOMContentLoaded', initializeCCCCodeInputs);
 
 // 自動計算 ST_QTY 的函數
 function calculateSTQTYForMTK() {
@@ -735,11 +739,6 @@ function updateArea(stqty, stum, wide, wideum, lengt, lengthum) {
     }
 }
 
-// 在頁面載入完成後初始化 CCC_CODE 和欄位監聽
-document.addEventListener('DOMContentLoaded', () => {
-    initializeCCCCodeInputs();
-});
-
 function getRegInfo(regCode, regData, type) {
     if (!regCode) {
         return '';  // 若無規定則返回空白
@@ -795,4 +794,94 @@ function hideTooltip() {
     }
 }
 
+// ================== GOV_ASGN 檢查（新增功能） ==================
 
+let govAsgnTariffSet = new Set();
+let govAsgnTariffLoaded = false;
+let govAsgnTariffLoading = false;
+let lastGovAsgnHintKey = '';
+
+// 載入 Excel
+async function loadGovAsgnTariffExcel() {
+    if (govAsgnTariffLoaded || govAsgnTariffLoading) return;
+
+    govAsgnTariffLoading = true;
+
+    try {
+        const response = await fetch('./Import_format/環保署容器代碼鎖檔稅則(114年版).xlsm');
+        if (!response.ok) {
+            throw new Error(`Excel 讀取失敗：${response.status}`);
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+        govAsgnTariffSet.clear();
+
+        for (let i = 1; i < rows.length; i++) {
+            const code = String(rows[i][0] || '')
+                .trim()
+                .replace(/[.\-\s]/g, '');
+
+            if (code.length === 11) {
+                govAsgnTariffSet.add(code);
+            }
+        }
+
+        govAsgnTariffLoaded = true;
+        console.log('GOV_ASGN 載入完成:', govAsgnTariffSet.size);
+
+    } catch (err) {
+        console.error('GOV_ASGN Excel 載入失敗:', err);
+    } finally {
+        govAsgnTariffLoading = false;
+    }
+}
+
+// 檢查
+function checkGovAsgnNoHint(inputElement) {
+    if (!inputElement) return;
+
+    const cleanedCode = inputElement.value.trim().replace(/[.\-\s]/g, '');
+
+    if (cleanedCode.length !== 11) {
+        lastGovAsgnHintKey = '';
+        return;
+    }
+
+    if (!govAsgnTariffLoaded) return;
+
+    const itemRow = inputElement.closest('.item-row');
+    const govInput = itemRow
+        ? itemRow.querySelector('.GOV_ASGN_NO')
+        : document.getElementById('GOV_ASGN_NO');
+
+    if (!govInput) return;
+
+    const govValue = govInput.value.trim();
+
+    if (govAsgnTariffSet.has(cleanedCode) && !govValue) {
+
+        // 如果畫面已經有 warning toast，就不要再顯示
+        const existingToast = document.querySelector('.iziToast.gov-asgn-toast');
+        if (existingToast) return;
+
+        iziToast.warning({
+            title: '注意',
+            message: '主管機關指定代碼(容器類)',
+            position: 'topRight',
+            timeout: 10000,
+            close: true,
+            closeOnClick: true,
+            class: 'gov-asgn-toast'
+        });
+    }
+}
+
+// 頁面載入時先讀 Excel
+document.addEventListener('DOMContentLoaded', () => {
+    initializeCCCCodeInputs();
+    loadGovAsgnTariffExcel();
+});
