@@ -195,7 +195,7 @@ function importToExcel(event) {
         let currentDescription = '';
 
         const tariffCodeMapping = {
-            "IC": "8542390022",
+            // "IC": "8542390022",
         };
 
         // 對應系統欄位與 Excel 標題名稱
