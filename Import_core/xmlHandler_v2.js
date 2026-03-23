@@ -128,21 +128,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const copy3 = document.getElementById('copy_3');
         const copy5 = document.getElementById('copy_5');
 
-        /*
-        // 更新 APP_DUTY_REFUND 和 MARK_TOT_LINES
-        appDutyRefund.value = (copy3.checked) ? 'Y' : 'N';
-        markTotLines.value = (copy3.checked) ? 'Y' : 'N';
-
-        // 更新 EXAM_TYPE 和 COPY_QTY
-        if (copy2.checked || copy3.checked || copy5.checked) {
-            examType.value = '8';
-            copyQty.value = '1';
-        } else {
-            examType.value = '';
-            copyQty.value = '0';
-        }
-        */
-
         // 用於顯示變數值的控制台日誌
         console.log("APP_DUTY_REFUND: " + appDutyRefund.value);
         console.log("MARK_TOT_LINES: " + markTotLines.value);
@@ -273,7 +258,6 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'CCC_CODE', name: '稅則' },
             { className: 'TAX_RATE', name: '稅率' },
             { className: 'ST_MTD', name: '納稅辦法' },
-            { className: 'NET_WT', name: '淨重' },
             { className: 'ORG_COUNTRY', name: '生產國別' }
         ];
 
