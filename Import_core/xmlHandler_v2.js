@@ -876,11 +876,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let remarkElement = document.getElementById('REMARK')?.value.trim() || '';
 
-        // ⭐ 若 REMARK 沒值，就改抓 REMARK1（並去掉【客服備註】）
+        // ⭐ fallback 改強一點（重點）
         if (!remarkElement) {
-            remarkElement = (document.getElementById('REMARK1')?.value || '')
-                .replace(/^【客服備註】/, '')
-                .trim();
+            let remark1Raw = document.getElementById('REMARK1')?.value || '';
+        
+            // 移除整段【客服備註】開頭 + 換行
+            remark1Raw = remark1Raw.replace(/^【客服備註】\s*/, '');
+        
+            // 只取第一行（避免整段帶進檔名）
+            remarkElement = remark1Raw.split('\n')[0].trim();
         }
         
         // 組合備註內容
