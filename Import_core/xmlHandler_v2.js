@@ -19,6 +19,9 @@ function importXML(event) {
         const matchRemark = file.name.match(/【(.*?)】/);
         let fileRemark = matchRemark ? matchRemark[1] : ''; // 若無則回傳空字串
 
+        // 若開頭包含「一般倉，」或「一般倉」則移除
+        fileRemark = fileRemark.replace(/^一般倉，?/, '').trim();
+        
         document.getElementById('REMARK').value = fileRemark;
 
         const reader = new FileReader();
