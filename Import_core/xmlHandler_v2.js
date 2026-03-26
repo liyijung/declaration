@@ -873,8 +873,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const fileName = document.getElementById('FILE_NO').value.trim();
         const exporterName = document.getElementById('SHPR_C_NAME').value.trim();
-        const remarkElement = document.getElementById('REMARK').value.trim() || '';
 
+        let remarkElement = document.getElementById('REMARK')?.value.trim() || '';
+
+        // ⭐ 若 REMARK 沒值，就改抓 REMARK1（並去掉【客服備註】）
+        if (!remarkElement) {
+            remarkElement = (document.getElementById('REMARK1')?.value || '')
+                .replace(/^【客服備註】/, '')
+                .trim();
+        }
+        
         // 組合備註內容
         let remarks = [];
         if (remarkElement) {
