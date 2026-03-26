@@ -185,7 +185,7 @@
       LICENCED_AGENT_NO: '00755',    // 專責代碼
       COMBINE_DECLAR: 'N',           // 單證合一註記節點
       AIR_SEA: '4',                  // 海空運別
-      TRANS_VIA: '41',               // 運輸方式
+      TRANS_VIA: '42',               // 運輸方式
       WAREHOUSE: 'C2051',            // 卸存地一
       CO_PACKING_NOTE: 'N',          // 合成註記
       APP_PERMIT: 'N',               // 已否簽證
