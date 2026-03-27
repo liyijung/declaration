@@ -661,13 +661,25 @@
           .replace(/[　]/g, '')          // 全形空白
           .slice(0, 50);                 // 每段長度限制
 
+        let remark = (document.getElementById('REMARK')?.value || '').trim();
+
+        if (!remark) {
+          let remark1Raw = document.getElementById('REMARK1')?.value || '';
+          remark1Raw = remark1Raw.replace(/^【客服備註】\s*/, '');
+          remark = remark1Raw.split('\n')[0].trim();
+        }
+
         const baseName = [
           safe(hawb),
           safe(shprCode),
           safe(shprCName)
         ].filter(Boolean).join('_') || 'import';
 
-        const filename = `${baseName}.xml`;
+        const safeRemark = safe(remark);
+
+        const filename = safeRemark
+          ? `${baseName}【${safeRemark}】.xml`
+          : `${baseName}.xml`;
 
         downloadText(filename, xml);
   
