@@ -264,45 +264,36 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'ORG_COUNTRY', name: '生產國別' }
         ];
 
-        // 檢查 DCL_DOC_TYPE 是否為 B6，並確保 SHPR_BONDED_ID 需有值
+        // B6：只檢查海關監管編號（不再檢查買方料號）
         if (['B6'].includes(dclDocType)) {
             let shprBondedId = document.getElementById('SHPR_BONDED_ID')?.value.trim();
-
-            // 如果 SHPR_BONDED_ID 為空，則顯示錯誤訊息並中止匯出
+        
             if (!shprBondedId) {
                 alert('當報單類別為 B6 時，海關監管編號需填列');
-                return; // 中止匯出過程
+                return;
             }
-        }
-
-        // 如果 DCL_DOC_TYPE 是 B6，還需要檢查 SELLER_ITEM_CODE
-        if (['B6'].includes(dclDocType)) {
-            itemRequiredFields.push(
-                { className: 'SELLER_ITEM_CODE', name: '買方料號' },
-            );
+        
         } else {
-            // 如果 DCL_DOC_TYPE 不是 B6，則 SHPR_BONDED_ID、SELLER_ITEM_CODE 不得填列
+            // 非 B6：不得填列 海關監管編號、買方料號
             let invalidFields = [];
-
-            // 檢查 SHPR_BONDED_ID 是否有值
+        
+            // 檢查 SHPR_BONDED_ID
             let shprBondedIdElement = document.getElementById('SHPR_BONDED_ID');
             if (shprBondedIdElement && shprBondedIdElement.value.trim()) {
                 invalidFields.push('海關監管編號');
             }
-
-            // 遍歷每個項次，檢查 SELLER_ITEM_CODE 是否有值
+        
+            // 檢查 SELLER_ITEM_CODE（買方料號）
             document.querySelectorAll('.item-row').forEach(item => {
-                ['SELLER_ITEM_CODE'].forEach(className => {
-                    let element = item.querySelector(`.${className}`);
-                    if (element && element.value && element.value.trim()) { // 確保 element 存在且 value 有值
-                        invalidFields.push(className === 'SELLER_ITEM_CODE' ? '買方料號' : '保稅貨物註記');
-                    }
-                });
+                let element = item.querySelector('.SELLER_ITEM_CODE');
+                if (element && element.value && element.value.trim()) {
+                    invalidFields.push('買方料號');
+                }
             });
-
+        
             if (invalidFields.length > 0) {
                 alert(`報單類別不是 B6，下列欄位不得填列：\n${invalidFields.join('、')}`);
-                return; // 中止匯出過程
+                return;
             }
         }
 
