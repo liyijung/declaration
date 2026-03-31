@@ -264,31 +264,23 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'ORG_COUNTRY', name: '生產國別' }
         ];
 
-        // B6：SHPR_BONDED_ID + 買方料號 必填
+        // 檢查 DCL_DOC_TYPE 是否為 B6，並確保 SHPR_BONDED_ID 需有值
         if (['B6'].includes(dclDocType)) {
-            let missingFields = [];
-        
-            // 檢查 SHPR_BONDED_ID
             let shprBondedId = document.getElementById('SHPR_BONDED_ID')?.value.trim();
+
+            // 如果 SHPR_BONDED_ID 為空，則顯示錯誤訊息並中止匯出
             if (!shprBondedId) {
-                missingFields.push('海關監管編號');
-            }
-        
-            // 檢查 SELLER_ITEM_CODE（每個項次）
-            document.querySelectorAll('.item-row').forEach(item => {
-                let element = item.querySelector('.SELLER_ITEM_CODE');
-                if (!element || !element.value.trim()) {
-                    missingFields.push('買方料號');
-                }
-            });
-        
-            if (missingFields.length > 0) {
-                alert(`當報單類別為 B6 時，下列欄位需填列：\n${[...new Set(missingFields)].join('、')}`);
-                return;
+                alert('當報單類別為 B6 時，海關監管編號需填列');
+                return; // 中止匯出過程
             }
         }
-        
-        // ❗ 非 B6 → 完全不檢查（不要 else）
+
+        // 如果 DCL_DOC_TYPE 是 B6，還需要檢查 SELLER_ITEM_CODE
+        if (['B6'].includes(dclDocType)) {
+            itemRequiredFields.push(
+                { className: 'SELLER_ITEM_CODE', name: '買方料號' },
+            );
+        }
 
         let itemContainer = document.querySelectorAll("#item-container .item-row");
         let itemNoCheckedCount = 0; // 用來計算連續勾選大品名註記的次數
