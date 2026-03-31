@@ -264,38 +264,31 @@ document.addEventListener('DOMContentLoaded', function () {
             { className: 'ORG_COUNTRY', name: '生產國別' }
         ];
 
-        // B6：只檢查海關監管編號（不再檢查買方料號）
+        // B6：SHPR_BONDED_ID + 買方料號 必填
         if (['B6'].includes(dclDocType)) {
-            let shprBondedId = document.getElementById('SHPR_BONDED_ID')?.value.trim();
-        
-            if (!shprBondedId) {
-                alert('當報單類別為 B6 時，海關監管編號需填列');
-                return;
-            }
-        
-        } else {
-            // 非 B6：不得填列 海關監管編號、買方料號
-            let invalidFields = [];
+            let missingFields = [];
         
             // 檢查 SHPR_BONDED_ID
-            let shprBondedIdElement = document.getElementById('SHPR_BONDED_ID');
-            if (shprBondedIdElement && shprBondedIdElement.value.trim()) {
-                invalidFields.push('海關監管編號');
+            let shprBondedId = document.getElementById('SHPR_BONDED_ID')?.value.trim();
+            if (!shprBondedId) {
+                missingFields.push('海關監管編號');
             }
         
-            // 檢查 SELLER_ITEM_CODE（買方料號）
+            // 檢查 SELLER_ITEM_CODE（每個項次）
             document.querySelectorAll('.item-row').forEach(item => {
                 let element = item.querySelector('.SELLER_ITEM_CODE');
-                if (element && element.value && element.value.trim()) {
-                    invalidFields.push('買方料號');
+                if (!element || !element.value.trim()) {
+                    missingFields.push('買方料號');
                 }
             });
         
-            if (invalidFields.length > 0) {
-                alert(`報單類別不是 B6，下列欄位不得填列：\n${invalidFields.join('、')}`);
+            if (missingFields.length > 0) {
+                alert(`當報單類別為 B6 時，下列欄位需填列：\n${[...new Set(missingFields)].join('、')}`);
                 return;
             }
         }
+        
+        // ❗ 非 B6 → 完全不檢查（不要 else）
 
         let itemContainer = document.querySelectorAll("#item-container .item-row");
         let itemNoCheckedCount = 0; // 用來計算連續勾選大品名註記的次數
