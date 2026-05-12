@@ -704,9 +704,7 @@
 // 過濾非可見字符、控制代碼及無效字符
 function cleanXmlValue(value) {
   return String(value ?? '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\u3000/g, ' ')
-    .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
-    .replace(/ {2,}/g, ' ')
+    .replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
+    .replace(/[\u00A0]/g, ' ')
     .trim();
 }
