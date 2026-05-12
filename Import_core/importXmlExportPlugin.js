@@ -481,7 +481,7 @@
       xml +=
         `  <fields>\n` +
         `    <field_name>${f}</field_name>\n` +
-        `    <field_value>${escapeXmlFn(v)}</field_value>\n` +
+        `    <field_value>${escapeXmlFn(cleanXmlValue(v))}</field_value>\n` +
         `  </fields>\n`;
     }
 
@@ -517,7 +517,7 @@
         xml +=
           `    <fields>\n` +
           `      <field_name>${f}</field_name>\n` +
-          `      <field_value>${escapeXmlFn(v)}</field_value>\n` +
+          `      <field_value>${escapeXmlFn(cleanXmlValue(v))}</field_value>\n` +
           `    </fields>\n`;
       }
 
@@ -700,3 +700,13 @@
   // 方便在 console 測試
   window.buildImportXmlByPlugin = buildImportXml;
 })();
+
+// 過濾非可見字符、控制代碼及無效字符
+function cleanXmlValue(value) {
+  return String(value ?? '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\u3000/g, ' ')
+    .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
+    .replace(/ {2,}/g, ' ')
+    .trim();
+}
