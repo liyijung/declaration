@@ -687,18 +687,13 @@ document.addEventListener('DOMContentLoaded', function () {
         headerFields.forEach(id => {
             let element = document.getElementById(id);
             if (element) {
-                let value = element.value || '';
+                let value = escapeXml(element.value);
 
                 // 過濾非可見字符、控制代碼及無效字符
-                value = value
-                    .replace(/\u00A0/g, ' ')
-                    .replace(/\u3000/g, ' ')
-                    .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
-                    .replace(/ {2,}/g, ' ')
+                value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
+                    .replace(/[\u00A0]/g, ' ')
                     .trim();
-                
-                value = escapeXml(value);
-                
+
                 // 對 CURRENCY 欄位進行特殊處理
                 if (id === 'CURRENCY') {
                     value = value.toUpperCase(); // 將值轉為大寫
@@ -785,19 +780,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    // 過濾非可見字符、控制代碼及無效字符
-                    let finalRemark1Value = remark1Element.value || '';
-                    
-                    finalRemark1Value = finalRemark1Value
-                        .replace(/\u00A0/g, ' ')
-                        .replace(/\u3000/g, ' ')
-                        .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
-                        .replace(/ {2,}/g, ' ')
-                        .trim();
-                    
-                    finalRemark1Value = escapeXml(finalRemark1Value);
-
-                    // 將 `REMARK1` 加入 XML                    
+                    // 將 `REMARK1` 加入 XML
+                    let finalRemark1Value = escapeXml(remark1Element.value.trim());
                     xmlContent += `  <fields>\n    <field_name>${id}</field_name>\n    <field_value>${finalRemark1Value}</field_value>\n  </fields>\n`;
 
                     return; // 避免 `headerFields.forEach` 繼續處理 `REMARK1`
@@ -830,13 +814,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     value = item.querySelector(`.${className}`).checked ? 'Y' : '';
                 } else {
                     value = item.querySelector(`.${className}`).value || '';
-                    value = value
-                        .replace(/\u00A0/g, ' ')
-                        .replace(/\u3000/g, ' ')
-                        .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
-                        .replace(/ {2,}/g, ' ')
+                    value = value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFFF9-\uFFFB\uFFFE\uFFFF]/g, '')
+                        .replace(/[\u00A0]/g, ' ')
                         .trim();
-                    
                     value = escapeXml(value);
 
                     // 替換單位及稅則
