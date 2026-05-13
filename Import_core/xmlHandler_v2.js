@@ -283,13 +283,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         let itemContainer = document.querySelectorAll("#item-container .item-row");
-        let itemNoCheckedCount = 0; // 用來計算連續勾選大品名註記的次數
 
         for (let item of itemContainer) {
             let itemNoChecked = item.querySelector('.ITEM_NO').checked;
 
             if (itemNoChecked) { // 若 ITEM_NO 已勾選
-                itemNoCheckedCount++; // 計算連續勾選次數
 
                 // 檢查 DESCRIPTION 是否有值
                 let descriptionElement = item.querySelector('.DESCRIPTION');
@@ -315,9 +313,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
             } else { // 若 ITEM_NO 未勾選，進行其他檢查
-
-                // 若未勾選大品名註記，將計數重置
-                itemNoCheckedCount = 0;
 
                 let itemMissingFields = [];
 
