@@ -360,12 +360,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     return; // 中止匯出過程
                 }
             }
-
-            // 檢查是否有連續兩個以上的「大品名註記」勾選
-            if (itemNoCheckedCount > 1) {
-                alert('大品名註記不可連續勾選兩個以上');
-                return; // 中止匯出過程
-            }
         }
 
         // ✅ 檢查：項次金額加總是否等於總金額 CAL_IP_TOT_ITEM_AMT
