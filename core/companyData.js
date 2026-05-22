@@ -81,13 +81,13 @@ function searchData(showErrorMessage = false) {
                     clearSHPRFields(); // 清空欄位
                     noDataMessage.style.display = 'inline'; // 顯示"查無資料"訊息
                     
-                    // 查找出口備註是否有 "未向國際貿易署登記出進口廠商資料者"
+                    // 查找備註是否有 "未向國際貿易署登記出進口廠商資料者"
                     checkUnregisteredCompany(searchCode);
                 }
             }
         });
     }
-    thingsToNote(); // 出口備註
+    thingsToNote(); // 備註
 }
 
 // 覆蓋更新
@@ -166,9 +166,18 @@ function clearSHPRFields() {
 
 // 查找未登記公司
 function checkUnregisteredCompany(SHPR_BAN_ID) {
-    fetch('./Export_format/thingsToNote.xlsx')
+    const url = window.location.href.toLowerCase();
+
+    const filePath =
+        url.includes('import') ||
+        url.includes('mode=import') ||
+        url.includes('#import')
+            ? './Import_format/thingsToNote.xlsx'
+            : './Export_format/thingsToNote.xlsx';
+
+    fetch(filePath)
         .then(response => {
-            if (!response.ok) throw new Error('無法讀取出口備註');
+            if (!response.ok) throw new Error('無法讀取備註');
             return response.arrayBuffer();
         })
         .then(data => {
@@ -216,8 +225,8 @@ function checkUnregisteredCompany(SHPR_BAN_ID) {
             }
         })
         .catch(error => {
-            console.error('讀取出口備註時發生錯誤:', error);
-            alert('讀取出口備註失敗');
+            console.error('讀取備註時發生錯誤:', error);
+            alert('讀取備註失敗');
         });
 }
 
