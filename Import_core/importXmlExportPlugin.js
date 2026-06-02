@@ -184,7 +184,7 @@
       DCL_COMP_ID: 'B',              // 報關分公司
       BROKER_BOX_NO: '709',          // 箱號
       LICENCED_AGENT_NO: '00755',    // 專責代碼
-      INS_RATE: '0.0011',　　　　　　// 保險費率
+      INS_RATE: '',　　　　　　      // 保險費率
       COMBINE_DECLAR: 'N',           // 單證合一註記節點
       AIR_SEA: '4',                  // 海空運別
       TRANS_VIA: '42',               // 運輸方式
