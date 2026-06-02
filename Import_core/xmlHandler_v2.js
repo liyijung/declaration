@@ -675,12 +675,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         headerFields.forEach(id => {
 
-            // INS_RATE 不存在於網頁，匯出 XML 時固定帶 0.0011
+            // INS_RATE 不存在於網頁，匯出 XML 時固定為空
             if (id === 'INS_RATE') {
                 xmlContent +=
                     `  <fields>\n` +
                     `    <field_name>INS_RATE</field_name>\n` +
-                    `    <field_value>0.0011</field_value>\n` +
+                    `    <field_value></field_value>\n` +
                     `  </fields>\n`;
                 return;
             }
