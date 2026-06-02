@@ -634,7 +634,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'ARRIVAL_DATE', 'ACCEPTANCE_DATE', 'EXIT_DATE', 'JOURNEY_ID', 'LOADING_LOCATION',
             'TOT_CTN', 'DOC_CTN_UM', 'CTN_DESC', 'DCL_GW', 'DCL_NW',
             'DCL_DOC_TYPE', 'TERMS_SALES', 'CURRENCY', 'CAL_IP_TOT_ITEM_AMT',
-            'FRT_AMT', 'INS_AMT', 'ADD_AMT', 'SUBTRACT_AMT',
+            'FRT_AMT', 'INS_AMT', 'INS_RATE', 'ADD_AMT', 'SUBTRACT_AMT',
             'DOC_MARKS_DESC', 'DOC_OTR_DESC', 'MEMO2', 'REMARK1',
             'FAC_BAN_ID_EX', 'FAC_BONDED_ID_EX',
             'FAC_BAN_ID', 'FAC_BONDED_ID', 'IN_BONDED_BAN', 'IN_BONDED_CODE',
@@ -674,6 +674,17 @@ document.addEventListener('DOMContentLoaded', function () {
         xmlContent += `  <fields>\n    <field_name>SHPR_AEO</field_name>\n    <field_value>${shprAeo}</field_value>\n  </fields>\n`;
 
         headerFields.forEach(id => {
+
+            // INS_RATE 不存在於網頁，匯出 XML 時固定帶 0.0011
+            if (id === 'INS_RATE') {
+                xmlContent +=
+                    `  <fields>\n` +
+                    `    <field_name>INS_RATE</field_name>\n` +
+                    `    <field_value>0.0011</field_value>\n` +
+                    `  </fields>\n`;
+                return;
+            }
+            
             let element = document.getElementById(id);
             if (element) {
                 let value = escapeXml(element.value);
