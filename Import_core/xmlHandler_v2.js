@@ -433,13 +433,27 @@ document.addEventListener('DOMContentLoaded', function () {
         
             const diff = round2(sumItems2 - headerTotal2);
         
-            alert(
-                `項次金額加總與總金額不一致，請確認：\n` +
-                `項次加總(金額) = ${sumItems2}\n` +
-                `總金額 = ${headerTotal2}\n` +
-                `差額(項次-總額) = ${diff}`
+            const exchangeRate = parseFloat(
+                document.getElementById('usd-exchange-rate')?.value || 0
             );
-            return;
+        
+            if (!exchangeRate || isNaN(exchangeRate)) {
+                alert('匯率尚未取得，請重新查詢匯率');
+                return;
+            }
+        
+            const diffTWD = Math.round(diff * exchangeRate);
+        
+            if (diffTWD >= 20) {
+                alert(
+                    `項次金額加總與總金額不一致，請確認：\n` +
+                    `項次加總(金額) = ${sumItems2}\n` +
+                    `總金額 = ${headerTotal2}\n` +
+                    `差額(項次-總額) = ${diff}\n` +
+                    `差額(台幣) = ${diffTWD}`
+                );
+                return;
+            }
         }
         
         // 欄位碼數檢查設定
