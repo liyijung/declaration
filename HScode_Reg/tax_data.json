@@ -24411,7 +24411,7 @@
         "統計重量單位": "TNE",
         "稽徵規定": "G ",
         "輸入規定": "402 465 B01 MW0 ",
-        "輸出規定": ""
+        "輸出規定": "441 "
     },
     {
         "貨品分類號列": "12023020004",
@@ -24424,7 +24424,7 @@
         "統計重量單位": "TNE",
         "稽徵規定": "G ",
         "輸入規定": "402 465 B01 MW0 ",
-        "輸出規定": ""
+        "輸出規定": "441 "
     },
     {
         "貨品分類號列": "12024100005",
@@ -129267,7 +129267,7 @@
         "第三欄稅率": "7.5%",
         "統計數量單位": "SET",
         "統計重量單位": "KGM",
-        "稽徵規定": "",
+        "稽徵規定": "Z ",
         "輸入規定": "",
         "輸出規定": ""
     },
@@ -145028,7 +145028,33 @@
         "輸出規定": ""
     },
     {
-        "貨品分類號列": "85258910208",
+        "貨品分類號列": "85258910315",
+        "中文貨名": "微型攝影機（含模組），已組裝於、或設計用於組裝至日常用品或其他電器用品中者（例如：書寫工具、鈕扣、眼鏡、手錶或ＵＳＢ　隨身碟），且鏡頭尺寸小於２ｃｍ（長）＊２ｃｍ（寬），具無線電功能",
+        "英文貨名": "Miniature television cameras (including modules), assembled into, or designed for assembly into, everyday articles or other electrical appliances (for example, writing instruments, buttons, spectacles, watches or USB flash drives), with lens dimensions of less than 2 cm (length) �2 cm (width), and with radio function",
+        "第一欄稅率": "0%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,CN,NZ,SG,MH)",
+        "第三欄稅率": "7.5%",
+        "統計數量單位": "SET",
+        "統計重量單位": "KGM",
+        "稽徵規定": "",
+        "輸入規定": "602 C02 ",
+        "輸出規定": ""
+    },
+    {
+        "貨品分類號列": "85258910397",
+        "中文貨名": "其他微型攝影機（含模組），已組裝於、或設計用於組裝至日常用品或其他電器用品中者（例如：書寫工具、鈕扣、眼鏡、手錶或ＵＳＢ　隨身碟），且鏡頭尺寸小於２ｃｍ（長）＊２ｃｍ（寬）",
+        "英文貨名": "Other miniature television cameras (including modules), assembled into, or designed for assembly into, everyday articles or other electrical appliances (for example, writing instruments, buttons, spectacles, watches or USB flash drives), with lens dimensions of less than 2 cm (length) �2 cm (width).",
+        "第一欄稅率": "0%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,CN,NZ,SG,MH)",
+        "第三欄稅率": "7.5%",
+        "統計數量單位": "SET",
+        "統計重量單位": "KGM",
+        "稽徵規定": "",
+        "輸入規定": "C02 ",
+        "輸出規定": ""
+    },
+    {
+        "貨品分類號列": "85258910404",
         "中文貨名": "其他電視攝影機，具無線電功能",
         "英文貨名": "Other television cameras, with radio function",
         "第一欄稅率": "0%",
@@ -145054,7 +145080,33 @@
         "輸出規定": ""
     },
     {
-        "貨品分類號列": "85258990103",
+        "貨品分類號列": "85258990210",
+        "中文貨名": "微型攝錄機（含模組），已組裝於、或設計用於組裝至日常用品或其他電器用品中者（例如：書寫工具、鈕扣、眼鏡、手錶或ＵＳＢ　隨身碟），且鏡頭尺寸小於２ｃｍ（長）＊２ｃｍ（寬），具無線電功能",
+        "英文貨名": "Miniature digital still image video cameras and digital cameras (including modules), assembled into, or designed for assembly into, everyday articles or other electrical appliances (for example, writing instruments, buttons, spectacles, watches or USB flash drives), with lens dimensions of less than 2 cm (length) �2 cm (width), and with radio function.",
+        "第一欄稅率": "0%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,NZ,SG,MH)",
+        "第三欄稅率": "15%",
+        "統計數量單位": "SET",
+        "統計重量單位": "KGM",
+        "稽徵規定": "",
+        "輸入規定": "602 C02 ",
+        "輸出規定": ""
+    },
+    {
+        "貨品分類號列": "85258990292",
+        "中文貨名": "其他微型攝錄機（含模組），已組裝於、或設計用於組裝至日常用品或其他電器用品中者（例如：書寫工具、鈕扣、眼鏡、手錶或ＵＳＢ　隨身碟），且鏡頭尺寸小於２ｃｍ（長）＊２ｃｍ（寬）",
+        "英文貨名": "Other miniature digital still image video cameras and digital cameras (including modules), assembled into, or designed for assembly into, everyday articles or other electrical appliances (for example, writing instruments, buttons, spectacles, watches or USB flash drives), with lens dimensions of less than 2 cm (length) �2 cm (width).",
+        "第一欄稅率": "0%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,NZ,SG,MH)",
+        "第三欄稅率": "15%",
+        "統計數量單位": "SET",
+        "統計重量單位": "KGM",
+        "稽徵規定": "",
+        "輸入規定": "C02 ",
+        "輸出規定": ""
+    },
+    {
+        "貨品分類號列": "85258990309",
         "中文貨名": "其他數位相機及影像攝錄機，具無線電功能",
         "英文貨名": "Other digital still image video cameras and digital cameras, with radio function",
         "第一欄稅率": "0%",
