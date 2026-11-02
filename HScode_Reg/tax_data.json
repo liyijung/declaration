@@ -38532,9 +38532,22 @@
         "輸出規定": ""
     },
     {
-        "貨品分類號列": "24049100008",
-        "中文貨名": "以口服方式攝入尼古丁之含尼古丁產品",
-        "英文貨名": "Preparations containing nicotine, intended for the intake of nicotine into the human body by oral application",
+        "貨品分類號列": "24049100106",
+        "中文貨名": "以口服方式攝入尼古丁之含尼古丁產品，且非戒菸輔助用產品",
+        "英文貨名": "Preparations containing nicotine, intended for the intake of nicotine into the human body by oral application, and not to assist smokers to stop smoking",
+        "第一欄稅率": "5%",
+        "第二欄稅率": "0% (PA,GT,NI,SV,HN,NZ,SG)",
+        "第三欄稅率": "50%",
+        "統計數量單位": "",
+        "統計重量單位": "KGM",
+        "稽徵規定": "",
+        "輸入規定": "111 MW0 ",
+        "輸出規定": ""
+    },
+    {
+        "貨品分類號列": "24049100909",
+        "中文貨名": "其他以口服方式攝入尼古丁之含尼古丁產品",
+        "英文貨名": "Other preparations containing nicotine, intended for the intake of nicotine into the human body by oral application",
         "第一欄稅率": "5%",
         "第二欄稅率": "0% (PA,GT,NI,SV,HN,NZ,SG)",
         "第三欄稅率": "50%",
